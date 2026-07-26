@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Curio base layer — Design Tokens §8 (Cosmic vs Archive).
+ *
+ * Archive (light) is the default surface for the connected web app, so the
+ * :root variables carry the light values. `.dark` (Cosmic) is applied by the
+ * theme toggle in a later chantier. These CSS variables let components read
+ * mode-aware colors without conditional class logic; the raw hex utilities in
+ * tailwind.config.ts stay available for fixed brand accents.
+ */
+:root {
+  --background: #fafbf2; /* archive */
+  --foreground: #111111; /* text-dark */
+  --button-primary: #0b0e14; /* button-primary-light */
+  --button-text: #fafbf2;
+}
+
+.dark {
+  --background: #0d0e15; /* cosmic */
+  --foreground: #fafbf2; /* archive */
+  --button-primary: #785cff; /* violet */
+  --button-text: #fafbf2;
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}

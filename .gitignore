@@ -33,6 +33,8 @@ lpt[1-9].*
 !.env.example
 node_modules/
 .next/
+# TypeScript incremental build cache
+*.tsbuildinfo
 dist/
 build/
 __pycache__/

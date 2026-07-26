@@ -1,0 +1,18 @@
+{
+  "Meta": {
+    "siteName": "Curio",
+    "defaultTitle": "Curio — L'internet qui vaut la peine d'être gardé",
+    "defaultDescription": "Curio est un réseau social de curation. Sauvegardez, organisez et partagez les liens qui comptent."
+  },
+  "Setup": {
+    "eyebrow": "PHASE 1 · FONDATIONS",
+    "title": "Le setup Curio est en ligne",
+    "accent": "à garder",
+    "titleSuffix": "L'internet",
+    "body": "Ce placeholder valide les tokens du design system : Instrument Serif en display, Inter pour l'UI, fond Archive par défaut.",
+    "tokensHeading": "Tokens du design system",
+    "supabaseOk": "Supabase (EU Frankfurt) joignable",
+    "supabaseWaiting": "Supabase non configuré — renseigner les variables d'env",
+    "localeLabel": "Locale active"
+  }
+}
