@@ -1,6 +1,8 @@
 
 # ── GSD baseline (auto-generated) ──
-.gsd
+.gsd/*
+# Track project knowledge in git (durable project rules; not a work artifact)
+!.gsd/KNOWLEDGE.md
 .gsd-worktrees/
 .gsd-backups/
 .gsd-id
