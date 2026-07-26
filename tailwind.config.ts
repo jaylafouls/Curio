@@ -44,6 +44,11 @@ const config: Config = {
     },
     extend: {
       colors: {
+        // Mode-aware surface + text. Backed by the R G B channel vars in
+        // globals.css so opacity modifiers work (e.g. text-foreground/70); the
+        // value flips between Archive and Cosmic with the `.dark` class.
+        background: 'rgb(var(--background) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
         // Brand palette — CONFIRMED (§1.1)
         cosmic: '#0D0E15', // dark background
         archive: '#FAFBF2', // light background (web default)
