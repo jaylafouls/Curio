@@ -10,25 +10,30 @@
  * theme toggle in a later chantier. These CSS variables let components read
  * mode-aware colors without conditional class logic; the raw hex utilities in
  * tailwind.config.ts stay available for fixed brand accents.
+ *
+ * --background / --foreground are stored as space-separated R G B channels (not
+ * hex) so Tailwind can compose them with an alpha value: `text-foreground/70`
+ * compiles to `rgb(var(--foreground) / 0.7)`. The `bg`/`fg` helper vars keep
+ * the plain hex around for `background-color`/`color` and any rgb() call sites.
  */
 :root {
-  --background: #fafbf2; /* archive */
-  --foreground: #111111; /* text-dark */
+  --background: 250 251 242; /* archive #fafbf2 */
+  --foreground: 17 17 17; /* text-dark #111111 */
   --button-primary: #0b0e14; /* button-primary-light */
   --button-text: #fafbf2;
 }
 
 .dark {
-  --background: #0d0e15; /* cosmic */
-  --foreground: #fafbf2; /* archive */
+  --background: 13 14 21; /* cosmic #0d0e15 */
+  --foreground: 250 251 242; /* archive #fafbf2 */
   --button-primary: #785cff; /* violet */
   --button-text: #fafbf2;
 }
 
 @layer base {
   body {
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
     font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
