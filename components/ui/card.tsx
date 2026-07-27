@@ -102,7 +102,7 @@ export function CollectionCard({
   }
 
   return (
-    <article className={cn(cardBase, 'bg-white/40', className)}>
+    <article className={cn(cardBase, 'bg-foreground/[0.03]', className)}>
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-violet-soft/20">
         {cover ? (
           <img
@@ -137,6 +137,13 @@ export function CollectionCard({
   )
 }
 
+// Deterministic follower grouping. `Number.prototype.toLocaleString()` with no
+// argument uses the *ambient runtime* locale, which differs between the Node
+// server (grouping "24,300") and a FR-locale browser ("24 300"), causing a
+// hydration mismatch. Pinning an explicit locale keeps SSR and client output
+// identical. Later locale-aware chantiers can lift this to the route locale.
+const FOLLOWER_FORMAT = new Intl.NumberFormat('en-US')
+
 export interface CuratorCardProps {
   name: string
   topic: BadgeTopic
@@ -162,7 +169,7 @@ export function CuratorCard({
   return (
     <article
       className={cn(
-        'flex w-full flex-col items-center gap-md rounded-lg border border-border-light bg-white/40 p-lg text-center transition-shadow duration-base hover:shadow-md',
+        'flex w-full flex-col items-center gap-md rounded-lg border border-border-light bg-foreground/[0.03] p-lg text-center transition-shadow duration-base hover:shadow-md',
         className,
       )}
     >
@@ -176,7 +183,7 @@ export function CuratorCard({
       <p className="font-sans text-body-small text-foreground/70">{bio}</p>
       <div className="flex items-center gap-xs font-sans text-meta text-foreground/60">
         <Users className="size-3.5" strokeWidth={2} aria-hidden />
-        {followers.toLocaleString()} followers
+        {FOLLOWER_FORMAT.format(followers)} followers
       </div>
       {action ? <div className="pt-xs">{action}</div> : null}
     </article>

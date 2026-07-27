@@ -31,7 +31,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   // The border + ring live on a wrapper so the search icon sits inside the
   // same focus target and the ring wraps the whole control.
   const shell = cn(
-    'flex items-center gap-sm border bg-white/40 transition-colors duration-fast',
+    'flex items-center gap-sm border bg-foreground/[0.03] transition-colors duration-fast',
     variant === 'search'
       ? 'rounded-full px-md h-11'
       : 'rounded-sm px-md h-11',

@@ -36,18 +36,60 @@ export function Modal({
 
   useEffect(() => {
     if (!open) return
+    const panel = panelRef.current
+    // Remember the trigger so focus can be restored when the modal closes.
+    const previouslyFocused = document.activeElement as HTMLElement | null
+
+    // Focusable descendants, recomputed per-key so it tracks dynamic content.
+    const getFocusable = () =>
+      panel
+        ? Array.from(
+            panel.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter((el) => el.offsetParent !== null || el === document.activeElement)
+        : []
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab') return
+      // Trap Tab/Shift+Tab within the panel so focus can't reach the
+      // backgrounded page while aria-modal claims the dialog is exclusive.
+      const focusable = getFocusable()
+      if (focusable.length === 0) {
+        // Nothing focusable inside — keep focus on the panel itself.
+        e.preventDefault()
+        panel?.focus()
+        return
+      }
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const active = document.activeElement
+      if (e.shiftKey) {
+        if (active === first || active === panel) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else if (active === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
+
     document.addEventListener('keydown', onKey)
     // Lock background scroll while open.
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     // Move focus into the panel for keyboard + screen-reader users.
-    panelRef.current?.focus()
+    panel?.focus()
     return () => {
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = prevOverflow
+      // Return focus to the element that opened the modal.
+      previouslyFocused?.focus?.()
     }
   }, [open, onClose])
 
