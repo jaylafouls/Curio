@@ -29,7 +29,9 @@
   "SignUp": {
     "metaTitle": "Sign up or log in",
     "metaDescription": "Join a universe of human curiosity. Continue with Apple, Google or email.",
-    "title": "Welcome to Curio.",
+    "titleBefore": "Welcome to ",
+    "titleAccent": "Curio",
+    "titleAfter": ".",
     "subtitle": "Join a universe of human curiosity.",
     "loginTitle": "Welcome back.",
     "loginSubtitle": "Log in to your universe of human curiosity.",

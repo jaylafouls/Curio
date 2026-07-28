@@ -50,16 +50,20 @@ export default async function WelcomePage({ params, searchParams }: PageProps) {
     // palette for this public landing regardless of any theme_preference, which
     // only applies once connected (web). The connected app keeps Archive default.
     <div className="dark">
-      <main className="relative flex min-h-screen flex-col items-center overflow-hidden bg-cosmic px-lg py-3xl text-foreground">
-        <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center gap-2xl text-center">
-          <div className="flex flex-col items-center gap-md">
-            <OrbitalLogo label={t('logoAlt')} size={104} />
+      <main className="relative flex min-h-screen flex-col items-center overflow-hidden bg-cosmic px-lg pb-3xl pt-4xl text-foreground">
+        {/* Top-anchored to match the mockup rhythm: logo + wordmark high on the
+            screen, tagline tight beneath, CTAs pushed to the bottom via mt-auto.
+            max-w-sm (384px) keeps the block within the padded content area on
+            narrow phone widths so the primary CTA never overflows. */}
+        <div className="flex w-full max-w-sm flex-1 flex-col items-center gap-2xl text-center">
+          <div className="flex flex-col items-center gap-sm">
+            <OrbitalLogo label={t('logoAlt')} size={96} />
             <span className="font-serif text-h3 tracking-tight text-foreground">
               curio
             </span>
           </div>
 
-          <div className="flex flex-col items-center gap-lg">
+          <div className="flex flex-col items-center gap-md">
             <AccentText
               before={t('tagBefore')}
               accent={t('tagAccent')}
@@ -67,7 +71,7 @@ export default async function WelcomePage({ params, searchParams }: PageProps) {
               as="h1"
               className="text-balance"
             />
-            <p className="max-w-sm font-sans text-body text-foreground/70">
+            <p className="font-sans text-body text-foreground/70">
               {t('body')}
             </p>
 
@@ -81,7 +85,7 @@ export default async function WelcomePage({ params, searchParams }: PageProps) {
             ) : null}
           </div>
 
-          <div className="flex w-full flex-col items-center gap-md">
+          <div className="mt-auto flex w-full flex-col items-center gap-md">
             {/* Primary CTA → écran 02. Rendered as a locale-aware Link styled as
                 the pill Button (Button is <button>; we need an anchor here). */}
             <Link

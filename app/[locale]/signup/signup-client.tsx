@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Apple, Mail, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Link } from '@/lib/i18n/navigation'
-import { Input } from '@/components/ui'
+import { AccentText, Input } from '@/components/ui'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
@@ -95,15 +95,28 @@ export function SignUpClient({
     setStage(error ? 'error' : 'sent')
   }
 
-  const title = mode === 'signup' ? t('title') : t('loginTitle')
   const subtitle = mode === 'signup' ? t('subtitle') : t('loginSubtitle')
 
   return (
     <div className="flex w-full max-w-sm flex-1 flex-col justify-center gap-2xl py-3xl">
       <header className="flex flex-col gap-sm text-center">
-        <h1 className="font-serif text-h1 leading-tight text-foreground">
-          {title}
-        </h1>
+        {/* Signup title accents "Curio" in italic violet (mockup §2, the
+            recurring brand pattern). Login title stays plain — the mockup only
+            accents the welcome headline. */}
+        {mode === 'signup' ? (
+          <AccentText
+            before={t('titleBefore')}
+            accent={t('titleAccent')}
+            after={t('titleAfter')}
+            size="h1"
+            as="h1"
+            className="text-balance"
+          />
+        ) : (
+          <h1 className="font-serif text-h1 leading-tight text-foreground">
+            {t('loginTitle')}
+          </h1>
+        )}
         <p className="font-sans text-body text-foreground/70">{subtitle}</p>
       </header>
 
