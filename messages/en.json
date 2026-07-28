@@ -61,5 +61,75 @@
     "errorTitle": "Sign-in link expired",
     "errorBody": "This sign-in link is invalid or has expired. Request a new one to continue.",
     "errorCta": "Back to sign in"
+  },
+  "Onboarding": {
+    "metaTitle": "Set up your universe",
+    "metaDescription": "Tell Curio what you're curious about, follow curators and create your universe.",
+    "logoAlt": "Curio",
+    "stepLabel": "Step {current}/{total}",
+    "back": "Back",
+    "continue": "Continue",
+    "saving": "Saving…",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "interests": {
+      "titleBefore": "What are you ",
+      "titleAccent": "curious",
+      "titleAfter": " about?",
+      "subtitle": "Pick a few topics to shape your universe. You can change these anytime.",
+      "minHint": "Choose at least one topic to continue."
+    },
+    "curators": {
+      "titleBefore": "Follow curators you ",
+      "titleAccent": "love",
+      "subtitle": "People worth following, picked from the topics you chose.",
+      "follow": "Follow",
+      "following": "Following",
+      "emptyTitle": "Curators are coming soon",
+      "emptyBody": "We're welcoming our first curators right now. Once they're here, you'll find people to follow based on your topics — for now, let's finish setting up your universe.",
+      "skip": "Skip for now"
+    },
+    "universe": {
+      "titleBefore": "Name your ",
+      "titleAccent": "universe",
+      "subtitle": "Your universe is your corner of Curio. Give it a name and a colour.",
+      "nameLabel": "Universe name",
+      "namePlaceholder": "My Universe",
+      "counter": "{count}/{max}",
+      "colorLabel": "Universe colour",
+      "colorViolet": "Violet",
+      "colorBeige": "Beige",
+      "colorVert": "Green",
+      "colorBleu": "Blue",
+      "colorRose": "Pink",
+      "submit": "Create my universe",
+      "nameRequired": "Give your universe a name to continue."
+    },
+    "ready": {
+      "title": "Your space is ready!",
+      "body": "{name} is live. Time to fill it with the internet worth keeping.",
+      "bodyNoName": "Your universe is live. Time to fill it with the internet worth keeping.",
+      "cta": "Start exploring"
+    },
+    "allSet": {
+      "titleBefore": "You're all ",
+      "titleAccent": "set",
+      "subtitle": "Here's how Curio works.",
+      "saveTitle": "Save anything",
+      "saveBody": "From anywhere — links, ideas and places that inspire you.",
+      "organizeTitle": "Organize beautifully",
+      "organizeBody": "In collections that make your universe yours.",
+      "discoverTitle": "Discover through people",
+      "discoverBody": "Explore new perspectives from curious minds.",
+      "cta": "Let's go"
+    }
+  },
+  "Home": {
+    "metaTitle": "Home",
+    "greetingMorning": "Good morning, {name}",
+    "greetingAfternoon": "Good afternoon, {name}",
+    "greetingEvening": "Good evening, {name}",
+    "tabForYou": "For you",
+    "tabFollowing": "Following",
+    "tabTrending": "Trending"
   }
 }
