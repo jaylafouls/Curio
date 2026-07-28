@@ -14,5 +14,50 @@
     "supabaseOk": "Supabase (EU Frankfurt) reachable",
     "supabaseWaiting": "Supabase not configured yet — set the env vars",
     "localeLabel": "Active locale"
+  },
+  "Welcome": {
+    "metaTitle": "Welcome to Curio",
+    "metaDescription": "The internet worth keeping. Save links, ideas and places that inspire you, and discover the universes of curious minds.",
+    "tagBefore": "The internet worth ",
+    "tagAccent": "keeping.",
+    "body": "Save links, ideas and places that inspire you. Discover the universes of curious minds.",
+    "ctaBuild": "Build your universe",
+    "ctaExplore": "Explore",
+    "invalidToken": "This invitation link is no longer valid, but you can still join Curio.",
+    "logoAlt": "Curio"
+  },
+  "SignUp": {
+    "metaTitle": "Sign up or log in",
+    "metaDescription": "Join a universe of human curiosity. Continue with Apple, Google or email.",
+    "title": "Welcome to Curio.",
+    "subtitle": "Join a universe of human curiosity.",
+    "loginTitle": "Welcome back.",
+    "loginSubtitle": "Log in to your universe of human curiosity.",
+    "continueApple": "Continue with Apple",
+    "continueGoogle": "Continue with Google",
+    "continueEmail": "Continue with email",
+    "or": "or",
+    "logInLink": "Log in",
+    "signUpLink": "Sign up",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "emailSubmit": "Send magic link",
+    "emailSubmitSending": "Sending…",
+    "back": "Back",
+    "magicLinkSent": "Check your inbox — we sent a magic link to {email}.",
+    "termsPrefix": "By continuing, you agree to Curio's ",
+    "terms": "Terms of Service",
+    "termsAnd": " and ",
+    "privacy": "Privacy Policy",
+    "termsSuffix": ".",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "errorEmail": "Please enter a valid email address.",
+    "providerUnavailable": "This sign-in method isn't available yet — try email for now."
+  },
+  "AuthCallback": {
+    "metaTitle": "Signing you in",
+    "errorTitle": "Sign-in link expired",
+    "errorBody": "This sign-in link is invalid or has expired. Request a new one to continue.",
+    "errorCta": "Back to sign in"
   }
 }

@@ -1,126 +1,105 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { buildMetadata } from '@/lib/seo/metadata'
-import { pingSupabase } from '@/lib/supabase/ping'
+import { checkInvitationToken } from '@/lib/auth/invitation'
+import { OrbitalLogo } from '@/components/brand/orbital-logo'
+import { AccentText } from '@/components/ui'
+import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 
-type PageProps = { params: Promise<{ locale: Locale }> }
+type PageProps = {
+  params: Promise<{ locale: Locale }>
+  searchParams: Promise<{ token?: string }>
+}
 
 /**
- * generateMetadata is present on the very first page (brief rule 1). It
- * delegates to the shared buildMetadata helper, so every future page gets
- * canonical + hreflang + OG for free by copying this three-line pattern.
+ * Écran 01 — Welcome (brief §1). Public landing, forced Cosmic (dark).
+ * generateMetadata present per brief rule 1.
  */
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params
-  const t = await getTranslations({ locale, namespace: 'Meta' })
+  const t = await getTranslations({ locale, namespace: 'Welcome' })
   return buildMetadata({
     locale,
-    title: t('defaultTitle'),
-    description: t('defaultDescription'),
-    siteName: t('siteName'),
+    title: t('metaTitle'),
+    description: t('metaDescription'),
+    siteName: (await getTranslations({ locale, namespace: 'Meta' }))('siteName'),
     path: '',
   })
 }
 
-// Topic badge tokens — rendered as swatches to verify the palette compiles
-// through Tailwind (Design Tokens §1.5). Order matches the tokens doc.
-const BADGES = [
-  'travel',
-  'design',
-  'food',
-  'books',
-  'culture',
-  'ideas',
-  'style',
-  'photography',
-  'beauty',
-  'wellness',
-] as const
-
-export default async function HomePage({ params }: PageProps) {
+export default async function WelcomePage({ params, searchParams }: PageProps) {
   const { locale } = await params
   setRequestLocale(locale)
-  const t = await getTranslations('Setup')
-  const ping = await pingSupabase()
+  const { token } = await searchParams
+  const t = await getTranslations('Welcome')
+
+  // Invitation token (brief §4): valid → nothing visually different; a token
+  // that is present but invalid/expired → short inline notice, then the normal
+  // Découvreur path. Absent → nothing.
+  const tokenState = await checkInvitationToken(token)
+
+  // Forward a still-valid token to the signup screen so redemption can happen
+  // at submit. An invalid one is dropped (user proceeds as Découvreur).
+  const signupHref = tokenState === 'valid' ? `/signup?token=${token}` : '/signup'
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-2xl px-lg py-4xl">
-      <header className="flex flex-col gap-md">
-        <p className="font-sans text-eyebrow uppercase text-olive">
-          {t('eyebrow')}
-        </p>
-        {/* font-serif = Instrument Serif 400; hierarchy by size only (§2.1).
-            Accented word in italic violet — the recurring brand pattern §2.3. */}
-        <h1 className="font-serif text-display leading-tight text-text-dark">
-          {t('titleSuffix')}{' '}
-          <em className="italic text-violet">{t('accent')}</em>
-        </h1>
-        <p className="max-w-2xl font-sans text-body text-text-dark/80">
-          {t('body')}
-        </p>
-      </header>
+    // Cosmic-fixed wrapper: `.dark` here (not on <html>) forces the Cosmic
+    // palette for this public landing regardless of any theme_preference, which
+    // only applies once connected (web). The connected app keeps Archive default.
+    <div className="dark">
+      <main className="relative flex min-h-screen flex-col items-center overflow-hidden bg-cosmic px-lg py-3xl text-foreground">
+        <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center gap-2xl text-center">
+          <div className="flex flex-col items-center gap-md">
+            <OrbitalLogo label={t('logoAlt')} size={104} />
+            <span className="font-serif text-h3 tracking-tight text-foreground">
+              curio
+            </span>
+          </div>
 
-      <section className="flex flex-col gap-lg">
-        <h2 className="font-serif text-h2 text-text-dark">
-          {t('tokensHeading')}
-        </h2>
-        <div className="grid grid-cols-2 gap-md sm:grid-cols-5">
-          {BADGES.map((name) => (
-            <div key={name} className="flex flex-col gap-xs">
-              <span
-                className={`h-16 rounded-lg border border-border-light bg-badge-${name}`}
-                aria-hidden
-              />
-              <span className="font-sans text-meta text-text-dark/70">
-                {name}
-              </span>
-            </div>
-          ))}
+          <div className="flex flex-col items-center gap-lg">
+            <AccentText
+              before={t('tagBefore')}
+              accent={t('tagAccent')}
+              size="display"
+              as="h1"
+              className="text-balance"
+            />
+            <p className="max-w-sm font-sans text-body text-foreground/70">
+              {t('body')}
+            </p>
+
+            {tokenState === 'invalid' ? (
+              <p
+                role="status"
+                className="max-w-sm font-sans text-body-small text-foreground/60"
+              >
+                {t('invalidToken')}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex w-full flex-col items-center gap-md">
+            {/* Primary CTA → écran 02. Rendered as a locale-aware Link styled as
+                the pill Button (Button is <button>; we need an anchor here). */}
+            <Link
+              href={signupHref}
+              className="inline-flex h-11 w-full items-center justify-center gap-sm rounded-full bg-violet px-lg font-sans text-body-small font-medium text-button-text shadow-glow-violet transition-colors duration-base hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2 focus-visible:ring-offset-cosmic"
+            >
+              {t('ctaBuild')}
+            </Link>
+            {/* Secondary CTA → /explore (Phase 2). Stub route redirects for now. */}
+            <Link
+              href="/explore"
+              className="inline-flex h-11 items-center justify-center rounded-full px-lg font-sans text-body-small text-foreground/80 transition-colors duration-base hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2 focus-visible:ring-offset-cosmic"
+            >
+              {t('ctaExplore')}
+            </Link>
+          </div>
         </div>
-
-        {/* Brand accents + a pill CTA to exercise radius.full, violet, shadow */}
-        <div className="flex flex-wrap items-center gap-md pt-md">
-          <button
-            type="button"
-            className="rounded-full bg-violet px-lg py-sm font-sans text-body-small text-button-text-on-dark transition-colors duration-base hover:bg-violet-soft hover:text-text-dark"
-          >
-            Curio CTA
-          </button>
-          <span className="rounded-full bg-beige px-md py-xs font-sans text-meta text-text-dark">
-            beige
-          </span>
-          <span className="rounded-full bg-olive px-md py-xs font-sans text-meta text-archive">
-            olive
-          </span>
-          <span className="rounded-full bg-brown-light px-md py-xs font-sans text-meta text-text-dark">
-            brown-light
-          </span>
-        </div>
-      </section>
-
-      <footer className="mt-auto flex flex-col gap-xs border-t border-border-light pt-lg font-sans text-body-small">
-        <p className="text-text-dark/70">
-          {t('localeLabel')}: <span className="font-medium">{locale}</span>
-        </p>
-        <p
-          className={
-            ping.status === 'ok'
-              ? 'text-olive'
-              : ping.status === 'error'
-                ? 'text-badge-food'
-                : 'text-text-dark/50'
-          }
-        >
-          {ping.status === 'ok'
-            ? `● ${t('supabaseOk')}`
-            : ping.status === 'error'
-              ? `● ${ping.message}`
-              : `○ ${t('supabaseWaiting')}`}
-        </p>
-      </footer>
-    </main>
+      </main>
+    </div>
   )
 }

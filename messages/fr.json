@@ -14,5 +14,50 @@
     "supabaseOk": "Supabase (EU Frankfurt) joignable",
     "supabaseWaiting": "Supabase non configuré — renseigner les variables d'env",
     "localeLabel": "Locale active"
+  },
+  "Welcome": {
+    "metaTitle": "Bienvenue sur Curio",
+    "metaDescription": "L'internet qui vaut la peine d'être gardé. Sauvegardez les liens, idées et lieux qui vous inspirent, et découvrez les univers des esprits curieux.",
+    "tagBefore": "The internet worth ",
+    "tagAccent": "keeping.",
+    "body": "Sauvegardez les liens, idées et lieux qui vous inspirent. Découvrez les univers des esprits curieux.",
+    "ctaBuild": "Build your universe",
+    "ctaExplore": "Explore",
+    "invalidToken": "Ce lien d'invitation n'est plus valide, mais vous pouvez tout de même rejoindre Curio.",
+    "logoAlt": "Curio"
+  },
+  "SignUp": {
+    "metaTitle": "Inscription ou connexion",
+    "metaDescription": "Rejoignez un univers de curiosité humaine. Continuez avec Apple, Google ou par e-mail.",
+    "title": "Welcome to Curio.",
+    "subtitle": "Join a universe of human curiosity.",
+    "loginTitle": "Bon retour.",
+    "loginSubtitle": "Connectez-vous à votre univers de curiosité humaine.",
+    "continueApple": "Continue with Apple",
+    "continueGoogle": "Continue with Google",
+    "continueEmail": "Continue with email",
+    "or": "ou",
+    "logInLink": "Log in",
+    "signUpLink": "Inscription",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "vous@exemple.com",
+    "emailSubmit": "Envoyer le lien magique",
+    "emailSubmitSending": "Envoi…",
+    "back": "Retour",
+    "magicLinkSent": "Vérifiez votre boîte mail — nous avons envoyé un lien magique à {email}.",
+    "termsPrefix": "En continuant, vous acceptez les ",
+    "terms": "Conditions d'utilisation",
+    "termsAnd": " et la ",
+    "privacy": "Politique de confidentialité",
+    "termsSuffix": " de Curio.",
+    "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
+    "errorEmail": "Veuillez saisir une adresse e-mail valide.",
+    "providerUnavailable": "Cette méthode de connexion n'est pas encore disponible — utilisez l'e-mail pour le moment."
+  },
+  "AuthCallback": {
+    "metaTitle": "Connexion en cours",
+    "errorTitle": "Lien de connexion expiré",
+    "errorBody": "Ce lien de connexion est invalide ou a expiré. Demandez-en un nouveau pour continuer.",
+    "errorCta": "Retour à la connexion"
   }
 }

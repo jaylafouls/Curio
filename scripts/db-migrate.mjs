@@ -63,6 +63,11 @@ const sql = postgres({
   ssl: 'require',
   prepare: false, // required for the transaction pooler
   max: 1,
+  // The pooler TLS handshake can be slow to cold-start (observed 25s+ on a first
+  // hit). The driver's default connect timeout is too short for that, so a run
+  // fails with CONNECT_TIMEOUT even though the DB is healthy. Give the handshake
+  // real headroom; this only affects how long we wait to establish, not queries.
+  connect_timeout: 60,
   onnotice: () => {}, // silence NOTICEs (e.g. "already exists" from IF NOT EXISTS)
 })
 
@@ -235,6 +240,32 @@ async function verify() {
       and conname like '%user_id%' limit 1`
   record('consent_logs.user_id FK = SET NULL (RGPD)', consentDel === 'n',
     `confdeltype=${consentDel} (n=set null, c=cascade)`)
+
+  // 14. auth.users → public.users provisioning trigger present (0006)
+  const [{ has: authTrig }] = await sql`
+    select count(*) > 0 as has from pg_trigger
+    where tgrelid = 'auth.users'::regclass
+      and tgname = 'trg_auth_user_created'`
+  record('auth.users signup provisioning trigger present', authTrig === true)
+
+  // 15. redeem_invitation_token(text,uuid) RPC present (0006). Match on the
+  //     argument TYPE list (proargtypes → regtype names), independent of the
+  //     parameter names that pg_get_function_identity_arguments includes.
+  const [{ has: redeemFn }] = await sql`
+    select count(*) > 0 as has from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname = 'redeem_invitation_token'
+      and array(select format_type(unnest(p.proargtypes), null)) = array['text','uuid']`
+  record('redeem_invitation_token(text,uuid) RPC present', redeemFn === true)
+
+  // 16. service_role has SELECT on a server-only table (0007 grants). Without
+  //     this, a service-role read of invitation_tokens fails 42501 even though
+  //     service_role bypasses RLS — GRANTs are a separate layer from RLS.
+  const [{ has: svcGrant }] = await sql`
+    select count(*) > 0 as has from information_schema.role_table_grants
+    where grantee = 'service_role' and table_schema = 'public'
+      and table_name = 'invitation_tokens' and privilege_type = 'SELECT'`
+  record('service_role SELECT grant on invitation_tokens', svcGrant === true)
 
   const failed = results.filter((r) => !r.pass)
   console.log(`\n${results.length - failed.length}/${results.length} checks passed.`)
