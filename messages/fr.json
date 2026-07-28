@@ -61,5 +61,75 @@
     "errorTitle": "Lien de connexion expiré",
     "errorBody": "Ce lien de connexion est invalide ou a expiré. Demandez-en un nouveau pour continuer.",
     "errorCta": "Retour à la connexion"
+  },
+  "Onboarding": {
+    "metaTitle": "Créez votre univers",
+    "metaDescription": "Dites à Curio ce qui vous rend curieux, suivez des curateurs et créez votre univers.",
+    "logoAlt": "Curio",
+    "stepLabel": "Étape {current}/{total}",
+    "back": "Retour",
+    "continue": "Continuer",
+    "saving": "Enregistrement…",
+    "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
+    "interests": {
+      "titleBefore": "Qu'est-ce qui vous rend ",
+      "titleAccent": "curieux",
+      "titleAfter": " ?",
+      "subtitle": "Choisissez quelques thèmes pour façonner votre univers. Modifiable à tout moment.",
+      "minHint": "Choisissez au moins un thème pour continuer."
+    },
+    "curators": {
+      "titleBefore": "Suivez les curateurs que vous ",
+      "titleAccent": "aimez",
+      "subtitle": "Des personnes à suivre, choisies selon les thèmes que vous avez sélectionnés.",
+      "follow": "Suivre",
+      "following": "Suivi",
+      "emptyTitle": "Les curateurs arrivent bientôt",
+      "emptyBody": "Nous accueillons nos premiers curateurs en ce moment même. Dès qu'ils seront là, vous trouverez ici des personnes à suivre selon vos thèmes — pour l'instant, terminons la création de votre univers.",
+      "skip": "Passer pour le moment"
+    },
+    "universe": {
+      "titleBefore": "Nommez votre ",
+      "titleAccent": "univers",
+      "subtitle": "Votre univers, c'est votre coin de Curio. Donnez-lui un nom et une couleur.",
+      "nameLabel": "Nom de l'univers",
+      "namePlaceholder": "Mon univers",
+      "counter": "{count}/{max}",
+      "colorLabel": "Couleur de l'univers",
+      "colorViolet": "Violet",
+      "colorBeige": "Beige",
+      "colorVert": "Vert",
+      "colorBleu": "Bleu",
+      "colorRose": "Rose",
+      "submit": "Créer mon univers",
+      "nameRequired": "Donnez un nom à votre univers pour continuer."
+    },
+    "ready": {
+      "title": "Votre espace est prêt !",
+      "body": "{name} est en ligne. Il est temps de le remplir avec l'internet qui vaut la peine d'être gardé.",
+      "bodyNoName": "Votre univers est en ligne. Il est temps de le remplir avec l'internet qui vaut la peine d'être gardé.",
+      "cta": "Commencer à explorer"
+    },
+    "allSet": {
+      "titleBefore": "Vous êtes ",
+      "titleAccent": "prêt",
+      "subtitle": "Voici comment fonctionne Curio.",
+      "saveTitle": "Sauvegardez tout",
+      "saveBody": "Depuis n'importe où — liens, idées et lieux qui vous inspirent.",
+      "organizeTitle": "Organisez avec soin",
+      "organizeBody": "Dans des collections qui rendent votre univers unique.",
+      "discoverTitle": "Découvrez par les gens",
+      "discoverBody": "Explorez de nouvelles perspectives d'esprits curieux.",
+      "cta": "C'est parti"
+    }
+  },
+  "Home": {
+    "metaTitle": "Accueil",
+    "greetingMorning": "Bonjour, {name}",
+    "greetingAfternoon": "Bon après-midi, {name}",
+    "greetingEvening": "Bonsoir, {name}",
+    "tabForYou": "Pour vous",
+    "tabFollowing": "Abonnements",
+    "tabTrending": "Tendances"
   }
 }
