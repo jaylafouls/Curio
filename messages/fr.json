@@ -287,5 +287,82 @@
     "tabForYou": "Pour vous",
     "tabFollowing": "Abonnements",
     "tabTrending": "Tendances"
+  },
+  "AppNav": {
+    "primary": "Navigation principale",
+    "mySpaceGroup": "Mon espace",
+    "home": "Accueil",
+    "explore": "Explorer",
+    "curators": "Curateurs",
+    "saved": "Enregistrés",
+    "myUniverse": "Mon univers",
+    "projects": "Projets",
+    "logout": "Se déconnecter"
+  },
+  "AppHeader": {
+    "morning": "Bonjour, {name}",
+    "afternoon": "Bon après-midi, {name}",
+    "evening": "Bonsoir, {name}",
+    "tagline": "Découvrez quelque chose d'inspirant aujourd'hui."
+  },
+  "MySpace": {
+    "metaTitle": "Mon univers",
+    "metaDescription": "Votre espace personnel sur Curio — vos collections, vos liens enregistrés et les curateurs que vous suivez.",
+    "joined": "Sur Curio depuis {date}",
+    "foundingCurator": "Curateur fondateur",
+    "latestCollections": "Vos dernières collections",
+    "collectionsEmptyTag": "Rien pour l'instant",
+    "collectionsEmptyTitle": "Vos collections apparaîtront ici",
+    "collectionsEmptyBody": "Commencez à enregistrer des liens et à les regrouper en collections pour bâtir votre univers.",
+    "curatorsYouFollow": "Curateurs que vous suivez",
+    "curatorsEmptyTag": "Personne pour l'instant",
+    "curatorsEmptyTitle": "Suivez les curateurs que vous aimez",
+    "curatorsEmptyBody": "Découvrez des personnes dont vous appréciez le goût et suivez-les pour façonner votre feed.",
+    "curatorsEmptyCta": "Parcourir les curateurs",
+    "universeInNumbers": "Votre univers en chiffres",
+    "statSavedLinks": "Liens enregistrés",
+    "statCollections": "Collections",
+    "statCuratorsFollowed": "Curateurs suivis",
+    "uniqueBefore": "Votre univers est ",
+    "uniqueAccent": "unique",
+    "uniqueBody": "Continuez à explorer, à collectionner, à construire.",
+    "uniqueCta": "Explorer davantage"
+  },
+  "Saved": {
+    "metaTitle": "Enregistrés",
+    "metaDescription": "Tous les liens que vous avez enregistrés sur Curio — classés en collections ou en attente dans Non classés.",
+    "title": "Enregistrés",
+    "subtitle": "Tout ce que vous avez gardé, du plus récent au plus ancien.",
+    "tabAll": "Tous les liens",
+    "tabUnsorted": "Non classés",
+    "countLinks": "{count, plural, =0 {Aucun lien} one {# lien} other {# liens}}",
+    "unsortedBadge": "Non classé",
+    "emptyAllTag": "Rien pour l'instant",
+    "emptyAllTitle": "Vos liens enregistrés apparaîtront ici",
+    "emptyAllBody": "Enregistrez un lien depuis n'importe où et il atterrit ici, prêt à être organisé en collections.",
+    "emptyUnsortedTag": "Tout est rangé",
+    "emptyUnsortedTitle": "Rien à classer",
+    "emptyUnsortedBody": "Les liens que vous n'avez pas encore classés dans une collection apparaîtront ici."
+  },
+  "Projects": {
+    "metaTitle": "Projets",
+    "metaDescription": "Vos projets privés sur Curio — organisez vos collections à votre façon.",
+    "title": "Projets",
+    "subtitle": "Des espaces privés pour regrouper vos collections.",
+    "linksAggregate": "{count, plural, =0 {Aucune collection} one {# collection} other {# collections}}",
+    "emptyTag": "Rien pour l'instant",
+    "emptyTitle": "Vos projets apparaîtront ici",
+    "emptyBody": "Les projets sont des espaces privés qui regroupent des collections liées — un voyage, une maison, un sujet de recherche. Leur création arrive bientôt."
+  },
+  "Profile": {
+    "notFoundTitle": "Profil introuvable",
+    "foundingCurator": "Curateur fondateur",
+    "collections": "Collections",
+    "followers": "Abonnés",
+    "following": "Abonnements",
+    "publicCollections": "Collections publiques",
+    "collectionsEmptyTag": "Rien de public pour l'instant",
+    "collectionsEmptyTitle": "Aucune collection publique",
+    "collectionsEmptyBody": "Ce curateur n'a encore rendu aucune collection publique."
   }
 }
