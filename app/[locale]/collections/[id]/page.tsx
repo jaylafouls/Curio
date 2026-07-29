@@ -4,6 +4,12 @@ import { buildMetadata } from '@/lib/seo/metadata'
 import { PlaceholderPage } from '@/lib/seo/placeholder-page'
 import type { Locale } from '@/lib/i18n/routing'
 
+// ISR default for this high-traffic public page (chantier SEO part 6). The
+// scaffold is static today; when the real collection page lands it revalidates
+// on this window instead of rendering per request. Next requires a static
+// literal here, so this mirrors PUBLIC_PAGE_REVALIDATE (lib/seo/config.ts).
+export const revalidate = 3600
+
 /**
  * Stable public collection URL — /[locale]/collections/[id] (brief rule 1 +
  * spec §8.7, e.g. /en/collections/tokyo-by-locals). Scaffold only; the real
