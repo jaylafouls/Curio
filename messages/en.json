@@ -287,5 +287,82 @@
     "tabForYou": "For you",
     "tabFollowing": "Following",
     "tabTrending": "Trending"
+  },
+  "AppNav": {
+    "primary": "Main navigation",
+    "mySpaceGroup": "My space",
+    "home": "Home",
+    "explore": "Explore",
+    "curators": "Curators",
+    "saved": "Saved",
+    "myUniverse": "My Universe",
+    "projects": "Projects",
+    "logout": "Log out"
+  },
+  "AppHeader": {
+    "morning": "Good morning, {name}",
+    "afternoon": "Good afternoon, {name}",
+    "evening": "Good evening, {name}",
+    "tagline": "Discover something inspiring today."
+  },
+  "MySpace": {
+    "metaTitle": "My Universe",
+    "metaDescription": "Your personal space on Curio — your collections, saved links and the curators you follow.",
+    "joined": "Joined Curio in {date}",
+    "foundingCurator": "Founding curator",
+    "latestCollections": "Your latest collections",
+    "collectionsEmptyTag": "Nothing yet",
+    "collectionsEmptyTitle": "Your collections will live here",
+    "collectionsEmptyBody": "Start saving links and grouping them into collections to build your universe.",
+    "curatorsYouFollow": "Curators you follow",
+    "curatorsEmptyTag": "No one yet",
+    "curatorsEmptyTitle": "Follow curators you love",
+    "curatorsEmptyBody": "Discover people whose taste you trust and follow them to shape your feed.",
+    "curatorsEmptyCta": "Browse curators",
+    "universeInNumbers": "Your universe in numbers",
+    "statSavedLinks": "Saved links",
+    "statCollections": "Collections",
+    "statCuratorsFollowed": "Curators followed",
+    "uniqueBefore": "Your universe is ",
+    "uniqueAccent": "unique",
+    "uniqueBody": "Keep exploring, keep collecting, keep building.",
+    "uniqueCta": "Explore more"
+  },
+  "Saved": {
+    "metaTitle": "Saved",
+    "metaDescription": "Every link you've saved on Curio — sorted into collections or waiting in Unsorted.",
+    "title": "Saved",
+    "subtitle": "Everything you've kept, newest first.",
+    "tabAll": "All links",
+    "tabUnsorted": "Unsorted",
+    "countLinks": "{count, plural, =0 {No links} one {# link} other {# links}}",
+    "unsortedBadge": "Unsorted",
+    "emptyAllTag": "Nothing yet",
+    "emptyAllTitle": "Your saved links will appear here",
+    "emptyAllBody": "Save a link from anywhere and it lands here, ready to organize into collections.",
+    "emptyUnsortedTag": "All tidy",
+    "emptyUnsortedTitle": "Nothing unsorted",
+    "emptyUnsortedBody": "Links you haven't filed into a collection yet will show up here."
+  },
+  "Projects": {
+    "metaTitle": "Projects",
+    "metaDescription": "Your private projects on Curio — organize your collections your way.",
+    "title": "Projects",
+    "subtitle": "Private spaces to group your collections.",
+    "linksAggregate": "{count, plural, =0 {No collections} one {# collection} other {# collections}}",
+    "emptyTag": "Nothing yet",
+    "emptyTitle": "Your projects will live here",
+    "emptyBody": "Projects are private spaces that group related collections — a trip, a home, a research topic. Creating them arrives soon."
+  },
+  "Profile": {
+    "notFoundTitle": "Profile not found",
+    "foundingCurator": "Founding curator",
+    "collections": "Collections",
+    "followers": "Followers",
+    "following": "Following",
+    "publicCollections": "Public collections",
+    "collectionsEmptyTag": "Nothing public yet",
+    "collectionsEmptyTitle": "No public collections",
+    "collectionsEmptyBody": "This curator hasn't made any collections public yet."
   }
 }

@@ -14,6 +14,12 @@ type BuildMetadataInput = {
    */
   path?: string
   images?: string[]
+  /**
+   * Private/authenticated pages (My Space, Saved, Projects) set this so the page
+   * is never crawled or indexed. Emits robots noindex,nofollow. Public pages
+   * omit it (default indexable).
+   */
+  noindex?: boolean
 }
 
 /**
@@ -31,6 +37,7 @@ export function buildMetadata({
   siteName,
   path = '',
   images,
+  noindex = false,
 }: BuildMetadataInput): Metadata {
   const normalizedPath = path && !path.startsWith('/') ? `/${path}` : path
   const canonical = `${SITE_URL}/${locale}${normalizedPath}`
@@ -53,6 +60,9 @@ export function buildMetadata({
     metadataBase: new URL(SITE_URL),
     title,
     description,
+    ...(noindex
+      ? { robots: { index: false, follow: false } }
+      : {}),
     alternates: {
       canonical,
       languages,
