@@ -4,6 +4,23 @@
     "defaultTitle": "Curio — The internet worth keeping",
     "defaultDescription": "Curio is a curation social network. Save, organise and share the links worth keeping."
   },
+  "Consent": {
+    "title": "Your privacy, your choice",
+    "body": "We use cookies strictly necessary for the site to work. With your consent, we also measure usage to improve Curio. Nothing is measured without your explicit consent.",
+    "necessaryLabel": "Necessary",
+    "necessaryDesc": "Essential for the site to work (session, security). Always on.",
+    "necessaryAlways": "Always on",
+    "analyticsLabel": "Analytics",
+    "analyticsDesc": "Anonymised usage statistics (PostHog, EU-hosted) to improve the product.",
+    "marketingLabel": "Marketing",
+    "marketingDesc": "Personalisation and targeted communications. No marketing tool is active today.",
+    "acceptAll": "Accept all",
+    "rejectAll": "Reject all",
+    "customize": "Customise",
+    "save": "Save my choices",
+    "back": "Back",
+    "policyNote": "See our privacy policy to learn more."
+  },
   "Setup": {
     "eyebrow": "PHASE 1 · FOUNDATIONS",
     "title": "Curio setup is live",

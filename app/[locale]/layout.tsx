@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { setRequestLocale, getMessages } from 'next-intl/server'
 import { instrumentSerif, inter } from '../fonts'
 import { routing, isSupportedLocale } from '@/lib/i18n/routing'
+import { ConsentProvider } from '@/components/consent/consent-provider'
 
 // Statically render the two known locales at build time.
 export function generateStaticParams() {
@@ -40,6 +41,8 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           {children}
+          {/* CMP: strict opt-in consent gate, present on every page (chantier 7). */}
+          <ConsentProvider />
         </NextIntlClientProvider>
       </body>
     </html>
