@@ -14,8 +14,13 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Run on everything except Next internals, API routes, and files with an
-  // extension (assets). Ensures public pages always get a locale prefix and
-  // connected pages get a fresh session + protection.
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  // Run on everything except Next internals, API routes, files with an extension
+  // (assets), and the root SEO file-convention routes. The SEO routes
+  // (opengraph-image, robots.txt, sitemap.xml) live at the app root, NOT under
+  // [locale]; letting next-intl locale-redirect them (e.g. /opengraph-image →
+  // /en/opengraph-image) would 404 the og:image and break crawler access to
+  // robots/sitemap. Everything else still gets a locale prefix + session refresh.
+  matcher: [
+    '/((?!api|_next|_vercel|opengraph-image|robots\\.txt|sitemap\\.xml|.*\\..*).*)',
+  ],
 }

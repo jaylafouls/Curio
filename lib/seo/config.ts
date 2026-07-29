@@ -18,3 +18,14 @@ export const OG_LOCALE: Record<string, string> = {
   en: 'en_US',
   fr: 'fr_FR',
 }
+
+/**
+ * Default ISR revalidation window, in seconds (chantier SEO part 6).
+ *
+ * Prepared for the future high-traffic public pages (curator profiles, public
+ * collections) so they serve statically-cached HTML and revalidate in the
+ * background rather than rendering per request. No page consumes it beyond the
+ * sitemap yet — a page opts in with `export const revalidate = PUBLIC_PAGE_REVALIDATE`.
+ * One hour balances freshness against origin load for content that changes slowly.
+ */
+export const PUBLIC_PAGE_REVALIDATE = 3600

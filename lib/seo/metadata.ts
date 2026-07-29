@@ -35,6 +35,13 @@ export function buildMetadata({
   const normalizedPath = path && !path.startsWith('/') ? `/${path}` : path
   const canonical = `${SITE_URL}/${locale}${normalizedPath}`
 
+  // Default OG/Twitter image → the app-wide dynamic card (app/opengraph-image).
+  // Next only auto-injects the file-convention image when a page provides NO
+  // openGraph object; because every page sets one via this builder, we must wire
+  // the image in explicitly or og:image would be missing everywhere. Pages can
+  // still override by passing their own `images`.
+  const resolvedImages = images ?? [`${SITE_URL}/opengraph-image`]
+
   // hreflang: one entry per locale, plus x-default pointing at the default.
   const languages: Record<string, string> = {}
   for (const l of LOCALES) {
@@ -57,13 +64,13 @@ export function buildMetadata({
       description,
       url: canonical,
       locale: OG_LOCALE[locale] ?? OG_LOCALE[DEFAULT_LOCALE],
-      images,
+      images: resolvedImages,
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images,
+      images: resolvedImages,
     },
   }
 }
