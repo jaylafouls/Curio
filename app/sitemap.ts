@@ -9,18 +9,19 @@ import { requireSupabaseEnv } from '@/lib/supabase/env'
  * Emits, with hreflang alternates for every locale:
  *  1. the locale homes (static, always present)
  *  2. every public profile — /[locale]/profile/[username] (spec §8.10)
+ *  3. every public collection — /[locale]/collections/[slug]
  *
- * Public collections are intentionally NOT listed yet (decision D004): the
- * `collections` table has no slug column, and the live route/PK is uuid-based.
- * Indexing uuid URLs now would break URL stability the moment human-readable
- * slugs land. The query is written and held below — flip it on when a
- * `/collections/[slug]` route + slug column exist, no other change needed.
+ * Collections are keyed by the `slug` column (migration 0008), not the uuid PK,
+ * so the URLs are stable and human-readable. The real /collections/[slug] route
+ * lands in a later chantier; this query is live now so the sitemap is ready the
+ * moment public collections exist (decision D004).
  *
  * Reads run against the ANON client: `users` is world-readable by RLS
- * (users_select_public `using (true)`), and a public sitemap must reflect
- * exactly what an anonymous crawler can see — so no service-role key is used.
- * The query returns an empty set today (no public profiles yet) and activates
- * automatically as profiles are created.
+ * (users_select_public `using (true)`) and `collections` exposes only
+ * is_public rows to anon (collections_select_public_or_owner). A public sitemap
+ * must reflect exactly what an anonymous crawler can see — so no service-role
+ * key is used. Both queries return an empty set today (no public rows yet) and
+ * activate automatically as profiles/collections are created.
  */
 
 // A public sitemap is a slow-changing, cacheable artifact; regenerate at most
@@ -48,16 +49,23 @@ function entriesForPath(path: string, lastModified: Date): SitemapEntry[] {
 }
 
 /**
+ * Anon Supabase client — a public sitemap must reflect exactly what an
+ * anonymous crawler can see, so reads go through RLS with the anon key (never
+ * the service role). No session, no cookies: a request-scoped read client.
+ */
+function anonClient() {
+  const { url, anonKey } = requireSupabaseEnv()
+  return createClient(url, anonKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
+
+/**
  * Public profiles from the DB. Anonymous-visible rows only (RLS enforces this
  * for us). `updated_at` drives lastModified so crawlers see accurate freshness.
  */
 async function publicProfileEntries(): Promise<SitemapEntry[]> {
-  const { url, anonKey } = requireSupabaseEnv()
-  const supabase = createClient(url, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  })
-
-  const { data, error } = await supabase
+  const { data, error } = await anonClient()
     .from('users')
     .select('username, updated_at')
     .order('updated_at', { ascending: false })
@@ -76,21 +84,38 @@ async function publicProfileEntries(): Promise<SitemapEntry[]> {
   )
 }
 
+/**
+ * Public collections from the DB, keyed by slug (migration 0008). The anon
+ * client only sees is_public rows (RLS), so the .eq('is_public', true) is a
+ * belt-and-braces filter that also makes the intent explicit at the call site.
+ */
+async function publicCollectionEntries(): Promise<SitemapEntry[]> {
+  const { data, error } = await anonClient()
+    .from('collections')
+    .select('slug, updated_at')
+    .eq('is_public', true)
+    .order('updated_at', { ascending: false })
+
+  if (error) {
+    console.error('sitemap: failed to load public collections', {
+      message: error.message,
+    })
+    return []
+  }
+
+  return (data ?? []).flatMap((row) =>
+    entriesForPath(`/collections/${row.slug}`, new Date(row.updated_at)),
+  )
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
   const homeEntries = entriesForPath('', now)
-  const profileEntries = await publicProfileEntries()
+  const [profileEntries, collectionEntries] = await Promise.all([
+    publicProfileEntries(),
+    publicCollectionEntries(),
+  ])
 
-  // Held until a slug column + /collections/[slug] route exist (decision D004):
-  //
-  //   const { data } = await supabase
-  //     .from('collections')
-  //     .select('slug, updated_at')
-  //     .eq('is_public', true)
-  //   const collectionEntries = (data ?? []).flatMap((row) =>
-  //     entriesForPath(`/collections/${row.slug}`, new Date(row.updated_at)),
-  //   )
-
-  return [...homeEntries, ...profileEntries]
+  return [...homeEntries, ...profileEntries, ...collectionEntries]
 }
