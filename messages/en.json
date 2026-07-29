@@ -4,6 +4,145 @@
     "defaultTitle": "Curio — The internet worth keeping",
     "defaultDescription": "Curio is a curation social network. Save, organise and share the links worth keeping."
   },
+  "Nav": {
+    "home": "Curio — home",
+    "primary": "Primary",
+    "explore": "Explore",
+    "curators": "Curators",
+    "editorial": "Editorial",
+    "about": "About",
+    "login": "Log in",
+    "signup": "Sign up",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "Footer": {
+    "tagline": "The internet worth keeping — save, organise and share what matters.",
+    "copyright": "© {year} Curio. All rights reserved."
+  },
+  "Landing": {
+    "metaTitle": "Curio — The internet worth keeping",
+    "metaDescription": "Curio is a curation social network. Save, organise and share the links worth keeping — and discover inspiring universes built by curious minds.",
+    "eyebrow": "A universe of human curiosity",
+    "titleBefore": "The internet worth ",
+    "titleAccent": "keeping.",
+    "subtitle": "Save anything, organise it beautifully, and discover the web through the people you trust.",
+    "invalidToken": "That invitation link has expired — you can still join as a Discoverer.",
+    "ctaBuild": "Build your universe",
+    "ctaExplore": "Explore",
+    "socialProof": "Join the first 1,000 curators.",
+    "universesBefore": "Explore inspiring ",
+    "universesAccent": "universes.",
+    "universesSubtitle": "Collections built by curious people, on the things worth keeping.",
+    "universesCta": "Explore all collections",
+    "universesEmptyTag": "Coming soon",
+    "universesEmptyTitle": "The first universes are on their way",
+    "universesEmptyBody": "Curio is just opening its doors. Be one of the first to build a public collection worth keeping.",
+    "values": {
+      "collect": {
+        "title": "Collect anything",
+        "body": "Links, places, products, ideas — save whatever is worth keeping, from anywhere."
+      },
+      "organize": {
+        "title": "Organise beautifully",
+        "body": "Shape your saves into collections and universes that actually feel like yours."
+      },
+      "discover": {
+        "title": "Discover through people",
+        "body": "Follow curious minds and explore the web through the people you trust."
+      },
+      "keep": {
+        "title": "Keep what matters",
+        "body": "No feed churn. What you save stays — a library that grows more valuable over time."
+      }
+    }
+  },
+  "About": {
+    "metaTitle": "About",
+    "metaDescription": "Curio's mission is to map human curiosity — a human-curated internet built on people, not algorithms.",
+    "eyebrow": "Our mission",
+    "missionBefore": "To map human ",
+    "missionAccent": "curiosity.",
+    "intro": "Curio is a home for the internet worth keeping — a place to collect links, ideas and places that inspire you, and to discover the universes of other curious minds. People before algorithms, quality over quantity.",
+    "valuesTitle": "What we believe",
+    "values": {
+      "human": {
+        "title": "Human first",
+        "body": "People before algorithms. Curation is a human act, and we build for the people doing it."
+      },
+      "curiosity": {
+        "title": "Curiosity driven",
+        "body": "Explore, learn, stay open. We reward wandering and depth over the endless scroll."
+      },
+      "curated": {
+        "title": "Thoughtfully curated",
+        "body": "Quality over quantity. The things worth keeping deserve care, not noise."
+      },
+      "lasting": {
+        "title": "Built to last",
+        "body": "A platform that grows with you — a library that gains value over time, not a feed that forgets."
+      }
+    },
+    "stats": {
+      "curators": "Curators",
+      "collections": "Public collections",
+      "links": "Links kept"
+    },
+    "ctaBefore": "Start your ",
+    "ctaAccent": "universe.",
+    "cta": "Start your universe"
+  },
+  "Editorial": {
+    "metaTitle": "Editorial",
+    "metaDescription": "Guides, essays and interviews from the Curio team on curation, taste and the internet worth keeping.",
+    "titleBefore": "The Curio ",
+    "titleAccent": "editorial.",
+    "subtitle": "Guides, essays and conversations on curation and the things worth keeping.",
+    "by": "By {name}",
+    "type": {
+      "guide": "Guide",
+      "essay": "Essay",
+      "interview": "Interview",
+      "collection": "Collection"
+    },
+    "emptyTag": "Coming soon",
+    "emptyTitle": "Our first stories are being written",
+    "emptyBody": "The Curio editorial is on its way — guides, essays and interviews on curation and taste. Check back soon."
+  },
+  "Curators": {
+    "metaTitle": "Curators",
+    "metaDescription": "Meet the curious minds behind Curio — curators sharing the collections and links worth keeping.",
+    "titleBefore": "Meet the curious ",
+    "titleAccent": "minds.",
+    "subtitle": "The people building the internet worth keeping, one collection at a time.",
+    "filterAll": "All",
+    "role": "Curator",
+    "viewProfile": "View profile",
+    "emptyTag": "Coming soon",
+    "emptyTitle": "Our founding curators are on their way",
+    "emptyBody": "We're inviting a first circle of founding curators. When they arrive, you'll meet them here — and you could be one of them.",
+    "joinCta": "Join as a curator"
+  },
+  "Explore": {
+    "metaTitle": "Explore",
+    "metaDescription": "Discover collections and curators across the topics you care about — travel, design, food, books, culture and more.",
+    "titleBefore": "Explore ",
+    "titleAccent": "Curio.",
+    "subtitle": "Browse by topic and discover collections built by curious minds.",
+    "tabAll": "All",
+    "emptyTag": "Coming soon",
+    "emptyCta": "Build your universe",
+    "curatorRole": "Curator",
+    "newTitle": "New & noteworthy",
+    "newEmptyTitle": "Fresh collections are coming",
+    "newEmptyBody": "As curators publish their universes, the newest and most noteworthy will surface here.",
+    "collectionsTitle": "Explore by collections",
+    "collectionsEmptyTitle": "No public collections yet",
+    "collectionsEmptyBody": "Public collections will appear here as people start sharing what they keep.",
+    "popularTitle": "Popular on Curio",
+    "popularEmptyTitle": "The community is just getting started",
+    "popularEmptyBody": "Popular curators and collections will rise here once Curio opens to its first members."
+  },
   "Consent": {
     "title": "Your privacy, your choice",
     "body": "We use cookies strictly necessary for the site to work. With your consent, we also measure usage to improve Curio. Nothing is measured without your explicit consent.",

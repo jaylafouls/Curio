@@ -7,7 +7,8 @@ import { requireSupabaseEnv } from '@/lib/supabase/env'
  * sitemap.xml (SEO-native, brief rule 1 + chantier SEO part 3).
  *
  * Emits, with hreflang alternates for every locale:
- *  1. the locale homes (static, always present)
+ *  1. the locale homes + the static public pages (explore/curators/editorial/
+ *     about) — always present (chantier Pages publiques)
  *  2. every public profile — /[locale]/profile/[username] (spec §8.10)
  *  3. every public collection — /[locale]/collections/[slug]
  *
@@ -108,14 +109,26 @@ async function publicCollectionEntries(): Promise<SitemapEntry[]> {
   )
 }
 
+// The static public marketing pages (chantier Pages publiques). Always
+// present, always indexable — listed here so crawlers reach them directly.
+const STATIC_PUBLIC_PATHS = [
+  '',
+  '/explore',
+  '/curators',
+  '/editorial',
+  '/about',
+] as const
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
-  const homeEntries = entriesForPath('', now)
+  const staticEntries = STATIC_PUBLIC_PATHS.flatMap((path) =>
+    entriesForPath(path, now),
+  )
   const [profileEntries, collectionEntries] = await Promise.all([
     publicProfileEntries(),
     publicCollectionEntries(),
   ])
 
-  return [...homeEntries, ...profileEntries, ...collectionEntries]
+  return [...staticEntries, ...profileEntries, ...collectionEntries]
 }
