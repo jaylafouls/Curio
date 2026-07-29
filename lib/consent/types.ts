@@ -9,6 +9,18 @@
  */
 export type ConsentCategory = 'necessary' | 'analytics' | 'marketing'
 
+/**
+ * Version of the Privacy Policy in force, stamped on every consent_logs row
+ * (RGPD: each consent record must reference the policy it was given against).
+ *
+ * Date form (ISO) is monotonic and human-readable — bump it the day the real
+ * Privacy Policy legal text is published. The legal text itself is a content
+ * task outside dev scope: it is a LAUNCH BLOCKER (a live product cannot collect
+ * consent against a policy the user cannot read) but NOT a blocker for wiring
+ * the consent machinery. Decision D007.
+ */
+export const CONSENT_POLICY_VERSION = '2026-07-29'
+
 export type ConsentState = Record<ConsentCategory, boolean>
 
 /**

@@ -10,6 +10,8 @@ import {
   getCuratorSuggestions,
   getSelectedTopicIds,
 } from '@/lib/onboarding/data'
+import { buildUserProperties } from '@/lib/analytics/user-properties'
+import { AnalyticsIdentify } from '@/components/consent/analytics-identify'
 import { OnboardingWizard } from './onboarding-wizard'
 
 /**
@@ -77,6 +79,10 @@ export default async function OnboardingPage({ params }: PageProps) {
 
   const t = await getTranslations({ locale, namespace: 'Onboarding' })
 
+  // PostHog person properties (spec §15.3). Assembled server-side; the client
+  // component sends them once analytics consent is granted (no-op before then).
+  const identity = await buildUserProperties(locale)
+
   return (
     <div className="dark">
       <main className="relative flex min-h-screen flex-col items-center overflow-hidden bg-cosmic px-lg text-foreground">
@@ -89,6 +95,12 @@ export default async function OnboardingPage({ params }: PageProps) {
           curators={curators}
           initialSelectedTopicIds={selectedTopicIds}
         />
+        {identity ? (
+          <AnalyticsIdentify
+            distinctId={identity.distinctId}
+            props={identity.props}
+          />
+        ) : null}
       </main>
     </div>
   )

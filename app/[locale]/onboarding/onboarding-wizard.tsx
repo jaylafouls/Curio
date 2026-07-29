@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, type FormEvent } from 'react'
+import { useRef, useState, useTransition, type FormEvent } from 'react'
 import { useTranslations } from 'next-intl'
 import { ArrowLeft, ArrowRight, Check, Plus } from 'lucide-react'
 import { AccentText, Avatar, Button } from '@/components/ui'
@@ -8,6 +8,7 @@ import { OrbitalLogo } from '@/components/brand/orbital-logo'
 import { TopicIcon } from '@/components/brand/topic-icon'
 import { cn } from '@/lib/ui/cn'
 import type { Locale } from '@/lib/i18n/routing'
+import { trackEvent } from '@/lib/analytics'
 import {
   completeOnboarding,
   followCurator,
@@ -83,8 +84,22 @@ export function OnboardingWizard({
   const stepIndex = STEPS.indexOf(step)
   const counter = COUNTED.indexOf(step) // -1 for ready/allSet
 
+  // When the current step began, so we can report time-on-step as `duration`
+  // (ms) with the onboarding_step_completed event. Reset on every transition.
+  const stepStartedAt = useRef<number>(Date.now())
+
   function goTo(next: Step) {
     setError(null)
+    const nextIndex = STEPS.indexOf(next)
+    // Emit only on a forward move: the step being LEFT is the one completed.
+    // `back` also routes through here; a backward move completes nothing.
+    if (nextIndex > stepIndex) {
+      trackEvent('onboarding_step_completed', {
+        step, // the step just finished
+        duration: Date.now() - stepStartedAt.current,
+      })
+    }
+    stepStartedAt.current = Date.now()
     setStep(next)
   }
 
@@ -158,6 +173,12 @@ export function OnboardingWizard({
   // ── Screen 07: finish → flips onboarding_completed and redirects to Home.
   function finish() {
     setError(null)
+    // The final step completes here (it never goes through goTo → no forward
+    // transition). Emit before the server redirect so the last step is counted.
+    trackEvent('onboarding_step_completed', {
+      step: 'allSet',
+      duration: Date.now() - stepStartedAt.current,
+    })
     startTransition(async () => {
       await completeOnboarding(locale)
       // completeOnboarding redirects server-side; nothing runs after it.
