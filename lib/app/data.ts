@@ -163,6 +163,8 @@ export type AppCollection = {
   topic: BadgeTopic
   cover: string | null
   isPublic: boolean
+  /** Real count from collections.links_count (trigger-maintained, chantier 10). */
+  linksCount: number
   owner: { name: string; avatar: string | null; username: string }
 }
 
@@ -173,6 +175,7 @@ type CollectionRow = {
   cover_image_url: string | null
   topic_id: string
   is_public: boolean
+  links_count: number
   owner:
     | { display_name: string; avatar_url: string | null; username: string }
     | { display_name: string; avatar_url: string | null; username: string }[]
@@ -188,6 +191,7 @@ function mapCollection(row: CollectionRow): AppCollection {
     topic: row.topic_id as BadgeTopic,
     cover: row.cover_image_url,
     isPublic: row.is_public,
+    linksCount: row.links_count ?? 0,
     owner: {
       name: owner?.display_name ?? '',
       avatar: owner?.avatar_url ?? null,
@@ -197,7 +201,7 @@ function mapCollection(row: CollectionRow): AppCollection {
 }
 
 const COLLECTION_SELECT =
-  'id, slug, name, cover_image_url, topic_id, is_public, ' +
+  'id, slug, name, cover_image_url, topic_id, is_public, links_count, ' +
   'owner:users!collections_owner_id_fkey (display_name, avatar_url, username)'
 
 /**

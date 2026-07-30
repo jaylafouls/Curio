@@ -118,9 +118,8 @@ export type PublicCollection = {
  * Public collections for the landing "Explore inspiring universes" strip and
  * the explore feed. Empty today (0 public collections). `topic_id` narrows to
  * the badge palette; a row with an off-palette topic is dropped rather than
- * crashing the card. `links_count` is not a stored column (data model §6), so
- * the card shows 0 until a later chantier wires the aggregate — acceptable, and
- * moot while the set is empty.
+ * crashing the card. `links_count` is the real trigger-maintained column
+ * (chantier 10 migration 0010).
  */
 export async function getPublicCollections(
   limit = 5,
@@ -130,7 +129,7 @@ export async function getPublicCollections(
   const { data, error } = await supabase
     .from('collections')
     .select(
-      'id, slug, name, description, cover_image_url, topic_id, ' +
+      'id, slug, name, description, cover_image_url, topic_id, links_count, ' +
         'owner:users!collections_owner_id_fkey (display_name, avatar_url, username)',
     )
     .eq('is_public', true)
@@ -151,6 +150,7 @@ export async function getPublicCollections(
     description: string | null
     cover_image_url: string | null
     topic_id: string
+    links_count: number
     owner:
       | { display_name: string; avatar_url: string | null; username: string }
       | { display_name: string; avatar_url: string | null; username: string }[]
@@ -169,7 +169,7 @@ export async function getPublicCollections(
         topic: row.topic_id as BadgeTopic,
         cover: row.cover_image_url,
         description: row.description,
-        linksCount: 0,
+        linksCount: row.links_count ?? 0,
         owner: {
           name: owner?.display_name ?? '',
           avatar: owner?.avatar_url ?? null,
