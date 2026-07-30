@@ -10,9 +10,14 @@ const nextConfig: NextConfig = {
   // Supabase Storage and OG-image hosts are wired in later chantiers.
   images: {
     remotePatterns: [
-      // Supabase Storage (EU Frankfurt project). Host filled once the project
-      // ref is known; kept explicit so nothing loads from an unexpected origin.
-      // { protocol: 'https', hostname: '<project-ref>.supabase.co' },
+      // Supabase Storage (EU Frankfurt project). Scoped to the storage object
+      // path so nothing loads from an unexpected origin. The host is the project
+      // ref (derived from the anon JWT — KNOWLEDGE rule #1), stable per project.
+      {
+        protocol: 'https',
+        hostname: 'leijjsyimganjpfhctbw.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
   },
 }

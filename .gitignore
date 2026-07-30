@@ -67,3 +67,6 @@ tmp/
 .gsd/DISCUSSION-MANIFEST.json
 .gsd/milestones/**/*-CONTINUE.md
 .gsd/milestones/**/continue.md
+
+# ephemeral verification harness (chantier 10 real-session smoke) — never committed
+.verify/

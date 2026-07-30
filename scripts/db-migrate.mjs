@@ -267,6 +267,33 @@ async function verify() {
       and table_name = 'invitation_tokens' and privilege_type = 'SELECT'`
   record('service_role SELECT grant on invitation_tokens', svcGrant === true)
 
+  // 17. collections.links_count column + maintenance trigger present (0010)
+  const [{ has: linksCountCol }] = await sql`
+    select count(*) > 0 as has from information_schema.columns
+    where table_schema = 'public' and table_name = 'collections'
+      and column_name = 'links_count'`
+  record('collections.links_count column present', linksCountCol === true)
+
+  const [{ has: linksCountTrig }] = await sql`
+    select count(*) > 0 as has from pg_trigger
+    where tgrelid = 'public.user_links'::regclass
+      and tgname = 'trg_user_links_collection_count'`
+  record('collections links_count trigger present', linksCountTrig === true)
+
+  // 18. storage bucket 'collection-covers' exists and is public (0010)
+  const bucket = await sql`
+    select public from storage.buckets where id = 'collection-covers'`
+  record('storage bucket collection-covers present + public',
+    bucket.length === 1 && bucket[0].public === true,
+    bucket.length === 1 ? `public=${bucket[0].public}` : 'bucket missing')
+
+  // 19. owner-scoped write policy on storage.objects for the covers bucket
+  const [{ has: coverInsertPol }] = await sql`
+    select count(*) > 0 as has from pg_policies
+    where schemaname = 'storage' and tablename = 'objects'
+      and policyname = 'collection_covers_insert_owner'`
+  record('collection-covers owner insert policy present', coverInsertPol === true)
+
   const failed = results.filter((r) => !r.pass)
   console.log(`\n${results.length - failed.length}/${results.length} checks passed.`)
   return failed.length === 0

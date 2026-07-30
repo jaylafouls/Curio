@@ -7,9 +7,8 @@ import type { AppCollection } from '@/lib/app/data'
  * ("your latest collections", §8.9) and a public profile's Collections tab
  * (§8.10). Each card links to the public collection page /collections/[slug].
  *
- * linksCount is not yet a stored column (data model §6 — the trigger lands in
- * chantier 10), so cards read 0 for now; harmless while accounts are empty and
- * corrected the moment the counter exists.
+ * linksCount is the real trigger-maintained count (collections.links_count,
+ * chantier 10 migration 0010).
  */
 export function CollectionGrid({
   collections,
@@ -29,7 +28,7 @@ export function CollectionGrid({
               topic={c.topic}
               cover={c.cover ?? undefined}
               owner={{ name: c.owner.name, avatar: c.owner.avatar ?? undefined }}
-              linksCount={0}
+              linksCount={c.linksCount}
             />
           </Link>
         </li>
