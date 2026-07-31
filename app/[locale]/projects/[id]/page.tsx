@@ -60,6 +60,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         username: user.username,
         avatarUrl: user.avatarUrl,
       }}
+      userId={user.id}
       locale={locale}
     >
       <ProjectDetailClient

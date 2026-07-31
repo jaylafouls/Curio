@@ -59,6 +59,7 @@ export default async function ProjectsPage({ params }: PageProps) {
         username: user.username,
         avatarUrl: user.avatarUrl,
       }}
+      userId={user.id}
       locale={locale}
     >
       <div className="mx-auto w-full max-w-5xl px-lg py-2xl lg:px-2xl">
