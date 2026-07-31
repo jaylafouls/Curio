@@ -79,6 +79,7 @@ export default async function MySpacePage({ params }: PageProps) {
         username: user.username,
         avatarUrl: user.avatarUrl,
       }}
+      userId={user.id}
       locale={locale}
     >
       <AppHeader displayName={user.displayName} />
