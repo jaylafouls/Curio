@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { LogOut } from 'lucide-react'
+import { LogOut, Settings } from 'lucide-react'
 import { Link, usePathname } from '@/lib/i18n/navigation'
 import { cn } from '@/lib/ui/cn'
 import { Avatar } from '@/components/ui'
@@ -99,7 +99,20 @@ export function AppSidebar({
             </span>
           </span>
         </Link>
-        <form action={`/${locale}/auth/signout`} method="post" className="mt-xs">
+        <Link
+          href="/settings"
+          aria-current={isActive('/settings') ? 'page' : undefined}
+          className={cn(
+            'mt-xs flex items-center gap-md rounded-md px-md py-sm font-sans text-body-small transition-colors duration-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
+            isActive('/settings')
+              ? 'bg-foreground/[0.06] text-foreground'
+              : 'text-foreground/60 hover:bg-foreground/[0.03] hover:text-foreground',
+          )}
+        >
+          <Settings className="size-4 shrink-0" strokeWidth={2} aria-hidden />
+          {t('settings')}
+        </Link>
+        <form action={`/${locale}/auth/signout`} method="post" className="mt-2xs">
           <button
             type="submit"
             className="flex w-full items-center gap-md rounded-md px-md py-sm font-sans text-body-small text-foreground/60 transition-colors hover:bg-foreground/[0.03] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
