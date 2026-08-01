@@ -24,6 +24,7 @@ const STORAGE_KEY = 'curio.consent.v1'
 let state: ConsentState = { ...DEFAULT_CONSENT }
 let decided = false
 const listeners = new Set<ConsentChangeListener>()
+const reopenListeners = new Set<() => void>()
 
 /**
  * Restore a previously saved decision from localStorage. Call once on the
@@ -85,4 +86,23 @@ export function setConsent(next: Partial<ConsentState>): void {
 export function subscribeConsent(listener: ConsentChangeListener): () => void {
   listeners.add(listener)
   return () => listeners.delete(listener)
+}
+
+/**
+ * Re-open the CMP banner on demand (Settings → Privacy "preference center",
+ * chantier 13). Because the first-party CMP is the only preference surface (no
+ * Axeptio dashboard exists, decision D006), the honest "link to the preference
+ * center" is a control that re-triggers our own banner so the user can revisit
+ * or change their choice at any time. Notifies whichever ConsentProvider is
+ * mounted; a no-op if none is (e.g. the control is rendered on a page without
+ * the provider — it just won't do anything, never throws).
+ */
+export function reopenConsent(): void {
+  for (const listener of reopenListeners) listener()
+}
+
+/** Subscribe to reopen requests; returns an unsubscribe fn. Used by the CMP. */
+export function subscribeReopen(listener: () => void): () => void {
+  reopenListeners.add(listener)
+  return () => reopenListeners.delete(listener)
 }

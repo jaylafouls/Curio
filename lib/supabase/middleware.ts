@@ -24,15 +24,18 @@ import { routing } from '@/lib/i18n/routing'
 // a prefix list so nested routes inherit protection.
 //
 // `my-space`, `saved`, `projects` are the connected app pages added in Phase 3
-// (chantier 9): a visitor's own space, never anon-visible. `collections/[id]`
-// and `profile/[username]` are deliberately absent — they stay public (ISR) so
-// crawlers and logged-out visitors can read public collections/profiles.
+// (chantier 9): a visitor's own space, never anon-visible. `settings` (chantier
+// 13) is the account settings page — private and noindex (§15.1 robots blocks
+// /settings). `collections/[id]` and `profile/[username]` are deliberately
+// absent — they stay public (ISR) so crawlers and logged-out visitors can read
+// public collections/profiles.
 const PROTECTED_SEGMENTS = [
   'home',
   'onboarding',
   'my-space',
   'saved',
   'projects',
+  'settings',
 ] as const
 
 function isProtectedPath(pathname: string): boolean {

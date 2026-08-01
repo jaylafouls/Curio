@@ -12,10 +12,11 @@ import {
  * Connected navigation model (spec §7.2 sidebar / §7.3 bottom nav), shared by
  * the desktop sidebar and the mobile bottom nav so the two never drift.
  *
- * Only routes that actually render this chantier are listed — same "no dead
- * links" discipline as the public footer. Deferred sidebar items from §7.2
- * (Likes, History, standalone Collections index, Settings) are intentionally
- * absent until their routes exist in a later chantier; adding them here as
+ * Only routes that actually render are listed — same "no dead links" discipline
+ * as the public footer. Settings (§7.2) landed in chantier 13 and lives in the
+ * sidebar account footer (next to Log out), not in these groups, so it is not in
+ * this list. Remaining deferred items from §7.2 (Likes, History, standalone
+ * Collections index) stay absent until their routes exist; adding them here as
  * 404-links would be worse than omitting them.
  *
  * `key` is the i18n key under the `AppNav` namespace. `href` is locale-agnostic

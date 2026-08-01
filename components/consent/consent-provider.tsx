@@ -3,7 +3,12 @@
 import { useEffect, useState } from 'react'
 import { ConsentBanner } from './consent-banner'
 import { logConsent } from '@/lib/consent/actions'
-import { hasDecided, hydrateConsent, setConsent } from '@/lib/consent/store'
+import {
+  hasDecided,
+  hydrateConsent,
+  setConsent,
+  subscribeReopen,
+} from '@/lib/consent/store'
 import { initAnalyticsConsentBridge } from '@/lib/analytics'
 import type { ConsentState } from '@/lib/consent/types'
 
@@ -33,6 +38,10 @@ export function ConsentProvider() {
     hydrateConsent()
     initAnalyticsConsentBridge()
     setShow(!hasDecided())
+    // Re-open on demand (Settings → Privacy preference center). A returning
+    // visitor who already decided can revisit their choice; the banner shows
+    // again with its current-decision toggles.
+    return subscribeReopen(() => setShow(true))
   }, [])
 
   function handleDecision(state: ConsentState) {
