@@ -334,7 +334,6 @@
     "metaTitle": "My Universe",
     "metaDescription": "Your personal space on Curio — your collections, saved links and the curators you follow.",
     "joined": "Joined Curio in {date}",
-    "foundingCurator": "Founding curator",
     "latestCollections": "Your latest collections",
     "collectionsEmptyTag": "Nothing yet",
     "collectionsEmptyTitle": "Your collections will live here",
@@ -381,7 +380,6 @@
   },
   "Profile": {
     "notFoundTitle": "Profile not found",
-    "foundingCurator": "Founding curator",
     "collections": "Collections",
     "followers": "Followers",
     "following": "Following",
@@ -617,5 +615,9 @@
     "errorImageType": "Please choose an image file.",
     "errorImageSize": "That image is too large (max 5 MB).",
     "errorUpload": "The photo couldn't be uploaded. Please try again."
+  },
+  "PlanBadge": {
+    "founding": "Founding curator",
+    "pro": "Curator Pro"
   }
 }

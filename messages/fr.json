@@ -334,7 +334,6 @@
     "metaTitle": "Mon univers",
     "metaDescription": "Votre espace personnel sur Curio — vos collections, vos liens enregistrés et les curateurs que vous suivez.",
     "joined": "Sur Curio depuis {date}",
-    "foundingCurator": "Curateur fondateur",
     "latestCollections": "Vos dernières collections",
     "collectionsEmptyTag": "Rien pour l'instant",
     "collectionsEmptyTitle": "Vos collections apparaîtront ici",
@@ -381,7 +380,6 @@
   },
   "Profile": {
     "notFoundTitle": "Profil introuvable",
-    "foundingCurator": "Curateur fondateur",
     "collections": "Collections",
     "followers": "Abonnés",
     "following": "Abonnements",
@@ -617,5 +615,9 @@
     "errorImageType": "Veuillez choisir un fichier image.",
     "errorImageSize": "Cette image est trop volumineuse (max 5 Mo).",
     "errorUpload": "La photo n’a pas pu être envoyée. Veuillez réessayer."
+  },
+  "PlanBadge": {
+    "founding": "Curateur fondateur",
+    "pro": "Curateur Pro"
   }
 }

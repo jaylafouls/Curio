@@ -19,6 +19,7 @@ import {
   getFollowedCurators,
   getMySpaceStats,
 } from '@/lib/app/data'
+import { getUserPlan } from '@/lib/plans/data'
 
 /**
  * /[locale]/my-space — the signed-in user's own space (spec §8.9). A protected
@@ -57,12 +58,14 @@ export default async function MySpacePage({ params }: PageProps) {
   if (!user) redirect(`/${locale}`)
 
   const t = await getTranslations({ locale, namespace: 'MySpace' })
+  const tPlan = await getTranslations({ locale, namespace: 'PlanBadge' })
 
-  const [topics, collections, curators, stats] = await Promise.all([
+  const [topics, collections, curators, stats, plan] = await Promise.all([
     getUserTopics(user.id, locale),
     getMyCollections(user.id, 6),
     getFollowedCurators(user.id, 8),
     getMySpaceStats(user.id),
+    getUserPlan(user.id),
   ])
 
   const joinedLabel = t('joined', {
@@ -95,8 +98,8 @@ export default async function MySpacePage({ params }: PageProps) {
             location={user.location}
             websiteUrl={user.websiteUrl}
             joinedLabel={joinedLabel}
-            isFoundingCurator={user.isFoundingCurator}
-            foundingLabel={t('foundingCurator')}
+            planBadge={plan.badge}
+            planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
             topics={topics}
           />
 
