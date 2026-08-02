@@ -54,10 +54,10 @@ export interface AnalyticsEventMap {
 export type AnalyticsEventName = keyof AnalyticsEventMap
 
 /**
- * PostHog person properties we set on identify (spec §15.3). Only the four with
- * a real source today carry values; `plan` and `location` have no feature yet,
- * so their keys exist in the type but are always left undefined — we never
- * fabricate a value (project non-negotiable: no factice data).
+ * PostHog person properties we set on identify (spec §15.3). `plan` carries a
+ * real value since Phase 4 (a plans row auto-creates at signup); `location` has
+ * no feature yet, so its key exists in the type but is always left undefined — we
+ * never fabricate a value (project non-negotiable: no factice data).
  */
 export interface UserProperties {
   /** Slugs of topics the user selected (from user_topics). */
@@ -68,8 +68,8 @@ export interface UserProperties {
   type: 'curator' | 'discoverer'
   /** users.created_at (ISO). */
   signup_date: string
-  /** No plan feature exists yet — always undefined for now. */
-  plan?: undefined
+  /** plans.plan_type — 'free' during beta (paid tiers not yet assigned). */
+  plan: string
   /** No geo feature exists yet — always undefined for now. */
   location?: undefined
 }

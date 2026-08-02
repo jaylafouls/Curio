@@ -2,12 +2,15 @@ import type { ReactNode } from 'react'
 import { MapPin, Link2, CalendarDays } from 'lucide-react'
 import { Avatar, Badge } from '@/components/ui'
 import { TopicIcon } from '@/components/brand/topic-icon'
+import { PlanBadge } from '@/components/app/plan-badge'
+import type { PlanBadgeKind } from '@/lib/plans/data'
 import type { AppTopic } from '@/lib/app/data'
 
 /**
  * ProfileIdentity — the shared identity block at the top of My Space (§8.9) and
- * a public profile (§8.10): orbital avatar, display name with an optional
- * founding-curator badge, bio, and a meta row (location · website · join date).
+ * a public profile (§8.10): orbital avatar, display name with an optional plan
+ * badge (Founding / Pro, §4.1), bio, and a meta row (location · website · join
+ * date).
  *
  * Topic pills (My Space only) and any actions (Edit profile on My Space, Follow
  * on a public profile) are passed in as slots so this one component serves both
@@ -22,8 +25,8 @@ export function ProfileIdentity({
   location,
   websiteUrl,
   joinedLabel,
-  isFoundingCurator,
-  foundingLabel,
+  planBadge,
+  planBadgeLabel,
   topics,
   actions,
 }: {
@@ -35,9 +38,10 @@ export function ProfileIdentity({
   websiteUrl: string | null
   /** Pre-formatted "Joined … 2024" line (locale-resolved by the caller). */
   joinedLabel: string
-  isFoundingCurator: boolean
-  /** Accessible label for the founding-curator badge (e.g. "Founding curator"). */
-  foundingLabel: string
+  /** Resolved plan badge to show next to the name (null = free, no badge). */
+  planBadge: PlanBadgeKind
+  /** Accessible label for the plan badge (e.g. "Founding curator" / "Curator Pro"). */
+  planBadgeLabel: string
   /** Active Topic pills — omit (undefined) on the public profile. */
   topics?: AppTopic[]
   /** Optional action slot (Edit profile / Follow), rendered under the meta row. */
@@ -60,15 +64,7 @@ export function ProfileIdentity({
         <div className="flex flex-col items-center gap-2xs sm:items-start">
           <div className="flex items-center gap-sm">
             <h2 className="font-serif text-h2 text-foreground">{displayName}</h2>
-            {isFoundingCurator ? (
-              <span
-                className="text-violet"
-                title={foundingLabel}
-                aria-label={foundingLabel}
-              >
-                ✳
-              </span>
-            ) : null}
+            <PlanBadge kind={planBadge} label={planBadgeLabel} />
           </div>
           <span className="font-sans text-body-small text-foreground/50">
             @{username}

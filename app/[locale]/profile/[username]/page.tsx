@@ -13,6 +13,7 @@ import {
   getProfileStats,
   getPublicCollectionsByOwner,
 } from '@/lib/app/data'
+import { getUserPlan } from '@/lib/plans/data'
 
 // ISR for this high-traffic public page (chantier SEO part 6). Revalidates on
 // this window rather than rendering per request. Next requires a static literal;
@@ -65,9 +66,11 @@ export default async function ProfilePage({ params }: PageProps) {
   if (!profile) notFound()
 
   const t = await getTranslations({ locale, namespace: 'Profile' })
-  const [stats, collections] = await Promise.all([
+  const tPlan = await getTranslations({ locale, namespace: 'PlanBadge' })
+  const [stats, collections, plan] = await Promise.all([
     getProfileStats(profile.id),
     getPublicCollectionsByOwner(profile.id),
+    getUserPlan(profile.id),
   ])
 
   const joinedLabel = new Date(profile.createdAt).toLocaleDateString(
@@ -87,8 +90,8 @@ export default async function ProfilePage({ params }: PageProps) {
             location={profile.location}
             websiteUrl={profile.websiteUrl}
             joinedLabel={joinedLabel}
-            isFoundingCurator={profile.isFoundingCurator}
-            foundingLabel={t('foundingCurator')}
+            planBadge={plan.badge}
+            planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
           />
           <StatList
             layout="inline"

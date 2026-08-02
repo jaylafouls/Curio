@@ -10,10 +10,12 @@ import type { UserProperties } from './events'
  *   • language      → the request locale (next-intl)
  *   • type          → 'curator' if users.is_founding_curator else 'discoverer'
  *   • signup_date   → users.created_at
+ *   • plan          → plans.plan_type (real since Phase 4 — a plan row auto-
+ *                     creates at signup, so this always resolves to at least 'free')
  *
- * `plan` and `location` have no feature yet, so they are intentionally left
- * undefined — never fabricated (project non-negotiable). identifyUser drops
- * undefined keys before sending.
+ * `location` has no feature yet, so it is intentionally left undefined — never
+ * fabricated (project non-negotiable). identifyUser drops undefined keys before
+ * sending.
  *
  * Returns null when there is no session (anonymous) — nothing to identify.
  * Runs server-side (reads through RLS with the caller's session).
@@ -27,16 +29,23 @@ export async function buildUserProperties(
   } = await supabase.auth.getUser()
   if (!user) return null
 
-  const [{ data: profile }, { data: topicRows }] = await Promise.all([
-    supabase
-      .from('users')
-      .select('is_founding_curator, created_at')
-      .eq('id', user.id)
-      .single(),
-    supabase.from('user_topics').select('topic_id').eq('user_id', user.id),
-  ])
+  const [{ data: profile }, { data: topicRows }, { data: planRow }] =
+    await Promise.all([
+      supabase
+        .from('users')
+        .select('is_founding_curator, created_at')
+        .eq('id', user.id)
+        .single(),
+      supabase.from('user_topics').select('topic_id').eq('user_id', user.id),
+      supabase
+        .from('plans')
+        .select('plan_type')
+        .eq('user_id', user.id)
+        .maybeSingle(),
+    ])
 
   const topics = (topicRows ?? []).map((r) => r.topic_id as string)
+  const plan = (planRow as { plan_type?: string } | null)?.plan_type
 
   return {
     distinctId: user.id,
@@ -45,7 +54,9 @@ export async function buildUserProperties(
       language: locale,
       type: profile?.is_founding_curator ? 'curator' : 'discoverer',
       signup_date: profile?.created_at ?? user.created_at,
-      // plan / location: no feature yet — left undefined on purpose.
+      // A plan row auto-creates at signup; fall back to 'free' if the read failed.
+      plan: plan ?? 'free',
+      // location: no feature yet — left undefined on purpose.
     },
   }
 }
