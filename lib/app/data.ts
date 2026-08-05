@@ -481,6 +481,137 @@ export async function getMySpaceStats(userId: string): Promise<MySpaceStats> {
   }
 }
 
+// ── Curator analytics (/analytics) ──────────────────────────────────────────
+
+export type AnalyticsTopLink = {
+  /** The user_link id (stable key; the row the user owns). */
+  id: string
+  title: string
+  image: string | null
+  urlOrigin: string
+  /** Canonical shared counter — how many users have saved this link (§9.1). */
+  saves: number
+}
+
+export type CuratorAnalytics = {
+  /** Sum of the canonical saves_count over every link the user has saved. */
+  totalSaves: number
+  /** Number of canonical links in the user's space (distinct saved links). */
+  linkCount: number
+  /**
+   * Whether canonical click tracking is wired yet. clicks_count exists on links
+   * but no click-event source populates it (0004/0012 note): it is a real column
+   * stuck at 0 for everyone. `false` lets the page show an honest "not tracked
+   * yet" state instead of a fake 0 that implies a working metric — the same rule
+   * that omits "Likes" from My Space stats.
+   */
+  clicksTracked: boolean
+  /** Top saved links by canonical saves, most-saved first. */
+  topLinks: AnalyticsTopLink[]
+}
+
+type AnalyticsLinkRow = {
+  id: string
+  link_id: string
+  title_override: string | null
+  custom_image_url: string | null
+  url_origin: string
+  link:
+    | {
+        title: string
+        image_url: string | null
+        saves_count: number
+        clicks_count: number
+      }
+    | {
+        title: string
+        image_url: string | null
+        saves_count: number
+        clicks_count: number
+      }[]
+    | null
+}
+
+const ANALYTICS_LINK_SELECT =
+  'id, link_id, title_override, custom_image_url, url_origin, ' +
+  'link:links!user_links_link_id_fkey (title, image_url, saves_count, clicks_count)'
+
+/**
+ * A curator's basic analytics (spec §4.1 "analytics de base", §4.3, §9.1) —
+ * pure read, no writes. A curator's canonical Links are the ones they've saved
+ * (user_links → links); the saves_count/clicks_count on those links are the
+ * SHARED canonical counters (§9.1), so this aggregates the reach of the links in
+ * the user's space, not private per-user events.
+ *
+ * forks_count is omitted from the shape entirely: no fork mechanism exists, so
+ * it is 0 for everyone and showing it would imply a feature that does not ship.
+ * clicks_count is a real column with no populating source yet (0004/0012), so it
+ * is surfaced as `clicksTracked: false` rather than a misleading 0.
+ *
+ * One query fetches every saved link with its canonical counters; totals and the
+ * top-N are computed in-process. No fake seeding — a fresh account reads all 0s
+ * and an empty top list, and the page shows its designed empty state.
+ */
+export async function getCuratorAnalytics(
+  userId: string,
+  topLimit = 5,
+): Promise<CuratorAnalytics> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('user_links')
+    .select(ANALYTICS_LINK_SELECT)
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error('app: failed to load curator analytics', {
+      message: error.message,
+    })
+    return { totalSaves: 0, linkCount: 0, clicksTracked: false, topLinks: [] }
+  }
+
+  const rows = (data ?? []) as unknown as AnalyticsLinkRow[]
+
+  // A user can save the same canonical link into several collections/sections,
+  // producing multiple user_links rows for one link. Dedupe by canonical link so
+  // its shared saves_count is counted once, not once per personal filing.
+  const seen = new Set<string>()
+  const links: AnalyticsTopLink[] = []
+  let totalSaves = 0
+
+  for (const row of rows) {
+    const link = Array.isArray(row.link) ? row.link[0] : row.link
+    if (!link) continue
+    // Dedupe on the canonical link_id: one user can file the same canonical link
+    // into several collections/sections (distinct user_links rows), but its
+    // shared saves_count must be counted exactly once.
+    if (seen.has(row.link_id)) continue
+    seen.add(row.link_id)
+
+    const saves = link.saves_count ?? 0
+    totalSaves += saves
+    links.push({
+      id: row.id,
+      title: row.title_override ?? link.title ?? row.url_origin,
+      image: row.custom_image_url ?? link.image_url ?? null,
+      urlOrigin: row.url_origin,
+      saves,
+    })
+  }
+
+  const topLinks = [...links]
+    .sort((a, b) => b.saves - a.saves)
+    .slice(0, topLimit)
+
+  return {
+    totalSaves,
+    linkCount: links.length,
+    // No click-event source is wired yet, so clicks_count is 0 for everyone
+    // (0004/0012). Report it as untracked rather than a fake metric.
+    clicksTracked: false,
+    topLinks,
+  }
+}
+
 // ── Public profile lookup (/profile/[username]) ─────────────────────────────
 
 export type PublicProfile = {

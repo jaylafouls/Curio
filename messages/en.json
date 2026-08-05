@@ -321,6 +321,7 @@
     "saved": "Saved",
     "myUniverse": "My Universe",
     "projects": "Projects",
+    "analytics": "Analytics",
     "settings": "Settings",
     "logout": "Log out"
   },
@@ -619,5 +620,20 @@
   "PlanBadge": {
     "founding": "Founding curator",
     "pro": "Curator Pro"
+  },
+  "Analytics": {
+    "metaTitle": "Analytics",
+    "metaDescription": "See how the links you've saved are performing across Curio.",
+    "title": "Analytics",
+    "subtitle": "How the links you've saved are performing across Curio.",
+    "totalSaves": "Total saves",
+    "totalSavesHint": "Across everyone who saved these links",
+    "clicks": "Total clicks",
+    "clicksUntracked": "Click tracking arrives in a future update.",
+    "topLinks": "Your top links",
+    "topLinksSaves": "saves",
+    "emptyTag": "Nothing yet",
+    "emptyTitle": "Your analytics will grow here",
+    "emptyBody": "Start saving links to see how they perform across Curio."
   }
 }
