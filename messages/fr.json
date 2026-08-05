@@ -321,6 +321,7 @@
     "saved": "Enregistrés",
     "myUniverse": "Mon univers",
     "projects": "Projets",
+    "analytics": "Statistiques",
     "settings": "Paramètres",
     "logout": "Se déconnecter"
   },
@@ -619,5 +620,20 @@
   "PlanBadge": {
     "founding": "Curateur fondateur",
     "pro": "Curateur Pro"
+  },
+  "Analytics": {
+    "metaTitle": "Statistiques",
+    "metaDescription": "Découvrez la performance des liens que vous avez enregistrés sur Curio.",
+    "title": "Statistiques",
+    "subtitle": "La performance des liens que vous avez enregistrés sur Curio.",
+    "totalSaves": "Enregistrements",
+    "totalSavesHint": "Toutes personnes ayant enregistré ces liens",
+    "clicks": "Clics",
+    "clicksUntracked": "Le suivi des clics arrivera dans une prochaine mise à jour.",
+    "topLinks": "Vos meilleurs liens",
+    "topLinksSaves": "enregistrements",
+    "emptyTag": "Rien pour l’instant",
+    "emptyTitle": "Vos statistiques apparaîtront ici",
+    "emptyBody": "Enregistrez des liens pour suivre leur performance sur Curio."
   }
 }

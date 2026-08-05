@@ -5,6 +5,7 @@ import {
   Bookmark,
   Sparkles,
   FolderOpen,
+  BarChart3,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -43,6 +44,7 @@ export const PRIMARY_NAV: readonly AppNavItem[] = [
 export const MY_SPACE_NAV: readonly AppNavItem[] = [
   { key: 'myUniverse', href: '/my-space', icon: Sparkles, bottomNav: true },
   { key: 'projects', href: '/projects', icon: FolderOpen },
+  { key: 'analytics', href: '/analytics', icon: BarChart3 },
 ] as const
 
 /** Flattened list for the mobile bottom bar, in display order. */

@@ -24,6 +24,7 @@ const PRIVATE_SEGMENTS = [
   'my-space',
   'projects',
   'settings',
+  'analytics',
 ] as const
 
 /** All locale-prefixed + bare path forms to disallow for a segment. */
