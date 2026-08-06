@@ -322,6 +322,8 @@
     "myUniverse": "My Universe",
     "projects": "Projects",
     "analytics": "Analytics",
+    "notifications": "Notifications",
+    "notificationsWithCount": "Notifications, {count, plural, one {# unread} other {# unread}}",
     "settings": "Settings",
     "logout": "Log out"
   },
@@ -635,5 +637,30 @@
     "emptyTag": "Nothing yet",
     "emptyTitle": "Your analytics will grow here",
     "emptyBody": "Start saving links to see how they perform across Curio."
+  },
+  "Notifications": {
+    "metaTitle": "Notifications",
+    "metaDescription": "Your recent activity on Curio — new followers and collection follows.",
+    "title": "Notifications",
+    "subtitle": "New followers and people following your collections.",
+    "tablistLabel": "Filter notifications",
+    "tab": {
+      "all": "All",
+      "comments": "Comments",
+      "follows": "Follows",
+      "likes": "Likes",
+      "mentions": "Mentions"
+    },
+    "comingSoon": "Coming soon",
+    "comingSoonTag": "Coming soon",
+    "comingSoonTitle": "Not available yet",
+    "comingSoonBody": "This kind of activity will appear here once the feature ships.",
+    "followedYou": "started following you",
+    "followedCollection": "started following your collection",
+    "someone": "Someone",
+    "unread": "Unread",
+    "emptyTag": "Nothing yet",
+    "emptyTitle": "No notifications yet",
+    "emptyBody": "When someone follows you or one of your collections, you'll see it here."
   }
 }

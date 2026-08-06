@@ -25,6 +25,7 @@ const PRIVATE_SEGMENTS = [
   'projects',
   'settings',
   'analytics',
+  'notifications',
 ] as const
 
 /** All locale-prefixed + bare path forms to disallow for a segment. */

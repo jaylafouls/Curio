@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { isSupportedLocale, routing } from '@/lib/i18n/routing'
+import { emitNotification } from '@/lib/notifications/emit'
 import { UNIVERSE_COLORS, type UniverseColor } from './types'
 
 /**
@@ -82,6 +83,12 @@ export async function saveTopics(topicIds: string[]): Promise<ActionResult> {
  * Screen 04 — follow a curator: insert into follows (follower_id, followed_id).
  * Guards the self-follow (also a DB check) and dedupes on the unique constraint
  * so a double-tap is a no-op, not an error.
+ *
+ * On a NEWLY created follow, emit a 'follow' notification to the followed user
+ * (chantier notifications). Re-following an already-followed curator is a no-op
+ * that must NOT re-notify, so we detect the fresh insert via the returned rows:
+ * ignoreDuplicates returns an empty set when the row already existed. Emission
+ * is best-effort and never fails the follow (see emitNotification).
  */
 export async function followCurator(followedId: string): Promise<ActionResult> {
   const userId = await getUserId()
@@ -89,16 +96,30 @@ export async function followCurator(followedId: string): Promise<ActionResult> {
   if (!followedId || followedId === userId) return { ok: false, error: 'invalid' }
 
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('follows')
     .upsert(
       { follower_id: userId, followed_id: followedId },
       { onConflict: 'follower_id,followed_id', ignoreDuplicates: true },
     )
+    .select('id')
   if (error) {
     console.error('followCurator: insert failed', { message: error.message })
     return { ok: false, error: 'server' }
   }
+
+  // A fresh follow returns the inserted row; a duplicate returns []. Only notify
+  // on a genuinely new follow edge, so a re-follow does not spam the recipient.
+  if ((data?.length ?? 0) > 0) {
+    await emitNotification({
+      recipientId: followedId,
+      actorId: userId,
+      type: 'follow',
+      targetType: 'user',
+      targetId: followedId,
+    })
+  }
+
   return { ok: true }
 }
 

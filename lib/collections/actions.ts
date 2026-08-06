@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { emitNotification } from '@/lib/notifications/emit'
 import { BADGE_TOPICS } from '@/components/ui'
 import {
   getOwnerCollectionById,
@@ -346,5 +347,89 @@ export async function deleteCollection(id: string): Promise<Result> {
   }
 
   revalidatePath('/[locale]/my-space', 'page')
+  return { ok: true }
+}
+
+/**
+ * Follow a collection (chantier notifications). Inserts into collection_follows
+ * through the caller's session — the collection_follows_insert_self RLS policy
+ * (auth.uid() = user_id) enforces that a user can only create their OWN follow.
+ * ignoreDuplicates makes a re-follow a no-op, and the returned rows tell us
+ * whether the edge was newly created so we only notify once.
+ *
+ * On a NEW follow, emit a 'follow' notification to the collection OWNER (the
+ * acted decision: collection-follow notifies the owner). The owner id is read
+ * server-side; emitNotification drops the self-case (owner following their own
+ * collection) and is best-effort — a notification failure never fails the
+ * follow.
+ */
+export async function followCollection(collectionId: string): Promise<Result> {
+  const userId = await getUserId()
+  if (!userId) return { ok: false, error: 'unauthenticated' }
+  if (!collectionId) return { ok: false, error: 'invalid' }
+
+  const supabase = await createClient()
+
+  // Resolve the owner up front so a new follow can notify them. A collection the
+  // caller cannot see (private, not theirs) resolves to null here and we bail
+  // before writing a follow the RLS/route would not support anyway.
+  const { data: collection, error: ownerErr } = await supabase
+    .from('collections')
+    .select('owner_id')
+    .eq('id', collectionId)
+    .maybeSingle()
+  if (ownerErr) {
+    console.error('followCollection: owner lookup failed', {
+      message: ownerErr.message,
+    })
+    return { ok: false, error: 'server' }
+  }
+  if (!collection) return { ok: false, error: 'not_found' }
+
+  const { data, error } = await supabase
+    .from('collection_follows')
+    .upsert(
+      { user_id: userId, collection_id: collectionId },
+      { onConflict: 'user_id,collection_id', ignoreDuplicates: true },
+    )
+    .select('id')
+  if (error) {
+    console.error('followCollection: insert failed', { message: error.message })
+    return { ok: false, error: 'server' }
+  }
+
+  if ((data?.length ?? 0) > 0) {
+    await emitNotification({
+      recipientId: collection.owner_id as string,
+      actorId: userId,
+      type: 'follow',
+      targetType: 'collection',
+      targetId: collectionId,
+    })
+  }
+
+  return { ok: true }
+}
+
+/** Unfollow a collection (toggle off), matching the follow write. */
+export async function unfollowCollection(
+  collectionId: string,
+): Promise<Result> {
+  const userId = await getUserId()
+  if (!userId) return { ok: false, error: 'unauthenticated' }
+  if (!collectionId) return { ok: false, error: 'invalid' }
+
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('collection_follows')
+    .delete()
+    .eq('user_id', userId)
+    .eq('collection_id', collectionId)
+  if (error) {
+    console.error('unfollowCollection: delete failed', {
+      message: error.message,
+    })
+    return { ok: false, error: 'server' }
+  }
   return { ok: true }
 }
