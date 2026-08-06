@@ -1,5 +1,5 @@
 # CURIO — Modèle de Données
-**Version 1.2.4 — Juillet 2026**
+**Version 1.2.6 — Août 2026**
 
 > Ce document fait foi sur la structure de la base de données Supabase/PostgreSQL de Curio.
 > Il complète CURIO_SPEC_PIVOT_v4.7.md (le quoi), CURIO_ADD_ITEM_FLOW_v3.1.md (le comment), CURIO_DECISIONS_LOG_v5.3.md (le pourquoi) et désormais GTM_LAUNCH_v1.md v6 (le modèle économique).
@@ -13,6 +13,7 @@
 - **v1.2.2 (correctif)** : mise à jour des pointeurs de version obsolètes en en-tête (Spec v4.2→v4.3, Decisions Log v3→v4) et de la note `topics.badge_color` (§3), suite aux décisions actées en Revues & Décisions (App mobile, palette badges Topic, vert olive). Aucun changement de structure de table — ce document reste valide tel quel sur le fond, seuls les renvois et notes de statut étaient obsolètes.
 - **v1.2.3 (correctif)** : mise à jour des pointeurs de version obsolètes en en-tête (Spec v4.3→v4.4, Decisions Log v4→v5, Add Item Flow v2→v3). Aucun changement de fond.
 - **v1.2.4 (correctif — check-up pré-étape 4)** : (1) mise à jour des pointeurs de version obsolètes en en-tête (Spec v4.4→v4.5, Decisions Log v5→v5.1) ; (2) correction d'une référence interne cassée en §6 `collections` (renvoyait à "§7" — la table `sections` — au lieu de §8 `links`/§13 `collection_follows`, source réelle des compteurs). Aucun changement de structure de table, aucune décision produit modifiée.
+- **v1.2.6 (rattrapage post-dev, chantiers SEO/collections-projects)** : deux colonnes ajoutées en cours de dev sur `collections`, jamais documentées ici. `slug` (chantier SEO, Phase 1) — text unique généré depuis `name` via `unaccent()` + collision suffix numérique, remplace l'usage de `id` dans les URLs publiques (`/collections/[slug]`), voir Decisions Log §12 pour le contexte. `links_count` (chantier collections-projects, Phase 3) — compteur dénormalisé, trigger sur `user_links`, referme la note laissée ouverte en v1.2 ("non ajoutés ici"). Note ajoutée sur `links.clicks_count` (§8) : colonne existante mais non alimentée à ce jour, voir Spec §18 nouveau point.
 
 ---
 
@@ -138,16 +139,18 @@ Ce modèle couvre les 13 entités identifiées en spec §16.2, la table de joint
 | `project_id` | `uuid` | nullable, FK → `projects(id) on delete set null` | NULL = standalone |
 | `topic_id` | `text` | `not null`, FK → `topics(id)` | 1 Collection = 1 Topic principal |
 | `name` | `text` | `not null` | |
+| `slug` | `text` | `not null`, `unique` | *(ajouté v1.2.6, chantier SEO)* Généré depuis `name` via `unaccent()` + collision suffix numérique (`name`, `name-2`…), trigger before insert/update. Stable : éditer `name` ne change pas un slug déjà attribué. Sert de clé d'URL publique (`/collections/[slug]`) à la place de `id`. |
 | `description` | `text` | nullable | |
 | `note` | `text` | nullable, max 500 car. | Privé, jamais public |
 | `cover_image_url` | `text` | nullable | |
 | `is_public` | `boolean` | `default false` | Indépendant du statut du Project parent |
+| `links_count` | `integer` | `not null`, `default 0` | *(ajouté v1.2.6, chantier collections-projects)* Dénormalisé, trigger sur `user_links` (insert/delete). Referme la note "non ajouté ici" de la version précédente de ce document. |
 | `created_at` | `timestamptz` | `default now()` | |
 | `updated_at` | `timestamptz` | `default now()`, trigger | |
 
 **Décisions actées** :
 - `project_id on delete set null` : supprimer un Project ne supprime jamais ses Collections.
-- Compteurs (`links_count`, `followers_count`) : non ajoutés ici, gérés via triggers depuis `links`/`collection_follows` (voir §8 et §13).
+- `followers_count` : toujours non ajouté ici, géré via `collection_follows` (voir §13) — seul `links_count` a été matérialisé en colonne à ce jour.
 
 ---
 
@@ -184,7 +187,7 @@ Objet canonique — cœur du modèle économique.
 | `longitude` | `numeric` | nullable | |
 | `address` | `text` | nullable | Champ texte unique, non décomposé |
 | `saves_count` | `integer` | `not null`, `default 0` | Dénormalisé, maj par trigger |
-| `clicks_count` | `integer` | `not null`, `default 0` | Dénormalisé |
+| `clicks_count` | `integer` | `not null`, `default 0` | Dénormalisé — **colonne présente mais non alimentée à ce jour** *(repéré v1.2.6, chantier /analytics)* : aucun mécanisme de capture de clic n'est construit. Le dashboard `/analytics` affiche honnêtement "—" plutôt qu'un faux 0. Voir Spec §18 nouveau point. |
 | `forks_count` | `integer` | `not null`, `default 0` | **Colonne présente mais non implémentée** — mécanisme de "fork" d'un Link isolé non défini à ce jour |
 | `status` | `text` | `default 'active'`, check `in ('active','unavailable')` | |
 | `last_checked_at` | `timestamptz` | nullable | Job hebdo de vérification |

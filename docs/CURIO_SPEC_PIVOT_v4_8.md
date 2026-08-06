@@ -1,11 +1,12 @@
 # CURIO — Spécification Produit
-**Version 4.7 — Juillet 2026 — Document de référence unique**
+**Version 4.8 — Août 2026 — Document de référence unique**
 > Changelog v4.2 : passage de 8 à 10 Topics Core (ajout Beauty, Wellness). Voir CURIO_DECISIONS_LOG_v3.md §5bis pour la justification complète.
 > Changelog v4.3 : décision App mobile V1 tranchée (§16.1, §17, §18 point 4) — web mobile au lancement de la beta + coque native légère (Capacitor/Expo) avant l'ouverture publique, plutôt que React Native complet. Voir CURIO_DECISIONS_LOG_v4.md §5ter pour la justification complète. Nettoyage §18 points 6-7 : statuts réels reflétés (recrutement Founding Curator tranché en GTM v3, pricing Brand en attente de validation CEO/PO plutôt que "à traiter"). Palette des 10 badges Topic et vert olive tranchés provisoirement (§14.2, §18 points 1-2, 9) — voir CURIO_DESIGN_TOKENS_v1_2.md §1.3/§1.5. Hero orbital reclassé non-bloquant (§18 point 8).
 > Changelog v4.4 : ajout §18 point 10 — clarification de la logique de tri/personnalisation Home (§8.2), suite à la décision Algorithme & Personnalisation actée en Decisions Log v5 §5quater. Le positionnement "anti-algorithme" ne signifie pas absence de tout tri — voir Decisions Log §5quater pour le détail par surface (Following/For you/Trending/sponsorisé).
 > Changelog v4.5 (correctif de cohérence, Revues & Décisions) : §8.3 — liste des onglets Topics `/explore` complétée (Beauty, Wellness, Culture manquants, résidu de l'ancienne liste à 8 Topics). §16.2 et §17 (Roadmap Phase 0) — pointeurs vers `CURIO_DATA_MODEL_v1.md` et `CURIO_DESIGN_TOKENS_v1.md` mis à jour vers les versions réelles (`CURIO_DATA_MODEL_v1_2_3.md`, validé ; `CURIO_DESIGN_TOKENS_v1_2.md`) et cases Phase 0 recochées en conséquence. Aucun changement de fond, aucune décision produit modifiée.
 > Changelog v4.6 (correctif de cohérence, checkup Étape 4) : §4.1 — Curator Pro tranché à **9,90€/mois** (fourchette "~9-12€" non tranchée retirée) + option annuelle 89€/an. "Liens monétisés" retiré du contenu du Plan Curator Pro et remplacé par une ligne dédiée : disponible à tout curateur actif dès un seuil d'activité (à définir), indépendamment du Plan souscrit — pour ne pas freiner le volume de clics affiliés (cf. GTM_LAUNCH_v1 §3.1 v4, décision CEO déjà actée mais jamais propagée ici). Voir CURIO_DECISIONS_LOG §5quinquies pour la justification.
 > Changelog v4.7 (relecture globale finale, avant Dev & GSD) : §12.2 — correction d'une auto-incohérence du document trouvée par le fil Parcours & UX (v1.3) : le panel/bottom sheet mobile était encore décrit comme "Save link / Write a note / Create collection", contredisant §12.1 et sa propre règle ("Write a note = champ, pas une action séparée"). Corrigé en "Save link / Add a custom image / Create collection", cohérent avec §12.1. Correction miroir appliquée dans `CURIO_ADD_ITEM_FLOW_v3.md §2.2` (même résidu, même origine).
+> **Changelog v4.8 (rattrapage post-dev, Phases 1-4 en cours)** : décisions prises pendant le dev jamais repropagées ici — voir `CURIO_DECISIONS_LOG_v5_3.md` §12-§16 pour le détail complet. §8.1/§14.3 — Landing corrigée en Light (Archive), pas Dark Cosmic. §15.3 — CMP corrigé en "first-party (Axeptio pluggable)". §4.1 — Curator Pro payant annoté comme différé en V2. §8.15 (nouveau) — page `/analytics` ajoutée, absente de la liste initiale. §18 point 10 — marqué résolu (formule Following/For you/Trending, Decisions Log §15). §18 — deux nouveaux points ouverts (features Like/Comment jamais scopées ; tracking des clics non implémenté).
 
 > Ce document fait foi sur toutes les décisions produit et fonctionnelles.
 > En cas de contradiction avec les maquettes : **la spec prime**.
@@ -141,7 +142,7 @@ Tout : Projects (et leurs Collections), Collections standalone, Links non class�
 | **Gratuit** | Tous | 0€ | Sauvegarder links, créer Projects/Collections/Sections, suivre, analytics de base |
 | **Founding Curator** | ~100 premiers invités | Gratuit à vie | Plan Pro complet + badge permanent |
 | **Curateur (1ère année)** | Lancement public | Gratuit 1 an | Plan Pro complet pendant 1 an |
-| **Curator Pro** | Curateurs actifs | 9,90€/mois (89€/an) | Analytics avancées, badge Pro, priorité recommandations |
+| **Curator Pro** | Curateurs actifs | 9,90€/mois (89€/an) | Analytics avancées, badge Pro, priorité recommandations — **paiement différé en V2** *(v4.8 : aucune intégration Stripe construite avant l'ouverture publique, voir Decisions Log §14 ; personne n'est sur ce plan pendant la beta)* |
 | **Brand/Business** | Annonceurs | À définir | Données agrégées, placement contextuel sponsorisé |
 
 **Monétisation des liens (tous plans)** — la part de commission d'affiliation reversée à un curateur sur ses Links canoniques n'est **pas** un avantage Curator Pro : elle se débloque pour tout curateur actif dès un seuil d'activité (nombre de clics minimum, Collection publique — seuil exact non tranché), indépendamment du Plan souscrit. Objectif : ne jamais faire dépendre le volume de clics affiliés — moteur de revenu principal (§4.2) — d'un abonnement payant.
@@ -255,7 +256,7 @@ FAB → bottom sheet "Add to Curio" : **Save link / Add a custom image / Create 
 ## 8. Pages — Spécification complète
 
 ### 8.1 `/` Landing (non connecté)
-- Hero dark Cosmic : "The internet worth keeping." + sous-titre + CTA "Build your universe" + "Explore"
+- Hero **Light (Archive)** *(corrigé v4.8 — était "dark Cosmic" ; livré en Light suite à la maquette dédiée haute résolution, voir Decisions Log §12 pour la justification complète)* : "The internet worth keeping." + sous-titre + CTA "Build your universe" + "Explore"
 - Visualisation orbitale animée : You au centre, 10 Topics Core en orbites *(⚠️ composition visuelle probablement designée pour 8 points — validation designer requise, voir points ouverts §18)*
 - Social proof : "Join the first 1,000 curators." + avatars
 - Logos presse : Monocle · Kinfolk · Sight Unseen · NYT · Apartamento · Vogue
@@ -339,6 +340,12 @@ FAB → bottom sheet "Add to Curio" : **Save link / Add a custom image / Create 
 ### 8.14 `/settings`
 - Account : Profile · Preferences · Notifications · Privacy · Connected apps · Language · Theme (Light/Dark) · Billing
 - CTA "Delete account" → purge complète RGPD
+
+### 8.15 `/analytics` *(nouveau, v4.8 — absent de la liste initiale)*
+- Dashboard analytics de base (§4.1 "analytics de base", tous plans confondus tant que Curator Pro payant est différé — voir §4.1, Decisions Log §14)
+- Total saves, total clicks *(affiché honnêtement "—" tant qu'aucun mécanisme ne l'alimente, voir §18 nouveau point sur le tracking des clics)*, top links triés par saves décroissants
+- `forks_count` volontairement omis de l'affichage (colonne présente en DB, mécanisme de fork non défini, §9.1)
+- Page privée, protégée, `noindex`
 
 ---
 
@@ -500,8 +507,8 @@ Jamais affichés publiquement. Jamais d'entité Note standalone. Décision défi
 Palette complète des 10 badges assignée pour débloquer le dev — voir `CURIO_DESIGN_TOKENS_v1_2.md §1.5` pour les valeurs hex et le détail par Topic. Travel/Design/Food confirmés par mesure directe ; les 7 autres sont provisoires, en attente de confirmation designer, mais utilisables en dev sans bloquer.
 
 ### 14.3 Mode par défaut
-- Web connecté : **Light (Archive)** par défaut — toggle dans Settings
-- Landing non connectée : Dark (Cosmic)
+- Web connecté : **Light (Archive)** par défaut — toggle réel *(différé Phase 5, voir Decisions Log §16 — la colonne `users.theme_preference` existe en base mais aucune page connectée n'est encore auditée en dark mode ; `/settings` affiche "Coming soon" en attendant)*
+- Landing non connectée : **Light (Archive)** *(corrigé v4.8, était "Dark Cosmic" — voir Decisions Log §12)*
 - App mobile : Dark (Cosmic)
 
 ### 14.4 Deux modes UI
@@ -550,7 +557,7 @@ Events obligatoires :
 Propriétés utilisateur : topics, type (curator/discoverer), plan, langue, localisation, dates clés.
 
 ### 15.3 RGPD & Cookies — Axeptio
-- CMP : Axeptio (français, RGPD-native)
+- CMP : **first-party (Axeptio pluggable)** *(corrigé v4.8 — livré en bannière first-party on-brand, aucun compte Axeptio créé à ce jour ; le point de bascule vers une intégration Axeptio réelle est documenté dans le code, voir Decisions Log §13)*
 - Strictement nécessaires (auth, session) : sans consentement
 - Analytics (PostHog) : consentement requis
 - Marketing/placement produit : consentement requis
@@ -672,4 +679,6 @@ Propriétés utilisateur : topics, type (curator/discoverer), plan, langue, loca
 7. ~~Processus recrutement Founding Curators~~ — **TRANCHÉ (GTM_LAUNCH_v1 v3 §1)** : critères de sélection, séquencement Wave 1 sans quota, canal (landing page dédiée), pitch, calendrier. Rien à rouvrir ici.
 8. **Composition visuelle du hero orbital (§8.1, §14.6)** — **Reclassé non-bloquant (CEO/PO)** : le hero orbital est une composition générée (points disposés algorithmiquement), pas un asset figé — on code une disposition symétrique à 10 points dès maintenant et on l'ajuste visuellement si le designer a un avis, moins coûteux à corriger après coup qu'une palette de badges déjà codée en dur. Ne bloque plus le début de la Phase 2.
 9. ~~Risque de confusion badge Wellness / Design~~ — **RÉSOLU** : la palette tranchée en `CURIO_DESIGN_TOKENS_v1_2.md §1.5` assigne à Wellness un bleu-sauge (`#93AFA8`), suffisamment distinct de l'olive de Design (`#6A7B7A`).
-10. **[v5]** Détail technique du scoring "For you" (§8.2) — principe acté en Decisions Log §5quater (personnalisation par préférence explicite, jamais par score d'engagement), pondération exacte à trancher au moment du prompt GSD Phase 3 → CEO/PO + dev, non bloquant pour le début de Phase 1-2.
+10. ~~Détail technique du scoring "For you" (§8.2)~~ — **RÉSOLU (v4.8)** : Following chronologique pur (`follows`), For you = Collections publiques dont le `topic_id` correspond aux Topics d'onboarding de l'utilisateur (`user_topics`), Trending = tri par `followers_count` puis récence, non personnalisé. Voir Decisions Log §15.
+11. **[v4.8, nouveau]** Features Like / Comment / Mention — §8.13 (`/notifications`) suppose ces trois types d'événements, mais aucune des trois fonctionnalités sources n'est scopée dans une phase du roadmap ci-dessus. Le chantier Notifications (Phase 4) a livré les onglets correspondants en "Coming soon" plutôt que d'improviser. À trancher : Phase 4/5 ou V1.1+ ? Voir Decisions Log §11 point 12.
+12. **[v4.8, nouveau]** Tracking des clics (`links.clicks_count`) — colonne dénormalisée en base (§9.2/Data Model §8) mais aucun mécanisme ne l'incrémente à ce jour (repéré au chantier `/analytics`, §8.15). Nécessite un point de capture d'événement non encore construit (redirect serveur, pixel, ou beacon — à trancher). Voir Decisions Log §11 point 13.
