@@ -355,6 +355,18 @@
     "uniqueBody": "Keep exploring, keep collecting, keep building.",
     "uniqueCta": "Explore more"
   },
+  "MyUniverse": {
+    "title": "My Universe",
+    "subtitle": "You at the centre — your projects and collections in orbit. Tap a node to open it.",
+    "you": "You",
+    "figureLabel": "Your universe: you at the centre, surrounded by your projects and collections",
+    "projectNodeLabel": "Project {name}: {collections, plural, =0 {no collections} one {# collection} other {# collections}}, {links, plural, =0 {no links} one {# link} other {# links}}",
+    "collectionNodeLabel": "Collection {name}: {links, plural, =0 {no links} one {# link} other {# links}}",
+    "emptyTag": "Nothing yet",
+    "emptyTitle": "Your universe is waiting to take shape",
+    "emptyBody": "Create a project or a collection and it will appear here, orbiting around you.",
+    "emptyCta": "Start a project"
+  },
   "Saved": {
     "metaTitle": "Saved",
     "metaDescription": "Every link you've saved on Curio — sorted into collections or waiting in Unsorted.",

@@ -11,6 +11,7 @@ import { AppHeader } from '@/components/app/app-header'
 import { ProfileIdentity } from '@/components/app/profile-identity'
 import { CollectionGrid } from '@/components/app/collection-grid'
 import { StatList } from '@/components/app/stat-list'
+import { UniverseOrbital } from '@/components/app/universe-orbital'
 import { EmptyState } from '@/components/public/empty-state'
 import {
   getCurrentUser,
@@ -19,6 +20,7 @@ import {
   getFollowedCurators,
   getMySpaceStats,
 } from '@/lib/app/data'
+import { getMyUniverse } from '@/lib/universe/data'
 import { getUserPlan } from '@/lib/plans/data'
 
 /**
@@ -59,14 +61,17 @@ export default async function MySpacePage({ params }: PageProps) {
 
   const t = await getTranslations({ locale, namespace: 'MySpace' })
   const tPlan = await getTranslations({ locale, namespace: 'PlanBadge' })
+  const tUniverse = await getTranslations({ locale, namespace: 'MyUniverse' })
 
-  const [topics, collections, curators, stats, plan] = await Promise.all([
-    getUserTopics(user.id, locale),
-    getMyCollections(user.id, 6),
-    getFollowedCurators(user.id, 8),
-    getMySpaceStats(user.id),
-    getUserPlan(user.id),
-  ])
+  const [topics, collections, curators, stats, plan, universe] =
+    await Promise.all([
+      getUserTopics(user.id, locale),
+      getMyCollections(user.id, 6),
+      getFollowedCurators(user.id, 8),
+      getMySpaceStats(user.id),
+      getUserPlan(user.id),
+      getMyUniverse(),
+    ])
 
   const joinedLabel = t('joined', {
     date: new Date(user.createdAt).toLocaleDateString(
@@ -90,6 +95,44 @@ export default async function MySpacePage({ params }: PageProps) {
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-2xl px-lg py-2xl lg:grid-cols-[1fr_18rem] lg:px-2xl">
         {/* Main column. */}
         <div className="flex min-w-0 flex-col gap-2xl">
+          {/* My Universe — the real interactive orbital view (§7.5). Hero of the
+              page: You at the centre with your Projects and standalone
+              Collections in orbit, each a real navigable node. Empty universe
+              (fresh account) shows its designed empty state, no fake seeding. */}
+          <section className="flex flex-col gap-lg">
+            <div className="flex flex-col gap-2xs">
+              <h2 className="font-serif text-h2 text-foreground">
+                {tUniverse('title')}
+              </h2>
+              <p className="font-sans text-body-small text-foreground/60">
+                {tUniverse('subtitle')}
+              </p>
+            </div>
+            {universe.nodes.length > 0 ? (
+              <div className="rounded-lg border border-border-light bg-foreground/[0.02] px-lg py-xl">
+                <UniverseOrbital
+                  nodes={universe.nodes}
+                  centerLabel={tUniverse('you')}
+                />
+              </div>
+            ) : (
+              <EmptyState
+                tag={tUniverse('emptyTag')}
+                title={tUniverse('emptyTitle')}
+                body={tUniverse('emptyBody')}
+                action={
+                  <Link
+                    href="/projects"
+                    className="inline-flex h-11 items-center gap-sm rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors hover:opacity-90"
+                  >
+                    {tUniverse('emptyCta')}
+                    <ArrowRight className="size-4" aria-hidden />
+                  </Link>
+                }
+              />
+            )}
+          </section>
+
           <ProfileIdentity
             displayName={user.displayName}
             username={user.username}
