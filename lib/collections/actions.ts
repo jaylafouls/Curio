@@ -433,3 +433,66 @@ export async function unfollowCollection(
   }
   return { ok: true }
 }
+
+/**
+ * Viewer-specific follow state for a collection, read AFTER hydration by the
+ * client Follow button — never at the public page's render, so the ISR HTML
+ * stays cookie-free and identical for everyone (same discipline as the owner
+ * overlay). The caller is re-derived from the session; the client id is never
+ * trusted.
+ *
+ * Returns the three facts the button needs to decide what to show:
+ *  - loggedIn:   anon visitors get a disabled/sign-in affordance, not a follow.
+ *  - isOwner:    the owner never follows their own collection (the edit bar
+ *                shows instead); hide the button entirely for them.
+ *  - isFollowing: drives the Follow / Following toggle label + optimistic state.
+ *
+ * A collection the caller cannot see (private, not theirs) yields isOwner=false
+ * and isFollowing=false — the button simply won't render a useful action, which
+ * matches the fact that such a collection isn't reachable at a public URL.
+ */
+export type CollectionFollowState = {
+  loggedIn: boolean
+  isOwner: boolean
+  isFollowing: boolean
+}
+
+export async function getCollectionFollowState(
+  collectionId: string,
+): Promise<CollectionFollowState> {
+  const notLoggedIn: CollectionFollowState = {
+    loggedIn: false,
+    isOwner: false,
+    isFollowing: false,
+  }
+  if (!collectionId) return notLoggedIn
+
+  const userId = await getUserId()
+  if (!userId) return notLoggedIn
+
+  const supabase = await createClient()
+
+  // Owner check: a collection the caller owns (RLS lets the owner read it even
+  // when private). owner_id null → not visible to the caller → treat as public
+  // non-owner, isFollowing decided by the follow row below.
+  const { data: collection } = await supabase
+    .from('collections')
+    .select('owner_id')
+    .eq('id', collectionId)
+    .maybeSingle()
+  const isOwner = collection?.owner_id === userId
+
+  // Follow edge: collection_follows_select_public lets anyone read the rows, so
+  // the caller can see their own edge. head+count avoids pulling the row.
+  const { count } = await supabase
+    .from('collection_follows')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('collection_id', collectionId)
+
+  return {
+    loggedIn: true,
+    isOwner,
+    isFollowing: (count ?? 0) > 0,
+  }
+}

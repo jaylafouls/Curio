@@ -479,7 +479,12 @@
     "emptyTitle": "Rien ici pour l'instant",
     "emptyBody": "Cette collection n'a encore aucun lien.",
     "notFoundTitle": "Collection introuvable",
-    "notFoundBody": "Cette collection n’existe pas, ou elle est privée."
+    "notFoundBody": "Cette collection n’existe pas, ou elle est privée.",
+    "follow": "Suivre",
+    "following": "Suivi",
+    "unfollow": "Ne plus suivre",
+    "followSignIn": "Connectez-vous pour suivre",
+    "followError": "Échec — réessayez."
   },
   "SaveFlow": {
     "open": "Ajouter à Curio",
