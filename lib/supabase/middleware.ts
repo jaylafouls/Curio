@@ -37,6 +37,7 @@ const PROTECTED_SEGMENTS = [
   'projects',
   'settings',
   'analytics',
+  'notifications',
 ] as const
 
 function isProtectedPath(pathname: string): boolean {

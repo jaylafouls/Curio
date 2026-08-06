@@ -322,6 +322,8 @@
     "myUniverse": "Mon univers",
     "projects": "Projets",
     "analytics": "Statistiques",
+    "notifications": "Notifications",
+    "notificationsWithCount": "Notifications, {count, plural, one {# non lue} other {# non lues}}",
     "settings": "Paramètres",
     "logout": "Se déconnecter"
   },
@@ -477,7 +479,12 @@
     "emptyTitle": "Rien ici pour l'instant",
     "emptyBody": "Cette collection n'a encore aucun lien.",
     "notFoundTitle": "Collection introuvable",
-    "notFoundBody": "Cette collection n’existe pas, ou elle est privée."
+    "notFoundBody": "Cette collection n’existe pas, ou elle est privée.",
+    "follow": "Suivre",
+    "following": "Suivi",
+    "unfollow": "Ne plus suivre",
+    "followSignIn": "Connectez-vous pour suivre",
+    "followError": "Échec — réessayez."
   },
   "SaveFlow": {
     "open": "Ajouter à Curio",
@@ -635,5 +642,30 @@
     "emptyTag": "Rien pour l’instant",
     "emptyTitle": "Vos statistiques apparaîtront ici",
     "emptyBody": "Enregistrez des liens pour suivre leur performance sur Curio."
+  },
+  "Notifications": {
+    "metaTitle": "Notifications",
+    "metaDescription": "Votre activité récente sur Curio — nouveaux abonnés et abonnements à vos collections.",
+    "title": "Notifications",
+    "subtitle": "Vos nouveaux abonnés et les personnes qui suivent vos collections.",
+    "tablistLabel": "Filtrer les notifications",
+    "tab": {
+      "all": "Tout",
+      "comments": "Commentaires",
+      "follows": "Abonnements",
+      "likes": "J’aime",
+      "mentions": "Mentions"
+    },
+    "comingSoon": "Bientôt",
+    "comingSoonTag": "Bientôt",
+    "comingSoonTitle": "Pas encore disponible",
+    "comingSoonBody": "Ce type d’activité apparaîtra ici dès que la fonctionnalité sera lancée.",
+    "followedYou": "a commencé à vous suivre",
+    "followedCollection": "a commencé à suivre votre collection",
+    "someone": "Quelqu’un",
+    "unread": "Non lue",
+    "emptyTag": "Rien pour l’instant",
+    "emptyTitle": "Aucune notification pour l’instant",
+    "emptyBody": "Lorsqu’une personne vous suit ou suit l’une de vos collections, vous le verrez ici."
   }
 }

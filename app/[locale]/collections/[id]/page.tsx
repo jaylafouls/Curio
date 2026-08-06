@@ -5,6 +5,7 @@ import type { Locale } from '@/lib/i18n/routing'
 import { getPublicCollectionBySlug } from '@/lib/collections/data'
 import { CollectionDetailBody } from '@/components/app/collection-detail-body'
 import { CollectionOwnerOverlay } from '@/components/app/collection-owner-overlay'
+import { CollectionFollowButton } from '@/components/app/collection-follow-button'
 import { CollectionPrivateClient } from '@/components/app/collection-private-client'
 
 /**
@@ -74,6 +75,11 @@ export default async function CollectionPage({ params }: PageProps) {
       <>
         <div className="pt-2xl">
           <CollectionOwnerOverlay collectionId={collection.id} locale={locale} />
+          {/* Viewer follow toggle — client-side, keyed off the collection id, so
+              the ISR body stays cookie-free. Renders nothing for the owner. */}
+          <div className="mx-auto w-full max-w-4xl px-lg lg:px-2xl">
+            <CollectionFollowButton collectionId={collection.id} />
+          </div>
         </div>
         <CollectionDetailBody
           collection={collection}

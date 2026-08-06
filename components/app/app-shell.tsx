@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react'
 import { AppSidebar } from './app-sidebar'
 import { AppBottomNav } from './app-bottom-nav'
+import { NotificationBell } from './notification-bell'
 import { SaveFlowProvider } from './save-flow/save-flow-provider'
 import { getSaveTargets } from '@/lib/links/data'
+import { getUnreadNotificationCount } from '@/lib/notifications/data'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
@@ -37,10 +39,20 @@ export async function AppShell({
   // "Save to" step. A fresh account gets [] and the picker shows only "Unsorted".
   const saveTargets = await getSaveTargets(userId)
 
+  // Unread notification count for the header bell (chantier notifications). RLS
+  // scopes it to the signed-in recipient; 0 for a fresh account.
+  const unreadCount = await getUnreadNotificationCount(userId)
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <AppSidebar user={user} locale={locale} />
       <div className="flex min-w-0 flex-1 flex-col">
+        {/* Connected top bar — carries the notification bell on every connected
+            page (the greeting header only exists on Home/My Space). Sticky so
+            the bell stays reachable while the content column scrolls. */}
+        <div className="sticky top-0 z-30 flex justify-end border-b border-border-light bg-background/90 px-lg py-sm backdrop-blur-md lg:px-2xl">
+          <NotificationBell unreadCount={unreadCount} />
+        </div>
         <main className="flex-1">{children}</main>
         <AppBottomNav />
       </div>
