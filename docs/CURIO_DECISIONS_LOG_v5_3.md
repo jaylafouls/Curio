@@ -6,6 +6,7 @@
 > Changelog v5.1 (correctif) : mise à jour des pointeurs de version obsolètes en en-tête (Spec v4.3→v4.4, Add Item Flow v2→v3). Aucun changement de fond.
 > Changelog v5.2 : ajout §5quinquies — correction Curator Pro (prix tranché 9,90€/mois, "liens monétisés" retiré du Plan Pro). Décision CEO déjà actée dans GTM_LAUNCH_v1 §3.1 (v4) mais jamais propagée à la spec — corrigé ici (Spec v4.5→v4.6 §4.1). Repéré lors du checkup de cohérence pré-ouverture Dev & GSD (Étape 4).
 > **Changelog v5.3 (rattrapage post-dev, Phases 1-4 en cours)** : de nombreuses décisions ont été prises pendant le développement (chantiers 4 à 15) sans jamais être repropagées dans les documents — repéré par le CEO/PO ("on n'a pas mis à jour les documents") après que GSD a commencé à signaler des incohérences spec/code en Phase 4. Rattrapage complet : ajout §12 (Landing en mode Light, pas Dark Cosmic), §13 (CMP first-party, Axeptio différé), §14 (Curator Pro payant entièrement reporté en V2), §15 (formule "For you"/"Trending" — résout §11 point 10), §16 (Theme toggle connecté différé Phase 5). §11 mis à jour (points résolus + deux nouveaux points ouverts : features Like/Comment jamais scopées, tracking des clics non implémenté). Corrections miroir dans `CURIO_SPEC_PIVOT_v4_7.md` (→ v4.8) et `CURIO_DATA_MODEL_v1_2_5.md` (→ v1.2.6).
+> **Changelog v5.4 (ouverture Phase 5 — Polish & Extension)** : ajout §17 — décision Transport & Auth de l'extension Chrome, actée au lancement de la Phase 5. Tranche le transport (routes `/api/extension/*` enveloppant `lib/links`/`lib/collections`) et l'authentification (token dédié depuis une session web authentifiée, pas de cookie cross-origin). Découpage Phase 5 en 6 branches verrouillé dans `docs/CURIO_PHASE5_ROADMAP.md`.
 
 > Ce document capture le "pourquoi" derrière toutes les décisions produit.
 > Il complète CURIO_SPEC_PIVOT_v4.8.md (le quoi) et CURIO_ADD_ITEM_FLOW_v3.1.md (le comment).
@@ -329,6 +330,30 @@ Design Token File avant tout code. Comparaison screenshot maquette/rendu à chaq
 **Raison** : un toggle "réel" mais non audité (bordures, cards, badges, images jamais vérifiés en sombre) produirait un dark mode à moitié cassé — contraire au principe de fidélité maquette (§10) et à l'exigence de vérification visuelle réelle avant de considérer un écran fini. Mieux vaut un état honnête ("bientôt disponible") qu'une fonctionnalité livrée mais dégradée.
 
 **Conséquence** : le vrai toggle persisté est programmé pour la Phase 5 ("Design Tokens appliqués, comparaison screenshots systématique"), une fois l'audit dark mode fait sur `/home`, `/my-space`, `/saved`, `/projects`, `/collections/[id]`, `/settings`, `/analytics`, `/notifications`. La colonne `theme_preference` reste en base, prête, non exploitée par l'UI pour l'instant.
+
+---
+
+## 17. Extension Chrome — Transport & Auth (v5.4, ouverture Phase 5)
+
+**Contexte** : la Phase 5 (§Spec Pivot v4.8 « Phase 5 — Polish & Extension ») prévoit une extension Chrome refaite avec 3 actions V1 : résoudre une URL en métadonnées (`resolve`), sauvegarder un Link (`save`), lister les Collections cibles de l'utilisateur (`collections`). Deux choix structurants devaient être tranchés avant d'écrire une ligne d'extension : par où passent les appels (transport), et comment l'extension s'authentifie (auth). Une extension s'exécute sur un origin `chrome-extension://…` distinct de l'app web — les décisions habituelles de session web ne s'y appliquent pas telles quelles.
+
+**Décision actée (CEO/PO, ouverture Phase 5)** :
+
+1. **Transport — option (a) : routes API dédiées.** Trois routes `/api/extension/{resolve,save,collections}` (App Router route handlers) enveloppent la logique métier déjà existante dans `lib/links` (résolution/normalisation d'URL, `og.ts`, création de Link) et `lib/collections` (liste des Collections de l'utilisateur, insertion dans une Collection). L'extension n'appelle jamais Supabase ni la logique métier en direct — elle passe exclusivement par ces routes.
+
+2. **Auth — token dédié, pas de cookie cross-origin.** L'extension s'authentifie via un token dédié, obtenu par un flux de connexion depuis une session web déjà authentifiée (l'utilisateur se connecte sur l'app web, puis l'extension récupère/échange un token porté ensuite en en-tête sur les appels `/api/extension/*`). Aucun partage de cookie de session cross-origin entre `chrome-extension://` et le domaine web.
+
+**Raison** :
+
+- *Transport (a)* : réutilise `lib/links`/`lib/collections` sans dupliquer la logique métier ni la réimplémenter côté extension — une seule source de vérité pour la résolution d'URL, la normalisation et les règles d'insertion. Les routes forment une frontière explicite, versionnable et testable (Playwright ad-hoc + tests d'API) entre un client non fiable (l'extension) et le cœur applicatif, là où une extension tapant directement dans Supabase disperserait les règles RLS/métier sur un origin qu'on ne contrôle pas au runtime.
+- *Auth par token dédié* : les cookies de session ne traversent pas proprement la frontière `chrome-extension://` → domaine web (SameSite, absence d'origin web fiable, risque CSRF sur des routes mutantes). Un token dédié rend l'authentification de l'extension explicite, révocable indépendamment de la session web, et découplée du cycle de vie du cookie web — cohérent avec le principe « frontière explicite pour un client non fiable » du choix transport.
+
+**Conséquence** :
+
+- Chantier `phase5/chrome-extension` : construit les 3 routes `/api/extension/*` (enveloppes minces au-dessus de `lib/links`/`lib/collections`), le flux d'émission/échange de token depuis une session web authentifiée, et l'extension consommant ces routes avec le token en en-tête.
+- Les 3 routes doivent respecter les non-négociables projet : opt-in strict analytics (aucun event PostHog sans consentement), aucun cookie non essentiel posé par l'extension, région Supabase EU inchangée.
+- Distribution V1 : build store-ready (icônes, manifest, lien Privacy Policy) livré par le chantier ; la soumission au Chrome Web Store est manuelle, effectuée par le CEO/PO plus tard — **hors périmètre** du chantier.
+- Découpage complet de la Phase 5 en 6 branches : voir `docs/CURIO_PHASE5_ROADMAP.md`.
 
 ---
 

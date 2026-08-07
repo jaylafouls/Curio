@@ -23,10 +23,17 @@ export const PROJECT_COLORS = [
 export type ProjectColor = (typeof PROJECT_COLORS)[number]
 
 /**
- * Hex backing each swatch — the SAME 5 values the onboarding universe picker
- * uses (app/[locale]/onboarding/onboarding-wizard.tsx COLOR_HEX), reused here so
- * a project swatch and a universe swatch read identically. Stored verbatim as
- * projects.color, and rendered as the dot on a project card.
+ * Hex backing each swatch — the single source of truth for the 5-swatch palette.
+ * The onboarding universe picker imports this map (COLOR_HEX in
+ * app/[locale]/onboarding/onboarding-wizard.tsx) rather than redefining it, so a
+ * project swatch and a universe swatch can never drift apart (design-token
+ * audit, Phase 5). Stored verbatim as projects.color, rendered as the dot on a
+ * project card.
+ *
+ * These hexes mirror tokens in tailwind.config.ts (violet/beige/olive + two
+ * badge hues); if a token value changes (e.g. olive is reconfirmed by the
+ * designer, Design Tokens §1.3), update it here too — this map is plain hex
+ * because projects.color is persisted as text, not a Tailwind class.
  */
 export const PROJECT_COLOR_HEX: Record<ProjectColor, string> = {
   violet: '#785CFF',
