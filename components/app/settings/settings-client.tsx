@@ -20,7 +20,8 @@ import {
   CreditCard,
   Palette,
 } from 'lucide-react'
-import { Button, Input, Modal, Avatar } from '@/components/ui'
+import { Button, Input, Modal, Avatar, ThemeToggle } from '@/components/ui'
+import type { ThemeMode } from '@/components/ui'
 import { cn } from '@/lib/ui/cn'
 import { createClient } from '@/lib/supabase/client'
 import { usePathname, useRouter } from '@/lib/i18n/navigation'
@@ -30,6 +31,12 @@ import {
   updateLanguage,
   deleteAccount,
 } from '@/lib/settings/actions'
+import { updateThemePreference } from '@/lib/theme/actions'
+import {
+  modeToPreference,
+  preferenceToMode,
+  type ThemePreference,
+} from '@/lib/theme/types'
 import type { SettingsProfile, ConnectedIdentity } from '@/lib/settings/data'
 import type { Locale } from '@/lib/i18n/routing'
 
@@ -55,10 +62,12 @@ export function SettingsClient({
   profile,
   identities,
   locale,
+  themePreference,
 }: {
   profile: SettingsProfile
   identities: ConnectedIdentity[]
   locale: Locale
+  themePreference: ThemePreference
 }) {
   const t = useTranslations('Settings')
 
@@ -83,11 +92,7 @@ export function SettingsClient({
         heading={t('billingHeading')}
         body={t('billingComingSoon')}
       />
-      <ComingSoonSection
-        icon={<Palette className="size-5" aria-hidden />}
-        heading={t('themeHeading')}
-        body={t('themeComingSoon')}
-      />
+      <ThemeSection initial={themePreference} />
       <DeleteSection locale={locale} />
     </div>
   )
@@ -552,7 +557,66 @@ function ConnectedSection({
   )
 }
 
-// ── Coming soon (Notifications / Billing / Theme) ────────────────────────────
+// ── Theme (Cosmic / Archive) ─────────────────────────────────────────────────
+
+/**
+ * ThemeSection — the real persisted theme toggle (spec §8.14, Decisions Log §16,
+ * Phase 5). Controlled ThemeToggle: this section owns both the live DOM flip and
+ * the persistence, so the toggle stays a pure visual control.
+ *
+ * The `.dark` class is scoped to the connected AppShell boundary
+ * (`[data-app-shell]`), NOT <html> — Cosmic mode applies to authenticated pages
+ * only, matching where the server applies it on load. The persist is best-effort
+ * (mirrors the Language section): a failed write only means the choice won't be
+ * remembered cross-device; it never blocks the immediate visual switch.
+ */
+function ThemeSection({ initial }: { initial: ThemePreference }) {
+  const t = useTranslations('Settings')
+  const [mode, setMode] = useState<ThemeMode>(() => preferenceToMode(initial))
+  const [, startTransition] = useTransition()
+
+  function choose(next: ThemeMode) {
+    setMode(next)
+    // Live flip on the connected theme boundary (the AppShell root). Falls back
+    // to <html> only if the marker is somehow absent (defensive; the shell
+    // always renders it on connected pages).
+    const target =
+      document.querySelector<HTMLElement>('[data-app-shell]') ??
+      document.documentElement
+    target.classList.toggle('dark', next === 'cosmic')
+    // Persist (best-effort) so the choice survives across sessions/devices.
+    startTransition(async () => {
+      await updateThemePreference(modeToPreference(next))
+    })
+  }
+
+  const isCosmic = mode === 'cosmic'
+
+  return (
+    <Section heading={t('themeHeading')} hint={t('themeHint')}>
+      <div className="flex flex-col gap-md rounded-md border border-border-light bg-foreground/[0.02] p-md sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-sm">
+          <Palette className="mt-0.5 size-5 shrink-0 text-violet" aria-hidden />
+          <div className="flex flex-col gap-2xs">
+            <span className="font-sans text-body-small font-medium text-foreground">
+              {isCosmic ? t('themeCosmic') : t('themeArchive')}
+            </span>
+            <span className="font-sans text-meta text-foreground/60">
+              {isCosmic ? t('themeCosmicBody') : t('themeArchiveBody')}
+            </span>
+          </div>
+        </div>
+        <ThemeToggle
+          mode={mode}
+          onModeChange={choose}
+          className="shrink-0 self-start sm:self-auto"
+        />
+      </div>
+    </Section>
+  )
+}
+
+// ── Coming soon (Notifications / Billing) ────────────────────────────────────
 
 function ComingSoonSection({
   icon,

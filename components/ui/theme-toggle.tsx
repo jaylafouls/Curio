@@ -11,9 +11,16 @@ import { cn } from '@/lib/ui/cn'
  * demonstrable, but does NOT persist the choice — real persistence lands with
  * Auth/Settings later.
  *
- * Archive = light (default, no class). Cosmic = dark (`.dark` on <html>).
- * Optionally controlled via `mode` + `onModeChange`; otherwise it self-manages
- * and syncs from the current document state on mount.
+ * Archive = light (default, no class). Cosmic = dark.
+ *
+ * Two modes:
+ *  - UNCONTROLLED (no `mode` prop): self-manages, flipping `.dark` on <html> and
+ *    syncing from the current document state on mount. Used in the showcase as a
+ *    standalone demo.
+ *  - CONTROLLED (`mode` + `onModeChange`): a pure visual control. It does NOT
+ *    touch the DOM — the parent owns the class flip (e.g. Settings scopes `.dark`
+ *    to the connected AppShell boundary, not <html>) and persistence. The toggle
+ *    only reports the intended next mode via onModeChange.
  */
 export type ThemeMode = 'archive' | 'cosmic'
 
@@ -44,9 +51,13 @@ export function ThemeToggle({
 
   const toggle = () => {
     const next: ThemeMode = mode === 'archive' ? 'cosmic' : 'archive'
-    // Reflect on <html> so the CSS-variable theme flips (globals.css .dark).
-    document.documentElement.classList.toggle('dark', next === 'cosmic')
-    if (controlledMode === undefined) setInternal(next)
+    if (controlledMode === undefined) {
+      // Uncontrolled: own the DOM side-effect — flip `.dark` on <html> so the
+      // CSS-variable theme flips (globals.css .dark), and track internally.
+      document.documentElement.classList.toggle('dark', next === 'cosmic')
+      setInternal(next)
+    }
+    // Controlled: report the intended mode; the parent owns the class flip.
     onModeChange?.(next)
   }
 
