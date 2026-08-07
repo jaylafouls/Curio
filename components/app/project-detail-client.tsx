@@ -164,7 +164,7 @@ export function ProjectDetailClient({
                 aria-label={t('detach')}
                 title={t('detach')}
                 className={cn(
-                  'absolute right-2 top-2 hidden rounded-full bg-background/90 p-1.5 text-foreground/60 shadow-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet group-hover:block',
+                  'absolute right-2 top-2 hidden rounded-full bg-background/90 p-1.5 text-foreground/60 shadow-sm dark:shadow-glow-violet transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet group-hover:block',
                   'disabled:opacity-50',
                 )}
               >

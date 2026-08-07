@@ -41,7 +41,7 @@ export function Tabs({
       role="tablist"
       className={cn(
         'flex items-center',
-        isPill ? 'gap-sm flex-wrap' : 'gap-lg border-b border-border-light',
+        isPill ? 'gap-sm flex-wrap' : 'gap-lg border-b border-border',
         className,
       )}
     >
@@ -61,7 +61,7 @@ export function Tabs({
                     'rounded-full px-md py-xs',
                     active
                       ? 'bg-violet text-button-text-on-dark'
-                      : 'border border-border-light text-foreground/70 hover:bg-foreground/5',
+                      : 'border border-border text-foreground/70 hover:bg-foreground/5',
                   )
                 : cn(
                     '-mb-px flex items-center gap-xs border-b-2 pb-sm',

@@ -67,7 +67,7 @@ export async function AppShell({
         {/* Connected top bar — carries the notification bell on every connected
             page (the greeting header only exists on Home/My Space). Sticky so
             the bell stays reachable while the content column scrolls. */}
-        <div className="sticky top-0 z-30 flex justify-end border-b border-border-light bg-background/90 px-lg py-sm backdrop-blur-md lg:px-2xl">
+        <div className="sticky top-0 z-30 flex justify-end border-b border-border bg-background/90 px-lg py-sm backdrop-blur-md lg:px-2xl">
           <NotificationBell unreadCount={unreadCount} />
         </div>
         <main className="flex-1">{children}</main>

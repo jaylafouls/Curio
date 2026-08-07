@@ -38,7 +38,7 @@ export function SavedLinksClient({ links }: { links: SavedLink[] }) {
       />
 
       {visible.length > 0 ? (
-        <ul className="flex flex-col divide-y divide-border-light">
+        <ul className="flex flex-col divide-y divide-border">
           {visible.map((link) => (
             <li key={link.id}>
               <SavedLinkRow link={link} unsortedLabel={t('unsortedBadge')} />

@@ -33,7 +33,7 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <section className="flex flex-col gap-md border-t border-border-light pt-lg">
+    <section className="flex flex-col gap-md border-t border-border pt-lg">
       <div className="flex flex-col gap-xs">
         <h2 className="font-serif text-h2 text-foreground">{title}</h2>
         {hint ? (

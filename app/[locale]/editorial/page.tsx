@@ -62,7 +62,7 @@ export default async function EditorialPage({ params }: PageProps) {
               <li key={p.id}>
                 <Link
                   href={`/editorial/${p.slug}`}
-                  className="group flex flex-col overflow-hidden rounded-lg border border-border-light bg-foreground/[0.03] transition-shadow duration-base hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+                  className="group flex flex-col overflow-hidden rounded-lg border border-border bg-foreground/[0.03] transition-shadow duration-base hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
                 >
                   <div className="aspect-[3/2] w-full overflow-hidden bg-violet-soft/20">
                     {p.cover ? (

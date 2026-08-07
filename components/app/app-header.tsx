@@ -26,7 +26,7 @@ export async function AppHeader({ displayName }: { displayName: string }) {
   const key = greetingKey(new Date().getHours())
 
   return (
-    <header className="border-b border-border-light bg-background px-lg py-lg lg:px-2xl">
+    <header className="border-b border-border bg-background px-lg py-lg lg:px-2xl">
       {/* Mobile-only brand lockup (desktop shows it in the sidebar). */}
       <Link
         href="/home"

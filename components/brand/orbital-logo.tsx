@@ -38,14 +38,16 @@ export function OrbitalLogo({ label, size = 96, className }: OrbitalLogoProps) {
             cx="50"
             cy="50"
             r="42"
-            stroke="rgb(120 92 255 / 0.35)"
+            stroke="rgb(var(--brand-violet) / 0.35)"
             strokeWidth="1"
           />
-          <circle cx="50" cy="8" r="2.4" fill="#785CFF" />
-          <circle cx="88" cy="60" r="1.6" fill="rgb(250 251 242 / 0.7)" />
-          <circle cx="16" cy="66" r="1.4" fill="rgb(250 251 242 / 0.5)" />
+          <circle cx="50" cy="8" r="2.4" fill="rgb(var(--brand-violet))" />
+          <circle cx="88" cy="60" r="1.6" fill="rgb(var(--brand-archive) / 0.7)" />
+          <circle cx="16" cy="66" r="1.4" fill="rgb(var(--brand-archive) / 0.5)" />
         </g>
-        {/* The serif C sits still at the centre. */}
+        {/* The serif C sits still at the centre. Archive/light ink — this logo
+            renders on the Cosmic onboarding/signup surface (no .dark), so a fixed
+            light glyph is intentional. Driven by the brand var, not a raw hex. */}
         <text
           x="50"
           y="50"
@@ -53,7 +55,7 @@ export function OrbitalLogo({ label, size = 96, className }: OrbitalLogoProps) {
           textAnchor="middle"
           className="font-serif"
           fontSize="46"
-          fill="rgb(250 251 242)"
+          fill="rgb(var(--brand-archive))"
         >
           C
         </text>

@@ -103,7 +103,7 @@ export default async function AboutPage({ params }: PageProps) {
 
       {/* Global stats */}
       <section className="mx-auto w-full max-w-6xl px-lg py-2xl">
-        <div className="grid grid-cols-1 gap-lg rounded-lg border border-border-light bg-foreground/[0.02] p-2xl sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-lg rounded-lg border border-border bg-foreground/[0.02] p-2xl sm:grid-cols-3">
           {statItems.map((s) => (
             <div key={s.key} className="flex flex-col items-center gap-xs text-center">
               <span className="font-serif text-display text-foreground">

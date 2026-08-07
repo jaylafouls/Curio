@@ -50,7 +50,7 @@ export function CollectionCard({
   className,
 }: CollectionCardProps) {
   const cardBase =
-    'group flex w-full flex-col overflow-hidden rounded-lg border border-border-light transition-shadow duration-base hover:shadow-md'
+    'group flex w-full flex-col overflow-hidden rounded-lg border border-border transition-shadow duration-base hover:shadow-md dark:hover:shadow-glow-violet'
 
   if (variant === 'overlay') {
     return (
@@ -169,7 +169,7 @@ export function CuratorCard({
   return (
     <article
       className={cn(
-        'flex w-full flex-col items-center gap-md rounded-lg border border-border-light bg-foreground/[0.03] p-lg text-center transition-shadow duration-base hover:shadow-md',
+        'flex w-full flex-col items-center gap-md rounded-lg border border-border bg-foreground/[0.03] p-lg text-center transition-shadow duration-base hover:shadow-md dark:hover:shadow-glow-violet',
         className,
       )}
     >

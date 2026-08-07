@@ -49,6 +49,13 @@ const config: Config = {
         // value flips between Archive and Cosmic with the `.dark` class.
         background: 'rgb(var(--background) / <alpha-value>)',
         foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        // Mode-aware border/divider (globals.css). Archive = sampled light
+        // neutral #DADAD6; Cosmic = white hairline at 0.12 alpha. The
+        // --border-opacity var carries the per-mode base alpha so
+        // `border-border` flips automatically. Use `border-border` /
+        // `divide-border` in place of the fixed `border-border-light` on any
+        // surface that receives the `.dark` (Cosmic) class. §8.
+        border: 'rgb(var(--border) / var(--border-opacity, 1))',
         // Brand palette — CONFIRMED (§1.1)
         cosmic: '#0D0E15', // dark background
         archive: '#FAFBF2', // light background (web default)

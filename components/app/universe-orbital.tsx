@@ -104,7 +104,7 @@ export function UniverseOrbital({
           cy="50"
           r={RING_RADIUS_PCT}
           fill="none"
-          className="stroke-border-light"
+          className="stroke-border"
           strokeWidth="0.3"
         />
         <circle
@@ -124,7 +124,7 @@ export function UniverseOrbital({
               y1="50"
               x2={x}
               y2={y}
-              className="stroke-border-light/60"
+              className="stroke-border/60"
               strokeWidth="0.2"
             />
           )
@@ -204,8 +204,12 @@ function UniverseNodeLink({
       <span
         className={cn(
           'relative flex size-11 items-center justify-center rounded-full text-archive shadow-sm sm:size-12',
+          // Cosmic: the near-black drop shadow is invisible on #0D0E15, so use
+          // the documented violet glow (§5) instead — flat in Archive, glowing
+          // in Cosmic, with a stronger glow on hover.
+          'dark:shadow-glow-violet',
           'ring-2 ring-transparent transition-shadow duration-base',
-          'group-hover:shadow-md group-focus-visible:ring-violet',
+          'group-hover:shadow-md dark:group-hover:shadow-glow-violet group-focus-visible:ring-violet',
           isProject
             ? // Project node: tinted by the owner-chosen colour when present,
               // else a neutral violet-soft container.

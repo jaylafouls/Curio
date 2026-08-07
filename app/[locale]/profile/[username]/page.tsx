@@ -81,7 +81,7 @@ export default async function ProfilePage({ params }: PageProps) {
   return (
     <PublicShell>
       <div className="mx-auto w-full max-w-6xl px-lg py-2xl lg:px-2xl">
-        <section className="flex flex-col gap-xl border-b border-border-light pb-2xl">
+        <section className="flex flex-col gap-xl border-b border-border pb-2xl">
           <ProfileIdentity
             displayName={profile.displayName}
             username={profile.username}

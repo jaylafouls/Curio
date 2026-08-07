@@ -68,7 +68,7 @@ export function NotificationsClient({
       <div
         role="tablist"
         aria-label={t('tablistLabel')}
-        className="flex items-center gap-lg overflow-x-auto border-b border-border-light"
+        className="flex items-center gap-lg overflow-x-auto border-b border-border"
       >
         {ALL_TABS.map((value) => {
           const enabled = ENABLED_TABS.includes(value)

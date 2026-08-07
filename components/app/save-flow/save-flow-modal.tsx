@@ -399,7 +399,7 @@ export function SaveFlowModal({
       {step === 'customize' ? (
         <div className="flex flex-col gap-lg">
           {/* Preview + canonical signal. */}
-          <div className="flex gap-md rounded-md border border-border-light p-sm">
+          <div className="flex gap-md rounded-md border border-border p-sm">
             {previewImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -508,7 +508,7 @@ export function SaveFlowModal({
               maxLength={300}
               rows={2}
               placeholder={t('descriptionPlaceholder')}
-              className="w-full rounded-sm border border-border-light bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
+              className="w-full rounded-sm border border-border bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
             />
             <p className="font-sans text-meta text-text-dark/50">
               {t('descriptionHint')}
@@ -578,7 +578,7 @@ export function SaveFlowModal({
               maxLength={500}
               rows={2}
               placeholder={t('notePlaceholder')}
-              className="w-full rounded-sm border border-border-light bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
+              className="w-full rounded-sm border border-border bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
             />
             <p className="font-sans text-meta text-text-dark/50">{t('notePrivate')}</p>
           </div>
@@ -629,7 +629,7 @@ export function SaveFlowModal({
               'flex items-center gap-md rounded-md border px-md py-sm text-left transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
               collectionId === null && !creatingCollection
                 ? 'border-violet bg-violet/10'
-                : 'border-border-light hover:bg-text-dark/[0.03]',
+                : 'border-border hover:bg-text-dark/[0.03]',
             )}
           >
             <Inbox className="size-4 text-text-dark/50" aria-hidden />
@@ -663,7 +663,7 @@ export function SaveFlowModal({
                         'flex w-full items-center gap-sm rounded-md border px-md py-sm text-left transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
                         collectionId === c.id
                           ? 'border-violet bg-violet/10'
-                          : 'border-border-light hover:bg-text-dark/[0.03]',
+                          : 'border-border hover:bg-text-dark/[0.03]',
                       )}
                     >
                       <Badge topic={c.topic} />
@@ -699,7 +699,7 @@ export function SaveFlowModal({
                     'rounded-full border px-md py-xs font-sans text-meta transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
                     sectionId === null
                       ? 'border-violet bg-violet/10 text-text-dark'
-                      : 'border-border-light text-text-dark/60',
+                      : 'border-border text-text-dark/60',
                   )}
                 >
                   {t('noSection')}
@@ -714,7 +714,7 @@ export function SaveFlowModal({
                       'rounded-full border px-md py-xs font-sans text-meta transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
                       sectionId === s.id
                         ? 'border-violet bg-violet/10 text-text-dark'
-                        : 'border-border-light text-text-dark/60',
+                        : 'border-border text-text-dark/60',
                     )}
                   >
                     {s.name}
@@ -774,7 +774,7 @@ export function SaveFlowModal({
                 setCollectionId(null)
                 setSectionId(null)
               }}
-              className="inline-flex items-center gap-sm self-start rounded-full border border-dashed border-border-light px-md py-xs font-sans text-body-small text-text-dark/70 transition-colors hover:border-violet hover:text-text-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+              className="inline-flex items-center gap-sm self-start rounded-full border border-dashed border-border px-md py-xs font-sans text-body-small text-text-dark/70 transition-colors hover:border-violet hover:text-text-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
             >
               <Plus className="size-4" aria-hidden />
               {t('createNewCollection')}

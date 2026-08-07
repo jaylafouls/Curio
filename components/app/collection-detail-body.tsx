@@ -32,7 +32,7 @@ function LinkRow({ link }: { link: CollectionLink }) {
       rel="noreferrer noopener nofollow"
       className="group flex items-center gap-md rounded-md px-sm py-md transition-colors hover:bg-foreground/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
     >
-      <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-light bg-foreground/[0.03]">
+      <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-foreground/[0.03]">
         {link.image ? (
           <img src={link.image} alt="" className="size-full object-cover" />
         ) : (
@@ -98,7 +98,7 @@ export function CollectionDetailBody({
   return (
     <article className="mx-auto w-full max-w-4xl px-lg py-2xl lg:px-2xl">
       {collection.cover ? (
-        <div className="mb-xl aspect-[3/1] w-full overflow-hidden rounded-lg border border-border-light bg-foreground/[0.03]">
+        <div className="mb-xl aspect-[3/1] w-full overflow-hidden rounded-lg border border-border bg-foreground/[0.03]">
           <img
             src={collection.cover}
             alt=""

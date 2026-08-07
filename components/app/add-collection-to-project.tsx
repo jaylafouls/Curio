@@ -102,7 +102,7 @@ export function AddCollectionToProject({
                   onClick={() => attach(c.id)}
                   disabled={pending}
                   className={cn(
-                    'flex w-full items-center justify-between gap-md rounded-md border border-border-light px-md py-sm text-left transition-colors duration-fast hover:bg-text-dark/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet disabled:opacity-50',
+                    'flex w-full items-center justify-between gap-md rounded-md border border-border px-md py-sm text-left transition-colors duration-fast hover:bg-text-dark/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet disabled:opacity-50',
                   )}
                 >
                   <span className="flex items-center gap-sm">

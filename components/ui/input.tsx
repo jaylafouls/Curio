@@ -37,7 +37,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       : 'rounded-sm px-md h-11',
     error
       ? 'border-badge-food focus-within:ring-2 focus-within:ring-badge-food/40'
-      : 'border-border-light focus-within:border-violet focus-within:ring-2 focus-within:ring-violet/30',
+      : 'border-border focus-within:border-violet focus-within:ring-2 focus-within:ring-violet/30',
     disabled && 'opacity-50',
   )
 
