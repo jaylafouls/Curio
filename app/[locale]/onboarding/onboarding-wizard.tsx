@@ -7,6 +7,7 @@ import { AccentText, Avatar, Button } from '@/components/ui'
 import { OrbitalLogo } from '@/components/brand/orbital-logo'
 import { TopicIcon } from '@/components/brand/topic-icon'
 import { cn } from '@/lib/ui/cn'
+import { PROJECT_COLOR_HEX } from '@/lib/projects/colors'
 import type { Locale } from '@/lib/i18n/routing'
 import { trackEvent } from '@/lib/analytics'
 import {
@@ -46,14 +47,11 @@ type Step = (typeof STEPS)[number]
 const COUNTED: Step[] = ['interests', 'curators', 'universe']
 
 // The 5 fixed universe swatches, mapped to their token hex so the picker
-// renders the real colour (the enum value is what we persist).
-const COLOR_HEX: Record<UniverseColor, string> = {
-  violet: '#785CFF',
-  beige: '#D9C6A6',
-  vert: '#6A7B7A',
-  bleu: '#5B7088',
-  rose: '#D9AFAE',
-}
+// renders the real colour (the enum value is what we persist). universe_color
+// and projects.color are the same 5-value enum (Data Model §2), so we reuse the
+// single shared hex map instead of redefining it — one source of truth for the
+// swatch palette (design-token audit, Phase 5).
+const COLOR_HEX: Record<UniverseColor, string> = PROJECT_COLOR_HEX
 
 export interface OnboardingWizardProps {
   locale: Locale
