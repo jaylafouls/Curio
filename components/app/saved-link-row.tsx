@@ -32,7 +32,7 @@ export function SavedLinkRow({
       rel="noreferrer noopener nofollow"
       className="group flex items-center gap-md rounded-md px-sm py-md transition-colors hover:bg-foreground/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
     >
-      <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-light bg-foreground/[0.03]">
+      <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-foreground/[0.03]">
         {link.image ? (
           <img
             src={link.image}

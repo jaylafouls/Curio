@@ -129,7 +129,7 @@ export function SaveFlowProvider({
         className={cn(
           'fixed bottom-4 left-1/2 z-50 -translate-x-1/2 lg:hidden',
           'flex size-14 items-center justify-center rounded-full',
-          'bg-[var(--button-primary)] text-[var(--button-text)] shadow-md',
+          'bg-[var(--button-primary)] text-[var(--button-text)] shadow-md dark:shadow-glow-violet',
           'transition-transform duration-fast active:scale-95',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2',
         )}
@@ -146,7 +146,7 @@ export function SaveFlowProvider({
         className={cn(
           'fixed bottom-8 right-8 z-50 hidden lg:inline-flex',
           'items-center gap-sm rounded-full px-lg h-12',
-          'bg-[var(--button-primary)] text-[var(--button-text)] shadow-md',
+          'bg-[var(--button-primary)] text-[var(--button-text)] shadow-md dark:shadow-glow-violet',
           'font-sans text-body-small font-medium',
           'transition-opacity duration-base hover:opacity-90',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2',
@@ -173,7 +173,10 @@ export function SaveFlowProvider({
             aria-label={t('panelTitle')}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              'relative flex flex-col bg-archive shadow-md animate-fade-in',
+              // Always-light Archive sheet — pin the mode-aware tokens to
+              // Archive so nested shared primitives keep dark ink + #DADAD6
+              // border even when the shell is Cosmic (.dark). See modal.tsx.
+              'relative flex flex-col bg-archive shadow-md animate-fade-in [--border-opacity:1] [--border:218_218_214] [--foreground:17_17_17]',
               isDesktop
                 ? 'mb-20 mr-2 w-80 rounded-lg p-sm'
                 : 'w-full max-w-xl rounded-t-xl p-lg pb-2xl',
@@ -181,7 +184,7 @@ export function SaveFlowProvider({
           >
             {!isDesktop ? (
               <span
-                className="mx-auto mb-md h-1 w-10 shrink-0 rounded-full bg-border-light"
+                className="mx-auto mb-md h-1 w-10 shrink-0 rounded-full bg-border"
                 aria-hidden
               />
             ) : null}

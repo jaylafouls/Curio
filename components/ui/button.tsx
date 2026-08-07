@@ -32,7 +32,7 @@ const variants: Record<ButtonVariant, string> = {
   primary:
     'bg-[var(--button-primary)] text-[var(--button-text)] hover:opacity-90',
   secondary:
-    'border border-border-light bg-transparent text-foreground hover:bg-foreground/5',
+    'border border-border bg-transparent text-foreground hover:bg-foreground/5',
   ghost: 'bg-transparent text-foreground hover:bg-foreground/5',
 }
 

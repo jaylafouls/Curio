@@ -331,7 +331,7 @@ export function CollectionModal({
             placeholder={t('descriptionPlaceholder')}
             maxLength={300}
             rows={2}
-            className="w-full rounded-sm border border-border-light bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
+            className="w-full rounded-sm border border-border bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
           />
         </div>
 
@@ -358,7 +358,7 @@ export function CollectionModal({
                         'inline-flex items-center gap-xs rounded-full border px-md py-xs font-sans text-meta transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
                         on
                           ? 'border-violet bg-violet/10 text-text-dark'
-                          : 'border-border-light text-text-dark/50',
+                          : 'border-border text-text-dark/50',
                       )}
                     >
                       {on ? (
@@ -433,7 +433,7 @@ export function CollectionModal({
             placeholder={t('notePlaceholder')}
             maxLength={500}
             rows={2}
-            className="w-full rounded-sm border border-border-light bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
+            className="w-full rounded-sm border border-border bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
           />
           <p className="font-sans text-meta text-text-dark/50">{t('notePrivate')}</p>
         </div>
@@ -444,7 +444,7 @@ export function CollectionModal({
             type="button"
             onClick={() => setIsPublic((v) => !v)}
             aria-pressed={isPublic}
-            className="flex items-center justify-between rounded-md border border-border-light px-md py-sm text-left transition-colors duration-fast hover:bg-text-dark/[0.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+            className="flex items-center justify-between rounded-md border border-border px-md py-sm text-left transition-colors duration-fast hover:bg-text-dark/[0.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
           >
             <span className="flex items-center gap-sm">
               {isPublic ? (

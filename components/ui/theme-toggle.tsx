@@ -71,7 +71,7 @@ export function ThemeToggle({
       aria-label={isCosmic ? 'Switch to Archive (light)' : 'Switch to Cosmic (dark)'}
       onClick={toggle}
       className={cn(
-        'inline-flex items-center gap-sm rounded-full border border-border-light px-sm py-xs font-sans text-meta text-foreground/70 transition-colors duration-fast hover:bg-foreground/5',
+        'inline-flex items-center gap-sm rounded-full border border-border px-sm py-xs font-sans text-meta text-foreground/70 transition-colors duration-fast hover:bg-foreground/5',
         className,
       )}
     >

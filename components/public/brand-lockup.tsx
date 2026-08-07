@@ -33,10 +33,10 @@ export function BrandLockup({
             cx="50"
             cy="50"
             r="42"
-            stroke="rgb(120 92 255 / 0.5)"
+            stroke="rgb(var(--brand-violet) / 0.5)"
             strokeWidth="2"
           />
-          <circle cx="50" cy="8" r="4" fill="#785CFF" />
+          <circle cx="50" cy="8" r="4" fill="rgb(var(--brand-violet))" />
           <circle cx="88" cy="60" r="2.4" fill="currentColor" opacity="0.35" />
         </g>
         <text

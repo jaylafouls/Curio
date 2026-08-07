@@ -113,7 +113,7 @@ export function CollectionPrivateClient({
           </Button>
         </div>
         {detail.note ? (
-          <div className="mt-lg rounded-lg border border-border-light bg-foreground/[0.02] px-lg py-md">
+          <div className="mt-lg rounded-lg border border-border bg-foreground/[0.02] px-lg py-md">
             <p className="whitespace-pre-line font-sans text-body-small text-foreground/70">
               {detail.note}
             </p>

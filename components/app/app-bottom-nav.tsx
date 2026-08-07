@@ -26,7 +26,7 @@ export function AppBottomNav() {
 
   return (
     <nav
-      className="sticky bottom-0 z-40 border-t border-border-light bg-background/90 backdrop-blur-md lg:hidden"
+      className="sticky bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-md lg:hidden"
       aria-label={t('primary')}
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-around">

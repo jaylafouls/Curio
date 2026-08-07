@@ -34,7 +34,7 @@ export function OrbitalViz({ topics }: { topics: PublicTopic[] }) {
       {/* Orbit rings — purely decorative. */}
       <div
         aria-hidden
-        className="absolute inset-[8%] rounded-full border border-border-light"
+        className="absolute inset-[8%] rounded-full border border-border"
       />
       <div
         aria-hidden
@@ -61,7 +61,7 @@ export function OrbitalViz({ topics }: { topics: PublicTopic[] }) {
           >
             <span
               className={cn(
-                'flex size-11 items-center justify-center rounded-full border border-border-light bg-background text-foreground/80 shadow-sm sm:size-14',
+                'flex size-11 items-center justify-center rounded-full border border-border bg-background text-foreground/80 shadow-sm sm:size-14',
               )}
             >
               <TopicIcon name={topic.icon} className="size-5 sm:size-6" strokeWidth={2} />

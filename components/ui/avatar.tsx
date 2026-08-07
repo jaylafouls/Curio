@@ -63,7 +63,7 @@ export function Avatar({
   const disc = (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-violet-soft/40 font-sans font-medium text-text-dark',
+        'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-violet-soft/40 font-sans font-medium text-foreground',
         sizeClasses[size],
       )}
     >

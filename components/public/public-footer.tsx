@@ -26,7 +26,7 @@ export async function PublicFooter() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-border-light bg-background">
+    <footer className="border-t border-border bg-background">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-lg px-lg py-2xl">
         <div className="flex flex-col gap-md sm:flex-row sm:items-start sm:justify-between">
           <div className="flex max-w-xs flex-col gap-sm">

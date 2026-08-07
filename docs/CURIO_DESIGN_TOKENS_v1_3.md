@@ -197,7 +197,19 @@ Non documentés explicitement dans la spec ni mesurables depuis des mockups stat
 | Fond | `#0D0E15` | `#FAFBF2` |
 | Texte primaire | `#FAFBF2` | `#111111` |
 | Bouton primaire | `#785CFF` | `#0B0E14` |
+| **Bordure / divider** | `rgba(255,255,255,0.12)` (hairline blanc translucide) | `#DADAD6` (§1.4) |
+| **Ombre** | Halo violet `shadow.glow.violet` (§5) — l'ombre noire est invisible sur `#0D0E15` | `shadow.sm`/`shadow.md` (§5) |
 | Usage | Landing non connectée, app mobile | Web connecté (défaut) |
+
+### 8.1 Bordure Cosmic — tranché (levée du gap `border.dark`)
+
+Le brand book / §1.4 ne définissaient qu'une bordure **light** (`color.border.light = #DADAD6`), explicitement étiquetée « en mode light ». Il n'existait aucun token de bordure Cosmic — un manque réel, puisque `#DADAD6` posé tel quel sur le fond `#0D0E15` donne un liseré gris clair trop lumineux.
+
+**Décision (owner)** : la bordure devient **mode-aware** via une CSS-var `--border` (comme `--background`/`--foreground`). Archive conserve `#DADAD6` ; Cosmic utilise un **hairline blanc translucide `rgba(255,255,255,0.12)`** — assez présent pour délimiter sans agresser sur le fond sombre. Implémentation : `--border` (canaux R G B) + `--border-opacity` dans `app/globals.css`, exposés en utilitaire Tailwind `border-border` / `divide-border` / `bg-border`. Les surfaces connectées (les 8 pages sous `.dark`) utilisent `border-border` ; l'ancien `border-border-light` figé reste réservé aux **feuilles toujours-Archive** (modales/sheets `bg-archive`), qui réépinglent d'ailleurs `--border` à la valeur Archive pour rester cohérentes même sous `.dark`.
+
+### 8.2 Ombres en Cosmic — halo violet (§5)
+
+Les ombres `shadow.sm`/`shadow.md` sont calibrées `rgba(17,17,17,…)` (noir sur clair) et **disparaissent** sur `#0D0E15`. Conformément à §5 (« halo bouton CTA violet en mode dark, halo orbital »), les surfaces connectées qui portaient une ombre au repos ou au hover reçoivent le **`shadow.glow.violet`** en Cosmic uniquement (`dark:shadow-glow-violet` / `dark:hover:shadow-glow-violet`) : plat en Archive, halo violet en Cosmic. Les feuilles toujours-Archive gardent leur `shadow-md` (ombre normale d'une feuille claire projetée sur le scrim cosmique).
 
 ---
 

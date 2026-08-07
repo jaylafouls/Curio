@@ -85,7 +85,7 @@ export default async function ProjectsPage({ params }: PageProps) {
                 <li key={p.id}>
                   <Link
                     href={`/projects/${p.id}`}
-                    className="flex h-full flex-col gap-sm rounded-lg border border-border-light bg-foreground/[0.02] p-lg transition-colors duration-fast hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+                    className="flex h-full flex-col gap-sm rounded-lg border border-border bg-foreground/[0.02] p-lg transition-colors duration-fast hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
                   >
                     <span
                       className="size-3 rounded-full"

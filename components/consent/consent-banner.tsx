@@ -42,7 +42,7 @@ export function ConsentBanner({
       role="dialog"
       aria-modal="false"
       aria-label={t('title')}
-      className="dark fixed inset-x-0 bottom-0 z-50 border-t border-border-light bg-cosmic/95 backdrop-blur supports-[backdrop-filter]:bg-cosmic/80"
+      className="dark fixed inset-x-0 bottom-0 z-50 border-t border-border bg-cosmic/95 backdrop-blur supports-[backdrop-filter]:bg-cosmic/80"
     >
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-md p-lg">
         <div className="flex flex-col gap-xs">
@@ -136,7 +136,7 @@ function CategoryRow({
   lockedLabel?: string
 }) {
   return (
-    <li className="flex items-start justify-between gap-md rounded-lg border border-border-light bg-foreground/[0.03] p-md">
+    <li className="flex items-start justify-between gap-md rounded-lg border border-border bg-foreground/[0.03] p-md">
       <div className="flex min-w-0 flex-col gap-xs">
         <span className="font-sans text-body-small font-medium text-foreground">
           {label}

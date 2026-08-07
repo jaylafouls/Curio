@@ -46,7 +46,7 @@ export function AnalyticsDashboard({
     <div className="flex flex-col gap-2xl">
       {/* Headline tiles. */}
       <div className="grid grid-cols-1 gap-lg sm:grid-cols-2">
-        <div className="flex flex-col gap-sm rounded-lg border border-border-light bg-foreground/[0.02] p-lg">
+        <div className="flex flex-col gap-sm rounded-lg border border-border bg-foreground/[0.02] p-lg">
           <div className="flex items-center gap-sm text-foreground/60">
             <Bookmark className="size-4 shrink-0" strokeWidth={2} aria-hidden />
             <span className="font-sans text-body-small">{labels.totalSaves}</span>
@@ -59,7 +59,7 @@ export function AnalyticsDashboard({
           </p>
         </div>
 
-        <div className="flex flex-col gap-sm rounded-lg border border-border-light bg-foreground/[0.02] p-lg">
+        <div className="flex flex-col gap-sm rounded-lg border border-border bg-foreground/[0.02] p-lg">
           <div className="flex items-center gap-sm text-foreground/60">
             <MousePointerClick
               className="size-4 shrink-0"
@@ -81,13 +81,13 @@ export function AnalyticsDashboard({
       <section className="flex flex-col gap-lg">
         <h2 className="font-serif text-h2 text-foreground">{labels.topLinks}</h2>
         {hasData ? (
-          <ul className="flex flex-col divide-y divide-border-light">
+          <ul className="flex flex-col divide-y divide-border">
             {analytics.topLinks.map((link) => (
               <li
                 key={link.id}
                 className="flex items-center gap-md py-md first:pt-0"
               >
-                <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border-light bg-foreground/[0.03]">
+                <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-foreground/[0.03]">
                   {link.image ? (
                     <img
                       src={link.image}

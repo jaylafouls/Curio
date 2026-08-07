@@ -39,7 +39,7 @@ export function PublicHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border-light bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-lg">
         {/* Brand → landing. */}
         <Link
@@ -112,7 +112,7 @@ export function PublicHeader() {
         <nav
           id="public-mobile-nav"
           aria-label={t('primary')}
-          className="border-t border-border-light bg-background px-lg py-md md:hidden"
+          className="border-t border-border bg-background px-lg py-md md:hidden"
         >
           <ul className="flex flex-col gap-xs">
             {NAV.map((item) => (
@@ -133,7 +133,7 @@ export function PublicHeader() {
               </li>
             ))}
           </ul>
-          <div className="mt-md flex flex-col gap-sm border-t border-border-light pt-md">
+          <div className="mt-md flex flex-col gap-sm border-t border-border pt-md">
             <Link
               href="/signup"
               onClick={() => setOpen(false)}

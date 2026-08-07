@@ -56,7 +56,7 @@ export function AppSidebar({
   }
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border-light bg-background lg:flex">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-background lg:flex">
       <div className="px-lg py-lg">
         <Link
           href="/home"
@@ -84,7 +84,7 @@ export function AppSidebar({
       </nav>
 
       {/* User footer + log out. */}
-      <div className="mt-auto border-t border-border-light p-md">
+      <div className="mt-auto border-t border-border p-md">
         <Link
           href="/my-space"
           className="flex items-center gap-sm rounded-md px-sm py-sm transition-colors hover:bg-foreground/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"

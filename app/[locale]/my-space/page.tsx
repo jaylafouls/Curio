@@ -109,7 +109,7 @@ export default async function MySpacePage({ params }: PageProps) {
               </p>
             </div>
             {universe.nodes.length > 0 ? (
-              <div className="rounded-lg border border-border-light bg-foreground/[0.02] px-lg py-xl">
+              <div className="rounded-lg border border-border bg-foreground/[0.02] px-lg py-xl">
                 <UniverseOrbital
                   nodes={universe.nodes}
                   centerLabel={tUniverse('you')}
@@ -170,7 +170,7 @@ export default async function MySpacePage({ params }: PageProps) {
               {t('curatorsYouFollow')}
             </h2>
             {curators.length > 0 ? (
-              <ul className="flex flex-col divide-y divide-border-light">
+              <ul className="flex flex-col divide-y divide-border">
                 {curators.map((c) => (
                   <li key={c.id}>
                     <Link
@@ -215,7 +215,7 @@ export default async function MySpacePage({ params }: PageProps) {
 
         {/* Sidebar — your universe in numbers. */}
         <aside className="flex flex-col gap-xl">
-          <section className="rounded-lg border border-border-light bg-foreground/[0.02] p-lg">
+          <section className="rounded-lg border border-border bg-foreground/[0.02] p-lg">
             <h2 className="mb-md font-serif text-h3 text-foreground">
               {t('universeInNumbers')}
             </h2>
@@ -232,7 +232,7 @@ export default async function MySpacePage({ params }: PageProps) {
           </section>
 
           {/* "Your universe is unique" editorial banner (§7.5). */}
-          <section className="flex flex-col items-center gap-sm rounded-lg border border-border-light bg-violet-soft/10 p-lg text-center">
+          <section className="flex flex-col items-center gap-sm rounded-lg border border-border bg-violet-soft/10 p-lg text-center">
             <AccentText
               before={t('uniqueBefore')}
               accent={t('uniqueAccent')}

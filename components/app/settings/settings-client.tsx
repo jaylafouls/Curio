@@ -115,7 +115,7 @@ function Section({
     <section
       className={cn(
         'flex flex-col gap-lg rounded-lg border bg-foreground/[0.02] p-lg',
-        danger ? 'border-badge-food/40' : 'border-border-light',
+        danger ? 'border-badge-food/40' : 'border-border',
       )}
     >
       <div className="flex flex-col gap-2xs">
@@ -341,7 +341,7 @@ function ProfileSection({ profile }: { profile: SettingsProfile }) {
             placeholder={t('bioPlaceholder')}
             maxLength={160}
             rows={3}
-            className="w-full rounded-sm border border-border-light bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
+            className="w-full rounded-sm border border-border bg-foreground/[0.03] px-md py-sm font-sans text-body-small text-foreground placeholder:text-foreground/40 focus:border-violet focus:outline-none focus:ring-2 focus:ring-violet/30"
           />
         </Field>
 
@@ -447,7 +447,7 @@ function LanguageSection({ current }: { current: Locale }) {
                 'flex flex-1 items-center justify-between gap-sm rounded-md border px-md py-sm text-left transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet disabled:cursor-not-allowed',
                 active
                   ? 'border-violet bg-violet/10 text-foreground'
-                  : 'border-border-light text-foreground/70 hover:bg-foreground/[0.03]',
+                  : 'border-border text-foreground/70 hover:bg-foreground/[0.03]',
               )}
             >
               <span className="font-sans text-body-small font-medium">
@@ -474,7 +474,7 @@ function PrivacySection() {
   const t = useTranslations('Settings')
   return (
     <Section heading={t('privacyHeading')} hint={t('privacyHint')}>
-      <div className="flex flex-col gap-md rounded-md border border-border-light bg-foreground/[0.02] p-md sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-md rounded-md border border-border bg-foreground/[0.02] p-md sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-sm">
           <ShieldCheck
             className="mt-0.5 size-5 shrink-0 text-violet"
@@ -532,7 +532,7 @@ function ConnectedSection({
           {t('connectedEmpty')}
         </p>
       ) : (
-        <ul className="flex flex-col divide-y divide-border-light">
+        <ul className="flex flex-col divide-y divide-border">
           {identities.map((identity) => (
             <li
               key={`${identity.provider}-${identity.label ?? ''}`}
@@ -594,7 +594,7 @@ function ThemeSection({ initial }: { initial: ThemePreference }) {
 
   return (
     <Section heading={t('themeHeading')} hint={t('themeHint')}>
-      <div className="flex flex-col gap-md rounded-md border border-border-light bg-foreground/[0.02] p-md sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-md rounded-md border border-border bg-foreground/[0.02] p-md sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-sm">
           <Palette className="mt-0.5 size-5 shrink-0 text-violet" aria-hidden />
           <div className="flex flex-col gap-2xs">
@@ -630,7 +630,7 @@ function ComingSoonSection({
   const t = useTranslations('Settings')
   return (
     <Section heading={heading}>
-      <div className="flex items-center gap-md rounded-md border border-dashed border-border-light bg-foreground/[0.02] p-md text-foreground/50">
+      <div className="flex items-center gap-md rounded-md border border-dashed border-border bg-foreground/[0.02] p-md text-foreground/50">
         <span className="shrink-0 text-foreground/40">{icon}</span>
         <div className="flex min-w-0 flex-col gap-2xs">
           <span className="inline-flex w-fit items-center rounded-full bg-foreground/10 px-sm py-2xs font-sans text-meta font-medium uppercase tracking-wide text-foreground/60">

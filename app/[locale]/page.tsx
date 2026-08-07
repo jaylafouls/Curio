@@ -115,7 +115,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             </Link>
             <Link
               href="/explore"
-              className="inline-flex h-11 items-center gap-sm rounded-full border border-border-light px-lg font-sans text-body-small text-foreground/80 transition-colors duration-base hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+              className="inline-flex h-11 items-center gap-sm rounded-full border border-border px-lg font-sans text-body-small text-foreground/80 transition-colors duration-base hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
             >
               {t('ctaExplore')}
               <ArrowRight className="size-4" aria-hidden />
@@ -218,7 +218,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             </>
           ) : (
             // Empty state — 0 public collections in prod. Graceful, no fake seeding.
-            <div className="flex flex-col items-center gap-md rounded-lg border border-border-light bg-foreground/[0.02] px-lg py-3xl text-center">
+            <div className="flex flex-col items-center gap-md rounded-lg border border-border bg-foreground/[0.02] px-lg py-3xl text-center">
               <Badge topic="ideas">{t('universesEmptyTag')}</Badge>
               <h3 className="font-serif text-h3 text-foreground">
                 {t('universesEmptyTitle')}

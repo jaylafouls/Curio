@@ -90,7 +90,7 @@ export function HomeFeedClient({
         </div>
         <Link
           href="/my-space"
-          className="inline-flex shrink-0 items-center gap-xs rounded-full border border-border-light px-md py-xs font-sans text-meta font-medium text-foreground/70 transition-colors hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+          className="inline-flex shrink-0 items-center gap-xs rounded-full border border-border px-md py-xs font-sans text-meta font-medium text-foreground/70 transition-colors hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
         >
           <SlidersHorizontal className="size-3.5" aria-hidden />
           {t('personalize')}
@@ -99,7 +99,7 @@ export function HomeFeedClient({
 
       {/* Tabs. */}
       <div
-        className="flex items-center gap-lg border-b border-border-light"
+        className="flex items-center gap-lg border-b border-border"
         role="tablist"
         aria-label={t('feedTabsLabel')}
       >
@@ -197,7 +197,7 @@ function FilterPill({
         'shrink-0 whitespace-nowrap rounded-full border px-md py-xs font-sans text-meta font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
         active
           ? 'border-violet bg-violet/10 text-foreground'
-          : 'border-border-light text-foreground/60 hover:bg-foreground/[0.04]',
+          : 'border-border text-foreground/60 hover:bg-foreground/[0.04]',
       )}
     >
       {children}

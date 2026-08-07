@@ -124,7 +124,7 @@ export default async function HomePage({ params }: PageProps) {
               {t('fromYourCurators')}
             </h2>
             {activity.length > 0 ? (
-              <ul className="flex flex-col divide-y divide-border-light">
+              <ul className="flex flex-col divide-y divide-border">
                 {activity.map((a) => (
                   <li key={a.collectionId}>
                     <Link
@@ -155,7 +155,7 @@ export default async function HomePage({ params }: PageProps) {
                 ))}
               </ul>
             ) : (
-              <p className="rounded-lg border border-border-light bg-foreground/[0.02] px-lg py-xl text-center font-sans text-body-small text-foreground/60">
+              <p className="rounded-lg border border-border bg-foreground/[0.02] px-lg py-xl text-center font-sans text-body-small text-foreground/60">
                 {t('curatorsActivityEmpty')}
               </p>
             )}
@@ -172,7 +172,7 @@ export default async function HomePage({ params }: PageProps) {
                   <Link
                     key={tp.id}
                     href="/explore"
-                    className="inline-flex items-center gap-xs rounded-full border border-border-light px-md py-sm font-sans text-body-small text-foreground/70 transition-colors hover:border-violet hover:bg-violet/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+                    className="inline-flex items-center gap-xs rounded-full border border-border px-md py-sm font-sans text-body-small text-foreground/70 transition-colors hover:border-violet hover:bg-violet/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
                   >
                     <Compass className="size-3.5 text-violet" aria-hidden />
                     {tp.label}
@@ -186,7 +186,7 @@ export default async function HomePage({ params }: PageProps) {
         {/* Right sidebar — My Universe miniature, stats, curators, create CTA. */}
         <aside className="flex flex-col gap-xl">
           {/* My Universe miniature + create CTA. */}
-          <section className="flex flex-col gap-md rounded-lg border border-border-light bg-violet-soft/10 p-lg">
+          <section className="flex flex-col gap-md rounded-lg border border-border bg-violet-soft/10 p-lg">
             <Link
               href="/my-space"
               className="group flex items-center gap-md rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
@@ -214,7 +214,7 @@ export default async function HomePage({ params }: PageProps) {
           </section>
 
           {/* Stats. */}
-          <section className="rounded-lg border border-border-light bg-foreground/[0.02] p-lg">
+          <section className="rounded-lg border border-border bg-foreground/[0.02] p-lg">
             <h2 className="mb-md font-serif text-h3 text-foreground">
               {t('universeInNumbers')}
             </h2>
@@ -231,7 +231,7 @@ export default async function HomePage({ params }: PageProps) {
           </section>
 
           {/* Curators you follow. */}
-          <section className="flex flex-col gap-md rounded-lg border border-border-light bg-foreground/[0.02] p-lg">
+          <section className="flex flex-col gap-md rounded-lg border border-border bg-foreground/[0.02] p-lg">
             <h2 className="font-serif text-h3 text-foreground">
               {t('curatorsYouFollow')}
             </h2>

@@ -21,6 +21,19 @@
   --foreground: 17 17 17; /* text-dark #111111 */
   --button-primary: #0b0e14; /* button-primary-light */
   --button-text: #fafbf2;
+  /* Mode-aware border/divider. Archive keeps the sampled light neutral
+   * (#DADAD6, §1.4). Cosmic has no dedicated border token in the spec (§8
+   * defines only 4 flippable properties), so it uses a translucent white hairline
+   * (rgba(255,255,255,0.12)) — legible on #0D0E15 without the harsh bright liseré
+   * a fixed light-gray would give. Stored as R G B channels so alpha modifiers
+   * (border-border/50) compose. See CURIO_DESIGN_TOKENS_v1_3.md §8. */
+  --border: 218 218 214; /* border-light #dadad6 */
+  --border-opacity: 1;
+  /* Mode-independent brand constants (R G B channels) for inline SVG fill/stroke,
+   * which cannot take Tailwind classes. Keeps the brand marks token-synced instead
+   * of re-typing the hex. Same value in both modes — these are fixed brand ink. */
+  --brand-violet: 120 92 255; /* accent.violet #785CFF */
+  --brand-archive: 250 251 242; /* archive #FAFBF2 */
 }
 
 .dark {
@@ -28,6 +41,8 @@
   --foreground: 250 251 242; /* archive #fafbf2 */
   --button-primary: #785cff; /* violet */
   --button-text: #fafbf2;
+  --border: 255 255 255; /* white hairline, driven at 0.12 alpha below */
+  --border-opacity: 0.12;
 }
 
 @layer base {

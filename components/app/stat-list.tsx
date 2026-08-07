@@ -36,7 +36,7 @@ export function StatList({
   }
 
   return (
-    <dl className="flex flex-col divide-y divide-border-light">
+    <dl className="flex flex-col divide-y divide-border">
       {stats.map((s) => (
         <div
           key={s.label}

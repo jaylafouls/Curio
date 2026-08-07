@@ -114,7 +114,12 @@ export function Modal({
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'relative flex flex-col gap-md bg-archive p-lg shadow-md focus:outline-none animate-fade-in',
+          // Always-light Archive sheet, even when the connected shell is in
+          // Cosmic (.dark). Pin the mode-aware tokens back to their Archive
+          // values on the panel so shared primitives rendered inside (Input,
+          // secondary Button, dividers) keep dark ink + the #DADAD6 border, not
+          // the Cosmic white-hairline they would otherwise inherit from .dark.
+          'relative flex flex-col gap-md bg-archive p-lg shadow-md focus:outline-none animate-fade-in [--border-opacity:1] [--border:218_218_214] [--foreground:17_17_17]',
           isSheet
             ? 'w-full max-w-xl rounded-t-xl pb-2xl'
             : 'w-full max-w-lg rounded-lg',
@@ -123,7 +128,7 @@ export function Modal({
       >
         {isSheet ? (
           <span
-            className="mx-auto mb-xs h-1 w-10 shrink-0 rounded-full bg-border-light"
+            className="mx-auto mb-xs h-1 w-10 shrink-0 rounded-full bg-border"
             aria-hidden
           />
         ) : null}
