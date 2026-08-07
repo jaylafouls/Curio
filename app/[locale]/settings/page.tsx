@@ -8,6 +8,7 @@ import {
   getSettingsProfile,
   getConnectedIdentities,
 } from '@/lib/settings/data'
+import { getThemePreference } from '@/lib/theme/data'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
@@ -41,9 +42,10 @@ export default async function SettingsPage({ params }: PageProps) {
   const { locale } = await params
   setRequestLocale(locale)
 
-  const [profile, identities] = await Promise.all([
+  const [profile, identities, themePreference] = await Promise.all([
     getSettingsProfile(),
     getConnectedIdentities(),
+    getThemePreference(),
   ])
 
   // Middleware guards this route, but if the session lapsed mid-request, bounce
@@ -64,6 +66,7 @@ export default async function SettingsPage({ params }: PageProps) {
         profile={profile}
         identities={identities}
         locale={locale}
+        themePreference={themePreference}
       />
     </AppShell>
   )

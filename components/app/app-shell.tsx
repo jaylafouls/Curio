@@ -5,6 +5,8 @@ import { NotificationBell } from './notification-bell'
 import { SaveFlowProvider } from './save-flow/save-flow-provider'
 import { getSaveTargets } from '@/lib/links/data'
 import { getUnreadNotificationCount } from '@/lib/notifications/data'
+import { getThemePreference } from '@/lib/theme/data'
+import { cn } from '@/lib/ui/cn'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
@@ -43,8 +45,23 @@ export async function AppShell({
   // scopes it to the signed-in recipient; 0 for a fresh account.
   const unreadCount = await getUnreadNotificationCount(userId)
 
+  // Persisted theme (§8.14 / Decisions Log §16). Applying `.dark` HERE — on the
+  // connected shell, not global <html> — scopes Cosmic mode to authenticated
+  // pages only, leaving the public/landing surfaces on their own modes. The read
+  // is server-side, so the class is in the initial HTML: no client flash (FOUC).
+  const themePreference = await getThemePreference()
+
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div
+      // data-app-shell marks this element as the connected theme boundary: the
+      // Settings toggle flips `.dark` HERE (nearest ancestor with the attribute)
+      // for live feedback, so client and SSR agree on one boundary.
+      data-app-shell=""
+      className={cn(
+        'flex min-h-screen bg-background text-foreground',
+        themePreference === 'dark' && 'dark',
+      )}
+    >
       <AppSidebar user={user} locale={locale} />
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Connected top bar — carries the notification bell on every connected
