@@ -77,7 +77,9 @@ export default async function CollectionPage({ params }: PageProps) {
           <CollectionOwnerOverlay collectionId={collection.id} locale={locale} />
           {/* Viewer follow toggle — client-side, keyed off the collection id, so
               the ISR body stays cookie-free. Renders nothing for the owner. */}
-          <div className="mx-auto w-full max-w-4xl px-lg lg:px-2xl">
+          {/* Reserve the follow button's height (h-9) so the article below never
+              shifts when the client-side button mounts after hydration (CLS). */}
+          <div className="mx-auto flex min-h-9 w-full max-w-4xl px-lg lg:px-2xl">
             <CollectionFollowButton collectionId={collection.id} />
           </div>
         </div>

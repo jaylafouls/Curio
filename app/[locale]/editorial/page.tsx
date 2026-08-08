@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { buildMetadata } from '@/lib/seo/metadata'
 import { AccentText } from '@/components/ui'
@@ -64,13 +65,14 @@ export default async function EditorialPage({ params }: PageProps) {
                   href={`/editorial/${p.slug}`}
                   className="group flex flex-col overflow-hidden rounded-lg border border-border bg-foreground/[0.03] transition-shadow duration-base hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
                 >
-                  <div className="aspect-[3/2] w-full overflow-hidden bg-violet-soft/20">
+                  <div className="relative aspect-[3/2] w-full overflow-hidden bg-violet-soft/20">
                     {p.cover ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={p.cover}
                         alt=""
-                        className="size-full object-cover transition-transform duration-base group-hover:scale-[1.02]"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-base group-hover:scale-[1.02]"
                       />
                     ) : null}
                   </div>

@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import Image from 'next/image'
 import { ExternalLink } from 'lucide-react'
 import { Avatar, Badge } from '@/components/ui'
 import { EmptyState } from '@/components/public/empty-state'
@@ -98,11 +99,14 @@ export function CollectionDetailBody({
   return (
     <article className="mx-auto w-full max-w-4xl px-lg py-2xl lg:px-2xl">
       {collection.cover ? (
-        <div className="mb-xl aspect-[3/1] w-full overflow-hidden rounded-lg border border-border bg-foreground/[0.03]">
-          <img
+        <div className="relative mb-xl aspect-[3/1] w-full overflow-hidden rounded-lg border border-border bg-foreground/[0.03]">
+          <Image
             src={collection.cover}
             alt=""
-            className="size-full object-cover"
+            fill
+            priority
+            sizes="(max-width: 896px) 100vw, 896px"
+            className="object-cover"
           />
         </div>
       ) : null}

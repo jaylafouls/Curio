@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from 'next/image'
 import type { ReactNode } from 'react'
 import { Bookmark, Users } from 'lucide-react'
 import { cn } from '@/lib/ui/cn'
@@ -62,10 +62,12 @@ export function CollectionCard({
         )}
       >
         {cover ? (
-          <img
+          <Image
             src={cover}
             alt=""
-            className="absolute inset-0 size-full object-cover transition-transform duration-base group-hover:scale-[1.02]"
+            fill
+            sizes="(max-width: 640px) 100vw, 33vw"
+            className="object-cover transition-transform duration-base group-hover:scale-[1.02]"
           />
         ) : null}
         {/* Dark scrim so overlaid light text stays legible over any cover. */}
@@ -105,10 +107,12 @@ export function CollectionCard({
     <article className={cn(cardBase, 'bg-foreground/[0.03]', className)}>
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-violet-soft/20">
         {cover ? (
-          <img
+          <Image
             src={cover}
             alt=""
-            className="size-full object-cover transition-transform duration-base group-hover:scale-[1.02]"
+            fill
+            sizes="(max-width: 640px) 100vw, 33vw"
+            className="object-cover transition-transform duration-base group-hover:scale-[1.02]"
           />
         ) : null}
         <div className="absolute left-md top-md">

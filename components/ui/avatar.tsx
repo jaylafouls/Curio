@@ -1,5 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
-import type { ImgHTMLAttributes } from 'react'
+import Image from 'next/image'
 import { cn } from '@/lib/ui/cn'
 
 /**
@@ -13,13 +12,13 @@ import { cn } from '@/lib/ui/cn'
  */
 export type AvatarSize = 'sm' | 'md' | 'lg'
 
-export interface AvatarProps
-  extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+export interface AvatarProps {
   src?: string
   /** Used for alt text and the initials fallback when src is absent. */
   name: string
   size?: AvatarSize
   orbital?: boolean
+  className?: string
 }
 
 const sizeClasses: Record<AvatarSize, string> = {
@@ -58,21 +57,21 @@ export function Avatar({
   size = 'md',
   orbital = false,
   className,
-  ...props
 }: AvatarProps) {
   const disc = (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-violet-soft/40 font-sans font-medium text-foreground',
+        'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-violet-soft/40 font-sans font-medium text-foreground',
         sizeClasses[size],
       )}
     >
       {src ? (
-        <img
+        <Image
           src={src}
           alt={name}
-          className="size-full object-cover"
-          {...props}
+          fill
+          sizes="96px"
+          className="object-cover"
         />
       ) : (
         <span aria-hidden>{initials(name)}</span>
