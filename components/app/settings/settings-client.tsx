@@ -19,6 +19,9 @@ import {
   Bell,
   CreditCard,
   Palette,
+  Puzzle,
+  Copy,
+  KeyRound,
 } from 'lucide-react'
 import { Button, Input, Modal, Avatar, ThemeToggle } from '@/components/ui'
 import type { ThemeMode } from '@/components/ui'
@@ -31,6 +34,11 @@ import {
   updateLanguage,
   deleteAccount,
 } from '@/lib/settings/actions'
+import {
+  createExtensionToken,
+  revokeExtensionTokenAction,
+} from '@/lib/extension/actions'
+import type { ExtensionTokenSummary } from '@/lib/extension/data'
 import { updateThemePreference } from '@/lib/theme/actions'
 import {
   modeToPreference,
@@ -63,11 +71,13 @@ export function SettingsClient({
   identities,
   locale,
   themePreference,
+  extensionTokens,
 }: {
   profile: SettingsProfile
   identities: ConnectedIdentity[]
   locale: Locale
   themePreference: ThemePreference
+  extensionTokens: ExtensionTokenSummary[]
 }) {
   const t = useTranslations('Settings')
 
@@ -82,6 +92,7 @@ export function SettingsClient({
       <LanguageSection current={profile.language} />
       <PrivacySection />
       <ConnectedSection identities={identities} />
+      <ExtensionSection tokens={extensionTokens} locale={locale} />
       <ComingSoonSection
         icon={<Bell className="size-5" aria-hidden />}
         heading={t('notificationsHeading')}
@@ -553,6 +564,231 @@ function ConnectedSection({
           ))}
         </ul>
       )}
+    </Section>
+  )
+}
+
+// ── Chrome extension tokens ──────────────────────────────────────────────────
+
+/**
+ * ExtensionSection — "Connect the Chrome extension" (Phase 5 chantier 5,
+ * Decisions Log §17). The extension authenticates with a dedicated bearer token,
+ * NOT the web session cookie (no cross-origin cookie sharing). This section:
+ *   • lists the user's active tokens (metadata only — the raw token never comes
+ *     back from the server),
+ *   • mints a new token (raw value shown EXACTLY ONCE, with copy-to-clipboard),
+ *   • revokes a token (kills that credential immediately).
+ *
+ * The just-minted raw token lives only in local component state and is cleared
+ * as soon as the user dismisses the reveal panel — it is never re-fetchable.
+ */
+function ExtensionSection({
+  tokens,
+  locale,
+}: {
+  tokens: ExtensionTokenSummary[]
+  locale: Locale
+}) {
+  const t = useTranslations('Settings')
+
+  // Live list (optimistic add/remove without a full page refresh).
+  const [list, setList] = useState<ExtensionTokenSummary[]>(tokens)
+  const [label, setLabel] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [pending, startTransition] = useTransition()
+
+  // The raw token from the most recent mint — shown once, then dismissed.
+  const [minted, setMinted] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  const dateFmt = new Intl.DateTimeFormat(
+    locale === 'fr' ? 'fr-FR' : 'en-US',
+    { day: 'numeric', month: 'short', year: 'numeric' },
+  )
+
+  function handleGenerate() {
+    if (pending) return
+    setError(null)
+    setCopied(false)
+    startTransition(async () => {
+      const res = await createExtensionToken(label.trim() || null)
+      if (!res.ok) {
+        setError(t('errorServer'))
+        return
+      }
+      setMinted(res.token)
+      // Prepend the new token to the list; timestamps come from "now".
+      setList((prev) => [
+        {
+          id: res.id,
+          label: label.trim() || null,
+          createdAt: new Date().toISOString(),
+          lastUsedAt: null,
+          expiresAt: null,
+          revoked: false,
+        },
+        ...prev,
+      ])
+      setLabel('')
+    })
+  }
+
+  function handleRevoke(id: string) {
+    if (pending) return
+    setError(null)
+    startTransition(async () => {
+      const res = await revokeExtensionTokenAction(id)
+      if (!res.ok) {
+        setError(t('errorServer'))
+        return
+      }
+      setList((prev) => prev.filter((tok) => tok.id !== id))
+    })
+  }
+
+  async function copyToken() {
+    if (!minted) return
+    try {
+      await navigator.clipboard.writeText(minted)
+      setCopied(true)
+    } catch {
+      // Clipboard blocked (permissions/insecure context) — the token is still
+      // visible for a manual copy, so this is a soft failure.
+      setCopied(false)
+    }
+  }
+
+  return (
+    <Section heading={t('extensionHeading')} hint={t('extensionHint')}>
+      <div className="flex flex-col gap-lg">
+        {/* Just-minted token reveal (shown once). */}
+        {minted ? (
+          <div
+            className="flex flex-col gap-sm rounded-md border border-violet/40 bg-violet/[0.06] p-md"
+            role="status"
+          >
+            <div className="flex items-start gap-sm">
+              <KeyRound className="mt-0.5 size-5 shrink-0 text-violet" aria-hidden />
+              <div className="flex flex-col gap-2xs">
+                <span className="font-sans text-body-small font-medium text-foreground">
+                  {t('extensionTokenRevealTitle')}
+                </span>
+                <span className="font-sans text-meta text-foreground/60">
+                  {t('extensionTokenRevealBody')}
+                </span>
+              </div>
+            </div>
+            <code className="block w-full overflow-x-auto rounded-sm border border-border bg-background px-md py-sm font-mono text-body-small text-foreground">
+              {minted}
+            </code>
+            <div className="flex items-center justify-end gap-sm">
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={copyToken}
+                iconLeft={
+                  copied ? (
+                    <Check className="size-4" aria-hidden />
+                  ) : (
+                    <Copy className="size-4" aria-hidden />
+                  )
+                }
+              >
+                {copied ? t('extensionTokenCopied') : t('extensionTokenCopy')}
+              </Button>
+              <Button
+                variant="ghost"
+                size="small"
+                onClick={() => {
+                  setMinted(null)
+                  setCopied(false)
+                }}
+              >
+                {t('extensionTokenDismiss')}
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Generate a new token. */}
+        <div className="flex flex-col gap-sm sm:flex-row sm:items-end">
+          <div className="flex flex-1 flex-col gap-xs">
+            <label
+              htmlFor="settings-extension-label"
+              className="font-sans text-body-small font-medium text-foreground"
+            >
+              {t('extensionLabelLabel')}
+            </label>
+            <Input
+              id="settings-extension-label"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder={t('extensionLabelPlaceholder')}
+              maxLength={80}
+              disabled={pending}
+            />
+          </div>
+          <Button
+            onClick={handleGenerate}
+            disabled={pending}
+            iconLeft={<Puzzle className="size-4" aria-hidden />}
+            className="shrink-0"
+          >
+            {pending ? t('extensionGenerating') : t('extensionGenerate')}
+          </Button>
+        </div>
+
+        {error ? (
+          <p className="font-sans text-body-small text-badge-food" role="alert">
+            {error}
+          </p>
+        ) : null}
+
+        {/* Active tokens list. */}
+        {list.length === 0 ? (
+          <p className="font-sans text-body-small text-foreground/50">
+            {t('extensionEmpty')}
+          </p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-border">
+            {list.map((tok) => (
+              <li
+                key={tok.id}
+                className="flex items-center gap-md py-md first:pt-0 last:pb-0"
+              >
+                <KeyRound
+                  className="size-5 shrink-0 text-foreground/60"
+                  aria-hidden
+                />
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate font-sans text-body-small font-medium text-foreground">
+                    {tok.label ?? t('extensionUnnamed')}
+                  </span>
+                  <span className="font-sans text-meta text-foreground/50">
+                    {tok.lastUsedAt
+                      ? t('extensionLastUsed', {
+                          date: dateFmt.format(new Date(tok.lastUsedAt)),
+                        })
+                      : t('extensionNeverUsed', {
+                          date: dateFmt.format(new Date(tok.createdAt)),
+                        })}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="small"
+                  onClick={() => handleRevoke(tok.id)}
+                  disabled={pending}
+                  iconLeft={<X className="size-4" aria-hidden />}
+                  className="shrink-0 text-badge-food hover:bg-badge-food/5"
+                >
+                  {t('extensionRevoke')}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </Section>
   )
 }

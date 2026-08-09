@@ -294,6 +294,29 @@ async function verify() {
       and policyname = 'collection_covers_insert_owner'`
   record('collection-covers owner insert policy present', coverInsertPol === true)
 
+  // 20. extension_tokens table present with RLS on and NO anon/authenticated
+  //     policy (deny-all to the browser; only service_role reaches it). 0014.
+  const extPresent = present.includes('extension_tokens')
+  record('extension_tokens table present', extPresent)
+
+  const [{ rls: extRls }] = await sql`
+    select coalesce(c.relrowsecurity, false) as rls
+    from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public' and c.relname = 'extension_tokens'`
+  record('extension_tokens RLS enabled', extRls === true)
+
+  const [{ pols: extPols }] = await sql`
+    select count(*)::int as pols from pg_policies
+    where schemaname = 'public' and tablename = 'extension_tokens'`
+  record('extension_tokens deny-all (no anon/authenticated policy)', extPols === 0,
+    `policy count=${extPols}`)
+
+  const [{ has: extUnique }] = await sql`
+    select count(*) > 0 as has from pg_constraint
+    where conrelid = 'public.extension_tokens'::regclass and contype = 'u'
+      and pg_get_constraintdef(oid) ilike '%token_hash%'`
+  record('extension_tokens.token_hash UNIQUE present', extUnique === true)
+
   const failed = results.filter((r) => !r.pass)
   console.log(`\n${results.length - failed.length}/${results.length} checks passed.`)
   return failed.length === 0

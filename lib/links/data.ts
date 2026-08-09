@@ -39,8 +39,15 @@ function isBadgeTopic(id: string): id is BadgeTopic {
 export async function getSaveTargets(
   ownerId: string,
   limit = 100,
+  /**
+   * Optional injected client (chantier 5, extension transport). WEB path omits
+   * it → session client under RLS. EXTENSION path passes a service-role client;
+   * the query already scopes by `.eq('owner_id', ownerId)`, so a token only ever
+   * reads its owner's collections even though service-role bypasses RLS.
+   */
+  client?: Awaited<ReturnType<typeof createClient>>,
 ): Promise<SaveTargetCollection[]> {
-  const supabase = await createClient()
+  const supabase = client ?? (await createClient())
 
   const { data: colls, error: collErr } = await supabase
     .from('collections')
