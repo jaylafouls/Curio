@@ -234,14 +234,24 @@ async function purgeUserStorage(
  * Delete the signed-in user's account and all their data (§8.14 "Delete account"
  * → purge complète RGPD). Order matters:
  *   1. Purge Storage (not FK-cascaded) under the user's owner prefix.
- *   2. admin.auth.admin.deleteUser(userId) — removes the auth.users row, which
- *      cascades through public.users (id references auth.users on delete cascade)
- *      and every table that references public.users on delete cascade
- *      (user_topics, collections→sections, projects, user_links, follows, …).
- *      consent_logs.user_id is ON DELETE SET NULL by design (the consent journal
- *      must survive the account for RGPD auditability — data model / migration
- *      0002), so those rows are anonymised, not destroyed.
- *   3. Sign out locally so the browser's auth cookies are cleared immediately
+ *   2. Delete the public.users row first, driving the ENTIRE app-data cascade
+ *      through Postgres (deterministic, proven robust on the full graph). This
+ *      also anonymises consent_logs/analytics_events (user_id → NULL, ON DELETE
+ *      SET NULL by design — the consent journal must survive the account for
+ *      RGPD auditability, data model / migration 0002).
+ *      WHY NOT rely on admin.auth.admin.deleteUser alone: GoTrue's hard-delete
+ *      returns HTTP 500 ("Database error deleting user") whenever the cascade
+ *      touches the user_links DELETE triggers (saves_count / links_count) while
+ *      the owning collection is cascade-deleted in the same operation — i.e. for
+ *      ANY real account with saved links. Postgres orders that cascade fine; the
+ *      GoTrue path does not. Deleting public.users app-side first makes the
+ *      app-graph teardown independent of that fragile path, and keeps working
+ *      regardless of future trigger-bearing tables. Verified end-to-end against
+ *      the EU project (Phase 5, chantier rgpd-audit).
+ *   3. admin.auth.admin.deleteUser(userId) — now a BARE auth user (its
+ *      public.users row and the whole graph are gone), so GoTrue always returns
+ *      200. Removes auth.users + auth.identities/sessions.
+ *   4. Sign out locally so the browser's auth cookies are cleared immediately
  *      (the deleted session is already invalid server-side; this tidies cookies
  *      so the next request is cleanly anonymous).
  *
@@ -267,7 +277,26 @@ export async function deleteAccount(
   //    but doing storage first keeps the "still exists" invariant simplest.
   await purgeUserStorage(admin, userId)
 
-  // 2. Delete the auth user → cascades the entire DB graph.
+  // 2. Delete the public.users row first — this drives the entire app-data
+  //    cascade through Postgres (deterministic, robust on the full graph) and
+  //    anonymises consent_logs/analytics_events (user_id → NULL). Doing this
+  //    BEFORE the auth delete avoids GoTrue's hard-delete 500 on accounts with
+  //    saved links (user_links DELETE triggers vs. a cascade-deleted collection
+  //    in the same op). See the doc-comment above for the full rationale.
+  const { error: userRowErr } = await admin
+    .from('users')
+    .delete()
+    .eq('id', userId)
+  if (userRowErr) {
+    console.error('deleteAccount: public.users delete failed', {
+      userId,
+      message: userRowErr.message,
+    })
+    return { ok: false, error: 'server' }
+  }
+
+  // 3. Delete the now-bare auth user (its app-data graph is already gone, so
+  //    GoTrue returns 200). Removes auth.users + auth.identities/sessions.
   const { error: delErr } = await admin.auth.admin.deleteUser(userId)
   if (delErr) {
     console.error('deleteAccount: auth deleteUser failed', {
@@ -277,7 +306,7 @@ export async function deleteAccount(
     return { ok: false, error: 'server' }
   }
 
-  // 3. Clear the local session cookies (the session is already invalid).
+  // 4. Clear the local session cookies (the session is already invalid).
   await supabase.auth.signOut().catch((err) => {
     // Non-fatal: the account is gone; a stale cookie is harmless and the next
     // authenticated request will fail cleanly. Log and move on.
