@@ -34,10 +34,9 @@ The extension sets **no cookies** and sends **no analytics**.
 
 - **Local dev:** `http://localhost:3000` (uncomment the dev line). `localhost`
   is already in `manifest.json` `host_permissions`.
-- **Production:** the deployed Curio origin. ⚠️ The value in `config.js` and the
-  `host_permissions` entry in `manifest.json` are currently a **placeholder**
-  (`https://curio.app`) and must be set to the real domain before the store
-  build.
+- **Production:** the deployed Curio origin (`https://curio-neon.vercel.app`),
+  set in both `config.js` (`API_BASE`) and the `host_permissions` entry in
+  `manifest.json`. Keep the two in sync if the domain changes.
 
 ## Load unpacked (dev)
 
