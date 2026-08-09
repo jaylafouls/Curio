@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Save to Curio</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup" aria-live="polite">
+      <!-- Brand header -->
+      <header class="header">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 100 100" width="28" height="28" fill="none">
+            <circle cx="50" cy="50" r="42" stroke="#785CFF" stroke-opacity="0.35" stroke-width="2" />
+            <circle cx="50" cy="8" r="3" fill="#785CFF" />
+            <circle cx="88" cy="60" r="2" fill="#785CFF" fill-opacity="0.5" />
+            <text x="50" y="52" dominant-baseline="central" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="46" fill="#FAFBF2">C</text>
+          </svg>
+        </span>
+        <span class="wordmark">Curio</span>
+      </header>
+
+      <!-- STATE: not connected — paste a token -->
+      <section id="view-connect" class="view" hidden>
+        <h1 class="title">Connect Curio</h1>
+        <p class="lede">
+          Generate a token in Curio → Settings → Chrome extension, then paste it
+          here to connect the extension to your account.
+        </p>
+        <label class="field">
+          <span class="field-label">Extension token</span>
+          <input
+            id="token-input"
+            class="input"
+            type="password"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="Paste your token"
+          />
+        </label>
+        <button id="connect-btn" class="btn btn-primary">Connect</button>
+        <p id="connect-error" class="error" role="alert" hidden></p>
+      </section>
+
+      <!-- STATE: connected — save the current tab -->
+      <section id="view-save" class="view" hidden>
+        <div class="page">
+          <p id="page-title" class="page-title"></p>
+          <p id="page-url" class="page-url"></p>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Collection</span>
+          <select id="collection-select" class="input select">
+            <option value="">Unsorted</option>
+          </select>
+        </label>
+
+        <label class="field" id="section-field" hidden>
+          <span class="field-label">Section</span>
+          <select id="section-select" class="input select">
+            <option value="">None</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Note <span class="optional">(optional)</span></span>
+          <textarea id="note-input" class="input textarea" rows="2" maxlength="500" placeholder="Why keep this?"></textarea>
+        </label>
+
+        <button id="save-btn" class="btn btn-primary">Save to Curio</button>
+        <p id="save-error" class="error" role="alert" hidden></p>
+
+        <button id="disconnect-btn" class="link-btn">Disconnect</button>
+      </section>
+
+      <!-- STATE: saved — confirmation -->
+      <section id="view-done" class="view" hidden>
+        <div class="done">
+          <span class="done-check" aria-hidden="true">✓</span>
+          <p class="done-title">Saved to Curio</p>
+          <p id="done-collection" class="done-sub"></p>
+        </div>
+        <button id="save-another-btn" class="btn btn-secondary">Save another</button>
+      </section>
+
+      <!-- STATE: loading -->
+      <section id="view-loading" class="view" hidden>
+        <p class="loading">Loading…</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <a id="privacy-link" href="#" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

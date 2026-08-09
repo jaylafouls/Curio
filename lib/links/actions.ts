@@ -7,6 +7,24 @@ import { normalizeUrl } from './normalize'
 import { fetchOgMetadata } from './og'
 
 /**
+ * Optional injected identity for the extension transport (chantier 5, Option B).
+ *
+ * WEB path (identity omitted): userId comes from the session cookie via
+ * getUserId(), and user_links writes go through the caller's SESSION client
+ * under RLS (auth.uid() = user_id) — unchanged behaviour.
+ *
+ * EXTENSION path (identity provided): the /api/extension/* route has already
+ * resolved a trusted userId from the bearer token, and passes a SERVICE-ROLE
+ * client. There is no session, so the user_links write cannot rely on RLS; the
+ * route's service-role client bypasses RLS and we set user_id = identity.userId
+ * ourselves (the same trust model resolveLink already uses for `links`).
+ */
+export type ExtensionIdentity = {
+  userId: string
+  client: ReturnType<typeof createAdminClient>
+}
+
+/**
  * Save Flow server actions (chantier 11) — the canonicalization + save pipeline.
  *
  * TWO trust boundaries, deliberately different:
@@ -93,13 +111,18 @@ export type ResolveLinkResult = {
  *                 INSERT a canonical row, return it with existing:false, saves 0.
  * Never fails the flow on an OG problem — only a bad URL or a DB error errors out.
  */
-export async function resolveLink(rawUrl: string): Promise<Result<ResolveLinkResult>> {
-  const userId = await getUserId()
+export async function resolveLink(
+  rawUrl: string,
+  identity?: ExtensionIdentity,
+): Promise<Result<ResolveLinkResult>> {
+  const userId = identity?.userId ?? (await getUserId())
   if (!userId) return { ok: false, error: 'unauthenticated' }
 
   const normalized = normalizeUrl(rawUrl)
   if (!normalized) return { ok: false, error: 'invalid_url' }
 
+  // `links` is service-role-only on both paths; the extension's injected client
+  // is already service-role, so either admin client works identically here.
   const admin = createAdminClient()
 
   // 1. Dedup lookup by the unique canonicalization key.
@@ -217,14 +240,22 @@ export type SaveLinkResult = {
  * DB trigger is a second line of defence, but we check here for a clean error and
  * to resolve the collection slug/name for the confirmation CTA).
  */
-export async function saveLink(input: SaveLinkInput): Promise<Result<SaveLinkResult>> {
-  const userId = await getUserId()
+export async function saveLink(
+  input: SaveLinkInput,
+  identity?: ExtensionIdentity,
+): Promise<Result<SaveLinkResult>> {
+  const userId = identity?.userId ?? (await getUserId())
   if (!userId) return { ok: false, error: 'unauthenticated' }
   if (!input.linkId || typeof input.linkId !== 'string') {
     return { ok: false, error: 'invalid' }
   }
 
-  const supabase = await createClient()
+  // WEB: session client under RLS. EXTENSION: injected service-role client — we
+  // set user_id = userId explicitly below (RLS is bypassed, so the caller's
+  // token-resolved identity is the authority, exactly as for `links`). The
+  // ownership checks on collection/section still scope by owner_id = userId, so
+  // a token can only save into collections the token's owner actually owns.
+  const supabase = identity?.client ?? (await createClient())
 
   // Resolve + authorize the target collection (if any).
   let collectionId: string | null = null

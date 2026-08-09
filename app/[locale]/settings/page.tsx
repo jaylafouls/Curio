@@ -8,6 +8,7 @@ import {
   getSettingsProfile,
   getConnectedIdentities,
 } from '@/lib/settings/data'
+import { getActiveExtensionTokens } from '@/lib/extension/data'
 import { getThemePreference } from '@/lib/theme/data'
 import type { Locale } from '@/lib/i18n/routing'
 
@@ -52,6 +53,10 @@ export default async function SettingsPage({ params }: PageProps) {
   // to Welcome rather than render a broken shell.
   if (!profile) redirect(`/${locale}`)
 
+  // Extension tokens are read owner-scoped (service-role, deny-all to browser),
+  // so we need the resolved userId — hence after the profile load above.
+  const extensionTokens = await getActiveExtensionTokens(profile.id)
+
   return (
     <AppShell
       user={{
@@ -67,6 +72,7 @@ export default async function SettingsPage({ params }: PageProps) {
         identities={identities}
         locale={locale}
         themePreference={themePreference}
+        extensionTokens={extensionTokens}
       />
     </AppShell>
   )
