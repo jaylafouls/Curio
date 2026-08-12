@@ -309,6 +309,11 @@ export type SavedLink = {
   urlOrigin: string
   collectionId: string | null
   savedAt: string
+  /** Personal categorisation Topic (§9bis), null when uncategorised. */
+  topic: BadgeTopic | null
+  /** Personal sub-category id + label, null when none chosen. */
+  subcategoryId: string | null
+  subcategoryLabel: string | null
 }
 
 type SavedLinkRow = {
@@ -318,14 +323,23 @@ type SavedLinkRow = {
   url_origin: string
   collection_id: string | null
   saved_at: string
+  topic_id: string | null
+  subcategory_id: string | null
   link:
     | { title: string; description: string | null; image_url: string | null }
     | { title: string; description: string | null; image_url: string | null }[]
+    | null
+  subcategory:
+    | { label: string }
+    | { label: string }[]
     | null
 }
 
 function mapSavedLink(row: SavedLinkRow): SavedLink {
   const link = Array.isArray(row.link) ? row.link[0] : row.link
+  const sub = Array.isArray(row.subcategory)
+    ? row.subcategory[0]
+    : row.subcategory
   return {
     id: row.id,
     // Personal display override wins over the canonical title (data model §9).
@@ -336,12 +350,17 @@ function mapSavedLink(row: SavedLinkRow): SavedLink {
     urlOrigin: row.url_origin,
     collectionId: row.collection_id,
     savedAt: row.saved_at,
+    topic: row.topic_id && isBadgeTopic(row.topic_id) ? row.topic_id : null,
+    subcategoryId: row.subcategory_id,
+    subcategoryLabel: sub?.label ?? null,
   }
 }
 
 const SAVED_LINK_SELECT =
   'id, title_override, custom_image_url, url_origin, collection_id, saved_at, ' +
-  'link:links!user_links_link_id_fkey (title, description, image_url)'
+  'topic_id, subcategory_id, ' +
+  'link:links!user_links_link_id_fkey (title, description, image_url), ' +
+  'subcategory:link_subcategories!user_links_subcategory_id_fkey (label)'
 
 /**
  * All of the user's saved links, newest first (owner RLS). `/saved` shows the

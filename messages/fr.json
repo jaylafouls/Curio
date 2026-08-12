@@ -376,12 +376,18 @@
     "tabUnsorted": "Non classés",
     "countLinks": "{count, plural, =0 {Aucun lien} one {# lien} other {# liens}}",
     "unsortedBadge": "Non classé",
+    "filterAll": "Tous",
+    "filterTopic": "Filtrer par thème",
+    "filterSubcategory": "Filtrer par sous-catégorie",
     "emptyAllTag": "Rien pour l'instant",
     "emptyAllTitle": "Vos liens enregistrés apparaîtront ici",
     "emptyAllBody": "Enregistrez un lien depuis n'importe où et il atterrit ici, prêt à être organisé en collections.",
     "emptyUnsortedTag": "Tout est rangé",
     "emptyUnsortedTitle": "Rien à classer",
-    "emptyUnsortedBody": "Les liens que vous n'avez pas encore classés dans une collection apparaîtront ici."
+    "emptyUnsortedBody": "Les liens que vous n'avez pas encore classés dans une collection apparaîtront ici.",
+    "emptyFilterTag": "Aucun résultat",
+    "emptyFilterTitle": "Rien sous ce filtre",
+    "emptyFilterBody": "Aucun lien enregistré ne correspond au thème ou à la sous-catégorie sélectionnés. Effacez le filtre pour voir le reste."
   },
   "Projects": {
     "metaTitle": "Projets",
@@ -544,6 +550,10 @@
     "unsortedHint": "Enregistrer sans collection.",
     "sectionOptional": "Section (facultatif)",
     "noSection": "Aucune section",
+    "topicLabel": "Thème",
+    "topicHintCollection": "Hérité de la collection — modifiable pour cet enregistrement.",
+    "topicHintUnsorted": "Choisissez un thème pour retrouver ce lien plus tard.",
+    "subcategoryLabel": "Sous-catégorie",
     "createNewCollection": "Créer une collection",
     "newCollectionPlaceholder": "Nom de la collection",
     "createCollection": "Créer",
@@ -562,7 +572,9 @@
     "errorImageType": "Veuillez choisir un fichier image.",
     "errorImageSize": "Cette image est trop volumineuse (5 Mo max).",
     "errorCollectionName": "Veuillez saisir un nom pour la collection.",
-    "errorCollectionGone": "Cette collection n’existe plus."
+    "errorCollectionGone": "Cette collection n’existe plus.",
+    "errorTopicRequired": "Veuillez choisir un thème pour cet enregistrement.",
+    "errorSubcategoryRequired": "Veuillez choisir une sous-catégorie."
   },
   "Settings": {
     "metaTitle": "Paramètres",

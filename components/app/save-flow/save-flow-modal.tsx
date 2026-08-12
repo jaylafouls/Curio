@@ -25,9 +25,14 @@ import { cn } from '@/lib/ui/cn'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from '@/lib/i18n/navigation'
 import { isSavableUrl } from '@/lib/links/normalize'
-import { resolveLink, saveLink } from '@/lib/links/actions'
+import {
+  resolveLink,
+  saveLink,
+  suggestInheritedCategory,
+} from '@/lib/links/actions'
 import { createCollection } from '@/lib/collections/actions'
 import type { SaveTargetCollection } from '@/lib/links/data'
+import type { LinkSubcategory } from '@/lib/links/subcategories'
 import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
 
 /**
@@ -74,6 +79,8 @@ export type SaveFlowModalProps = {
   userId: string
   /** The user's collections + sections for the "Save to" picker. */
   targets: SaveTargetCollection[]
+  /** Sub-categories grouped by Topic id (Decisions Log §18); Travel/Food only. */
+  subcategoriesByTopic: Record<string, LinkSubcategory[]>
   /** Which panel action opened the flow (default: save a link). */
   initialAction?: SaveFlowInitialAction
 }
@@ -88,6 +95,7 @@ export function SaveFlowModal({
   variant,
   userId,
   targets,
+  subcategoriesByTopic,
   initialAction = 'save',
 }: SaveFlowModalProps) {
   const t = useTranslations('SaveFlow')
@@ -124,6 +132,16 @@ export function SaveFlowModal({
   const [newCollectionName, setNewCollectionName] = useState('')
   const [newCollectionTopic, setNewCollectionTopic] = useState<BadgeTopic>('travel')
 
+  // Step 3 — categorisation (Topic + optional sub-category, Decisions Log §18).
+  // topicId is the personal Topic filed on this save; subcategoryId refines it
+  // (Travel/Food only). The server re-validates coherence (Model B), but the
+  // pickers enforce the same rules client-side so the CTA can guard cleanly.
+  const [topicId, setTopicId] = useState<BadgeTopic | null>(null)
+  const [subcategoryId, setSubcategoryId] = useState<string | null>(null)
+  // Whether the user has touched the Topic picker on this flow — once they have,
+  // we stop auto-inheriting from the chosen Collection so their choice sticks.
+  const touchedTopic = useRef(false)
+
   // Step 4 — confirmation.
   const [savedTo, setSavedTo] = useState<{ name: string | null; slug: string | null }>({
     name: null,
@@ -153,6 +171,9 @@ export function SaveFlowModal({
     setSectionId(null)
     setCreatingCollection(false)
     setNewCollectionName('')
+    setTopicId(null)
+    setSubcategoryId(null)
+    touchedTopic.current = false
     setSavedTo({ name: null, slug: null })
     setError(null)
   }, [])
@@ -200,6 +221,27 @@ export function SaveFlowModal({
       setCanonicalTitle(res.title)
       setDescription(res.description ?? '')
       setImage(res.image)
+
+      // Prefill the categorisation from the most-recent filing of the same
+      // canonical link by ANY user (§18 cross-user inheritance). Best-effort: a
+      // miss or error just leaves the pickers empty, to be inherited from the
+      // Collection or chosen manually. The suggestion never overrides a later
+      // collection pick — touchedTopic stays false so a Collection choice can
+      // still inherit.
+      const sug = await suggestInheritedCategory(res.linkId)
+      if (sug.ok && sug.suggestion.topicId) {
+        setTopicId(sug.suggestion.topicId)
+        // Keep the suggested sub-category only if it is coherent with the Topic
+        // (the reference map is the source of truth for that Topic's set).
+        const subs = subcategoriesByTopic[sug.suggestion.topicId] ?? []
+        setSubcategoryId(
+          sug.suggestion.subcategoryId &&
+            subs.some((s) => s.id === sug.suggestion.subcategoryId)
+            ? sug.suggestion.subcategoryId
+            : null,
+        )
+      }
+
       // Lead with the custom-image picker when the flow was opened via
       // "Add a custom image"; the effect fires it on entering Customize.
       autoPickImage.current = initialAction === 'image'
@@ -266,6 +308,31 @@ export function SaveFlowModal({
     setCollectionId(id)
     setSectionId(null) // section is scoped to a collection; reset on change
     setCreatingCollection(false)
+    // Inherit the Collection's Topic unless the user has picked one themselves.
+    // Matches the server rule (an omitted topicId in a Collection uses the
+    // Collection's). Picking Unsorted (id null) leaves any current Topic as-is —
+    // Unsorted needs an explicit Topic, so we keep whatever is chosen/inherited.
+    if (!touchedTopic.current && id) {
+      const coll = collections.find((c) => c.id === id)
+      if (coll) {
+        setTopicId(coll.topic)
+        setSubcategoryId(null) // reset — sub-cat must be re-picked for the new Topic
+      }
+    }
+  }
+
+  // The sub-categories for the currently-selected Topic (empty for the 8 Topics
+  // that define none, and when no Topic is chosen yet). Drives whether the
+  // conditional sub-category picker shows and whether one is mandatory.
+  const activeSubcategories = useMemo(
+    () => (topicId ? subcategoriesByTopic[topicId] ?? [] : []),
+    [topicId, subcategoriesByTopic],
+  )
+
+  function pickTopic(id: BadgeTopic) {
+    touchedTopic.current = true
+    setTopicId(id)
+    setSubcategoryId(null) // sub-cat belongs to a Topic; reset when the Topic changes
   }
 
   function handleCreateCollection() {
@@ -303,6 +370,20 @@ export function SaveFlowModal({
     if (!linkId) return
     setError(null)
     const targetCollection = toUnsorted ? null : collectionId
+
+    // Categorisation guards mirror the server (§18.2, Model B):
+    //  - a Topic is mandatory when saving to Unsorted (no Collection to inherit);
+    //  - where the resolved Topic defines sub-categories (Travel/Food), one must
+    //    be chosen ("Autre" is always in the list, so this never blocks a save).
+    if (!targetCollection && !topicId) {
+      setError(t('errorTopicRequired'))
+      return
+    }
+    if (activeSubcategories.length > 0 && !subcategoryId) {
+      setError(t('errorSubcategoryRequired'))
+      return
+    }
+
     const targetSection = toUnsorted ? null : sectionId
     startTransition(async () => {
       const res = await saveLink({
@@ -316,6 +397,10 @@ export function SaveFlowModal({
         note: note.trim() || null,
         tags,
         customImageUrl: customImage,
+        // Personal categorisation; the server inherits the Collection's Topic when
+        // this is null inside a Collection, and re-validates sub-cat coherence.
+        topicId,
+        subcategoryId,
       })
       if (!res.ok) {
         setError(res.error === 'not_found' ? t('errorCollectionGone') : t('errorServer'))
@@ -723,6 +808,66 @@ export function SaveFlowModal({
               </div>
             </div>
           ) : null}
+
+          {/* Categorisation — Topic (always) + sub-category (Travel/Food only).
+              §18: personal, independent of the Collection. Prefilled from the
+              Collection's Topic or the user's prior filing of this link. */}
+          <div className="flex flex-col gap-sm border-t border-border pt-md">
+            <div className="flex flex-col gap-xs">
+              <span className="font-sans text-body-small font-medium text-text-dark">
+                {t('topicLabel')}
+              </span>
+              <p className="font-sans text-meta text-text-dark/50">
+                {collectionId ? t('topicHintCollection') : t('topicHintUnsorted')}
+              </p>
+              <div className="flex flex-wrap gap-xs pt-2xs">
+                {BADGE_TOPICS.filter(isBadgeTopic).map((tp) => (
+                  <button
+                    key={tp}
+                    type="button"
+                    onClick={() => pickTopic(tp)}
+                    aria-pressed={tp === topicId}
+                    className={cn(
+                      'rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2',
+                      tp === topicId
+                        ? 'ring-2 ring-violet ring-offset-2'
+                        : 'opacity-70 hover:opacity-100',
+                    )}
+                  >
+                    <Badge topic={tp} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sub-category — only when the chosen Topic defines any (Travel/Food).
+                One is required (the CTA guards); "Autre" is always the last option. */}
+            {activeSubcategories.length > 0 ? (
+              <div className="flex flex-col gap-xs">
+                <span className="font-sans text-body-small font-medium text-text-dark">
+                  {t('subcategoryLabel')}
+                </span>
+                <div className="flex flex-wrap gap-xs">
+                  {activeSubcategories.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => setSubcategoryId(s.id)}
+                      aria-pressed={subcategoryId === s.id}
+                      className={cn(
+                        'rounded-full border px-md py-xs font-sans text-meta transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
+                        subcategoryId === s.id
+                          ? 'border-violet bg-violet/10 text-text-dark'
+                          : 'border-border text-text-dark/60',
+                      )}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
 
           {/* Create new collection — inline. */}
           {creatingCollection ? (

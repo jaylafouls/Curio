@@ -317,6 +317,72 @@ async function verify() {
       and pg_get_constraintdef(oid) ilike '%token_hash%'`
   record('extension_tokens.token_hash UNIQUE present', extUnique === true)
 
+  // 21. link_subcategories reference table present with RLS on + a public-read
+  //     policy (readable like topics), and the V1 seed = 11 rows (6 Travel + 5
+  //     Food, "Autre" last in each). 0015.
+  const subcatPresent = present.includes('link_subcategories')
+  record('link_subcategories table present', subcatPresent)
+
+  const [{ rls: subcatRls }] = await sql`
+    select coalesce(c.relrowsecurity, false) as rls
+    from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public' and c.relname = 'link_subcategories'`
+  record('link_subcategories RLS enabled', subcatRls === true)
+
+  const [{ has: subcatReadPol }] = await sql`
+    select count(*) > 0 as has from pg_policies
+    where schemaname = 'public' and tablename = 'link_subcategories'
+      and policyname = 'link_subcategories_select_public' and cmd = 'SELECT'`
+  record('link_subcategories public-read policy present', subcatReadPol === true)
+
+  const [{ total: subcatTotal }] =
+    await sql`select count(*)::int as total from public.link_subcategories`
+  const [{ travel: subcatTravel }] =
+    await sql`select count(*)::int as travel from public.link_subcategories where topic_id = 'travel'`
+  const [{ food: subcatFood }] =
+    await sql`select count(*)::int as food from public.link_subcategories where topic_id = 'food'`
+  record('link_subcategories seed (11 = 6 Travel + 5 Food)',
+    subcatTotal === 11 && subcatTravel === 6 && subcatFood === 5,
+    `total=${subcatTotal} travel=${subcatTravel} food=${subcatFood}`)
+
+  // "Autre" is the escape valve and must sort LAST in each Topic's list.
+  const [{ ok: autreLast }] = await sql`
+    select (
+      (select label from public.link_subcategories
+         where topic_id='travel' order by sort_order desc limit 1) = 'Autre' and
+      (select label from public.link_subcategories
+         where topic_id='food'   order by sort_order desc limit 1) = 'Autre'
+    ) as ok`
+  record('link_subcategories "Autre" sorts last (Travel + Food)', autreLast === true)
+
+  // The 8 non-equipped Topics carry NO sub-category rows in V1.
+  const [{ n: otherTopicRows }] = await sql`
+    select count(*)::int as n from public.link_subcategories
+    where topic_id not in ('travel', 'food')`
+  record('link_subcategories: 8 other Topics have no rows', otherTopicRows === 0,
+    `rows on other topics=${otherTopicRows}`)
+
+  // 22. user_links: new FK columns present + nullable, old `category` dropped. 0015.
+  const ulCols = await sql`
+    select column_name, is_nullable from information_schema.columns
+    where table_schema = 'public' and table_name = 'user_links'
+      and column_name in ('topic_id', 'subcategory_id', 'category')`
+  const ulTopic = ulCols.find((c) => c.column_name === 'topic_id')
+  const ulSubcat = ulCols.find((c) => c.column_name === 'subcategory_id')
+  const ulCategory = ulCols.find((c) => c.column_name === 'category')
+  record('user_links.topic_id present + nullable',
+    Boolean(ulTopic) && ulTopic.is_nullable === 'YES')
+  record('user_links.subcategory_id present + nullable',
+    Boolean(ulSubcat) && ulSubcat.is_nullable === 'YES')
+  record('user_links.category dropped', !ulCategory)
+
+  // subcategory_id FK actually points at link_subcategories (not left dangling).
+  const [{ has: subcatFk }] = await sql`
+    select count(*) > 0 as has from pg_constraint
+    where conrelid = 'public.user_links'::regclass and contype = 'f'
+      and confrelid = 'public.link_subcategories'::regclass`
+  record('user_links.subcategory_id FK → link_subcategories present', subcatFk === true)
+
   const failed = results.filter((r) => !r.pass)
   console.log(`\n${results.length - failed.length}/${results.length} checks passed.`)
   return failed.length === 0

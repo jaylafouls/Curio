@@ -7,6 +7,7 @@ import { cn } from '@/lib/ui/cn'
 import { useRouter } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import type { SaveTargetCollection } from '@/lib/links/data'
+import type { LinkSubcategory } from '@/lib/links/subcategories'
 import { CollectionModal } from '@/components/app/collection-modal'
 import { SaveFlowModal, type SaveFlowInitialAction } from './save-flow-modal'
 
@@ -49,10 +50,13 @@ export function SaveFlowProvider({
   userId,
   locale,
   targets,
+  subcategoriesByTopic,
 }: {
   userId: string
   locale: Locale
   targets: SaveTargetCollection[]
+  /** Sub-categories grouped by Topic id (Decisions Log §18); Travel/Food only in V1. */
+  subcategoriesByTopic: Record<string, LinkSubcategory[]>
 }) {
   const t = useTranslations('SaveFlow')
   const router = useRouter()
@@ -240,6 +244,7 @@ export function SaveFlowProvider({
         variant={isDesktop ? 'center' : 'sheet'}
         userId={userId}
         targets={targets}
+        subcategoriesByTopic={subcategoriesByTopic}
         initialAction={wizardAction}
       />
 

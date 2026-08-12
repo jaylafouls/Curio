@@ -4,6 +4,7 @@ import { AppBottomNav } from './app-bottom-nav'
 import { NotificationBell } from './notification-bell'
 import { SaveFlowProvider } from './save-flow/save-flow-provider'
 import { getSaveTargets } from '@/lib/links/data'
+import { getSubcategoriesByTopic } from '@/lib/links/subcategories'
 import { getUnreadNotificationCount } from '@/lib/notifications/data'
 import { getThemePreference } from '@/lib/theme/data'
 import { cn } from '@/lib/ui/cn'
@@ -41,6 +42,11 @@ export async function AppShell({
   // "Save to" step. A fresh account gets [] and the picker shows only "Unsorted".
   const saveTargets = await getSaveTargets(userId)
 
+  // Public reference data: sub-categories grouped by Topic (Decisions Log §18).
+  // Only Travel/Food carry rows in V1; the map feeds the Save Flow's conditional
+  // sub-category picker. Read once here, threaded through the provider.
+  const subcategoriesByTopic = await getSubcategoriesByTopic()
+
   // Unread notification count for the header bell (chantier notifications). RLS
   // scopes it to the signed-in recipient; 0 for a fresh account.
   const unreadCount = await getUnreadNotificationCount(userId)
@@ -73,7 +79,12 @@ export async function AppShell({
         <main className="flex-1">{children}</main>
         <AppBottomNav />
       </div>
-      <SaveFlowProvider userId={userId} locale={locale} targets={saveTargets} />
+      <SaveFlowProvider
+        userId={userId}
+        locale={locale}
+        targets={saveTargets}
+        subcategoriesByTopic={subcategoriesByTopic}
+      />
     </div>
   )
 }
