@@ -220,7 +220,8 @@ Relation personnelle — la plus dense en volume et en usage.
 | `custom_image_url` | `text` | nullable | Image perso uploadée (Supabase Storage), surcharge `links.image_url` canonique pour cet utilisateur uniquement — voir "Add a custom image" §12.1 Spec / §4 Decisions Log |
 | `note` | `text` | nullable, max 500 car. | Privé |
 | `tags` | `text[]` | nullable | Entièrement libres, pas de table séparée |
-| `category` | `text` | nullable | Distinct des tags, personnel |
+| `topic_id` | `text` | nullable, FK → `topics(id)` | *(0015, chantier link-subcategories)* Topic de ce save, personnel. Stockable seul (les 8 Topics sans sous-catégorie, ou un save Unsorted où le Topic est obligatoire). Remplace l'ancien `category`. |
+| `subcategory_id` | `uuid` | nullable, FK → `link_subcategories(id)` | *(0015)* Sous-catégorie optionnelle affinant le Topic, une seule par `user_link`. Cohérence `subcategory.topic_id === topic_id` validée applicativement au save (pas de trigger). |
 | `url_origin` | `text` | `not null` | URL brute avec tracking propre à ce save |
 | `saved_at` | `timestamptz` | `default now()` | |
 | Contrainte | `unique(user_id, link_id, collection_id, section_id)` | | Empêche le doublon exact accidentel — autorise cependant le même Link dans plusieurs Collections différentes |
@@ -232,6 +233,23 @@ Relation personnelle — la plus dense en volume et en usage.
 - Trigger `BEFORE INSERT/UPDATE` requis pour garantir que `section_id` appartient bien à `collection_id` sur la même ligne (Postgres ne peut pas le vérifier nativement via FK simple).
 - **`custom_image_url` ajouté suite à la décision actée en Parcours & UX (résolution §21)** : "Take a screenshot" est définitivement écarté au profit de "Add a custom image" (§12.1 Spec / §4 Decisions Log). Ce champ stocke l'upload personnel qui surcharge `links.image_url` uniquement pour l'affichage côté `UserLink` de cet utilisateur — le Link canonique et son image figée au 1er save ne sont jamais modifiés.
 - **Aucune modification structurelle liée aux Links sponsorisés.** Un Link sponsorisé rejoint une Collection exactement comme un Link organique — via un `INSERT` normal dans `user_links`, déclenché par une action explicite de l'utilisateur. C'est la garantie structurelle du principe "jamais d'auto-insertion silencieuse" (§19) : il n'existe et n'existera aucun mécanisme d'écriture automatique dans cette table hors du flow de save standard.
+- **Catégorisation par Topic + sous-catégorie (0015, Decisions Log §18).** L'ancien `category` (`text`, jamais branché à aucune UI) est remplacé par `topic_id` + `subcategory_id`. Deux niveaux : le Topic (niveau principal, réutilise les badges), et une sous-catégorie optionnelle issue de la table de référence `link_subcategories` (voir §9bis). Aucune donnée de catégorisation ne devient canonique sur `links` — la valeur *stockée* reste strictement personnelle par `user_link`. En revanche la *suggestion* de pré-remplissage du Save Flow est héritée **cross-user** du même Link canonique (Decisions Log §18.6) : best-effort, jamais imposée, seuls `topic_id`/`subcategory_id` traversent.
+
+---
+
+## 9bis. Table `link_subcategories` *(0015, chantier link-subcategories)*
+
+Vocabulaire contrôlé, léger, des sous-catégories par Topic — une table de référence (pas un `CHECK` en dur, pour rester extensible sans migration de schéma). Lisible publiquement (RLS `select using (true)`, comme `topics`), aucune écriture client.
+
+| Champ | Type | Contraintes | Note |
+|---|---|---|---|
+| `id` | `uuid` | PK, `default gen_random_uuid()` | |
+| `topic_id` | `text` | `not null`, FK → `topics(id)` | Le Topic auquel cette sous-catégorie appartient |
+| `label` | `text` | `not null` | Libellé affiché (FR en V1) |
+| `sort_order` | `integer` | `not null`, `default 0` | Ordre d'affichage ; "Autre" porte la valeur la plus haute (toujours en dernier) |
+| Contrainte | `unique(topic_id, label)` | | Pas de doublon (Topic, libellé) ; permet le seed idempotent. Ce n'est PAS un `CHECK` sur les valeurs — le vocabulaire reste ouvert. |
+
+**Seed V1 (§18.2)** : Travel (Hébergement / Restaurant / Lieu à voir / Activité / Transport / **Autre**) + Food (Restaurant / Recette / Bar-Café / Produit / **Autre**). Les 8 autres Topics n'ont aucune ligne en V1 — en équiper un plus tard = insérer des lignes, jamais une migration de schéma. **"Autre" systématique** : la valve d'échappement qui permet de rendre la sous-catégorie obligatoire sans jamais bloquer un save.
 
 ---
 

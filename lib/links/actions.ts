@@ -5,6 +5,10 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeUrl } from './normalize'
 import { fetchOgMetadata } from './og'
+import {
+  getInheritedCategory,
+  type InheritedCategory,
+} from './subcategories'
 
 /**
  * Optional injected identity for the extension transport (chantier 5, Option B).
@@ -223,6 +227,19 @@ export type SaveLinkInput = {
   tags?: string[] | null
   /** Personal image (public URL in the user-images bucket), overrides canonical. */
   customImageUrl?: string | null
+  /**
+   * Categorisation Topic (data model §9bis / Decisions Log §18). Required when
+   * saving to Unsorted (collectionId null); inside a Collection the Topic is
+   * inherited from the Collection when omitted. Personal, never canonical.
+   */
+  topicId?: string | null
+  /**
+   * Optional sub-category refining the Topic. Only Travel/Food define any; where
+   * a Topic defines sub-categories the Save Flow makes one mandatory ("Autre" is
+   * always available). Must belong to `topicId` — validated below (Model B, no
+   * DB trigger).
+   */
+  subcategoryId?: string | null
 }
 
 export type SaveLinkResult = {
@@ -257,14 +274,18 @@ export async function saveLink(
   // a token can only save into collections the token's owner actually owns.
   const supabase = identity?.client ?? (await createClient())
 
-  // Resolve + authorize the target collection (if any).
+  // Resolve + authorize the target collection (if any). We also read the
+  // collection's topic_id so a save into a Collection can inherit its Topic when
+  // the caller doesn't override it (Save Flow prefills, but the server is the
+  // authority — an omitted topicId in a Collection means "use the Collection's").
   let collectionId: string | null = null
   let collectionSlug: string | null = null
   let collectionName: string | null = null
+  let collectionTopicId: string | null = null
   if (input.collectionId) {
     const { data: coll } = await supabase
       .from('collections')
-      .select('id, slug, name')
+      .select('id, slug, name, topic_id')
       .eq('id', input.collectionId)
       .eq('owner_id', userId)
       .maybeSingle()
@@ -272,6 +293,7 @@ export async function saveLink(
     collectionId = coll.id
     collectionSlug = coll.slug
     collectionName = coll.name
+    collectionTopicId = coll.topic_id ?? null
   }
 
   // Section only valid inside the chosen collection (the DB trigger enforces this
@@ -306,6 +328,32 @@ export async function saveLink(
   const urlOrigin = clip(input.urlOrigin, 2048)
   if (!urlOrigin) return { ok: false, error: 'invalid' }
 
+  // ── Categorisation (Topic + optional sub-category), §18 / Model B ──────────
+  // Resolve the effective Topic: an explicit input wins; otherwise a save into a
+  // Collection inherits the Collection's Topic. Unsorted saves have no Collection
+  // to inherit from, so a Topic is mandatory there.
+  const topicId = clip(input.topicId, 64) ?? collectionTopicId
+  if (!collectionId && !topicId) {
+    // Save to Unsorted without a Topic — the Save Flow requires one (§18.2).
+    return { ok: false, error: 'invalid' }
+  }
+
+  // A sub-category is only meaningful with a Topic, and must belong to it. We
+  // validate coherence here (no DB trigger, Model B): the sub-category row must
+  // exist AND its topic_id must equal the resolved Topic. This is the single
+  // enforcement point for "subcategory.topic_id === topicId".
+  let subcategoryId: string | null = null
+  if (input.subcategoryId) {
+    if (!topicId) return { ok: false, error: 'invalid' }
+    const { data: sub } = await supabase
+      .from('link_subcategories')
+      .select('id, topic_id')
+      .eq('id', input.subcategoryId)
+      .maybeSingle()
+    if (!sub || sub.topic_id !== topicId) return { ok: false, error: 'invalid' }
+    subcategoryId = sub.id
+  }
+
   const { data, error } = await supabase
     .from('user_links')
     .insert({
@@ -318,6 +366,8 @@ export async function saveLink(
       tags: tags.length > 0 ? tags : null,
       custom_image_url: cleanCustomImage(input.customImageUrl),
       url_origin: urlOrigin,
+      topic_id: topicId,
+      subcategory_id: subcategoryId,
     })
     .select('id')
     .single()
@@ -342,4 +392,29 @@ export async function saveLink(
     collectionSlug,
     collectionName,
   }
+}
+
+// ── suggestInheritedCategory — prefill the Save Flow (cross-user inheritance) ──
+
+/**
+ * Server action for the Save Flow: the most-recent categorisation of this
+ * canonical link by ANY user, used to prefill the Topic/sub-category pickers
+ * (§18 cross-user inheritance — if someone already filed this exact link under a
+ * Topic, that pre-fills the next saver's choice). Only reference-table
+ * topic_id/subcategory_id crosses users, never who filed it or private content.
+ *
+ * Still session-gated (must be authenticated to call the Save Flow), but the read
+ * itself is not scoped to the caller. Returns nulls when no one has categorised
+ * this link before.
+ */
+export async function suggestInheritedCategory(
+  linkId: string,
+): Promise<Result<{ suggestion: InheritedCategory }>> {
+  const userId = await getUserId()
+  if (!userId) return { ok: false, error: 'unauthenticated' }
+  if (!linkId || typeof linkId !== 'string') {
+    return { ok: false, error: 'invalid' }
+  }
+  const suggestion = await getInheritedCategory(linkId)
+  return { ok: true, suggestion }
 }
