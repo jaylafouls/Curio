@@ -335,6 +335,7 @@
   },
   "MySpace": {
     "metaTitle": "Mon univers",
+    "pageTitle": "Mon espace",
     "metaDescription": "Votre espace personnel sur Curio — vos collections, vos liens enregistrés et les curateurs que vous suivez.",
     "joined": "Sur Curio depuis {date}",
     "latestCollections": "Vos dernières collections",

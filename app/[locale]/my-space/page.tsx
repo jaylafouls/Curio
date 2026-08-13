@@ -7,7 +7,7 @@ import { AccentText, Avatar } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { AppShell } from '@/components/app/app-shell'
-import { AppHeader } from '@/components/app/app-header'
+import { AppPageTitle } from '@/components/app/app-header'
 import { ProfileIdentity } from '@/components/app/profile-identity'
 import { CollectionGrid } from '@/components/app/collection-grid'
 import { StatList } from '@/components/app/stat-list'
@@ -89,9 +89,8 @@ export default async function MySpacePage({ params }: PageProps) {
       }}
       userId={user.id}
       locale={locale}
+      header={<AppPageTitle title={t('pageTitle')} />}
     >
-      <AppHeader displayName={user.displayName} />
-
       <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-2xl px-lg py-2xl lg:grid-cols-[1fr_18rem] lg:px-2xl">
         {/* Main column. */}
         <div className="flex min-w-0 flex-col gap-2xl">
