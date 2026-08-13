@@ -7,6 +7,7 @@ import { CollectionDetailBody } from '@/components/app/collection-detail-body'
 import { CollectionOwnerOverlay } from '@/components/app/collection-owner-overlay'
 import { CollectionFollowButton } from '@/components/app/collection-follow-button'
 import { CollectionPrivateClient } from '@/components/app/collection-private-client'
+import { CollectionConnectedShell } from '@/components/app/collection-connected-shell'
 
 /**
  * /[locale]/collections/[id] — the public collection page (spec §8.7 / §10).
@@ -70,9 +71,16 @@ export default async function CollectionPage({ params }: PageProps) {
   const t = await getTranslations({ locale, namespace: 'CollectionDetail' })
 
   // Public hit → ISR-cached crawler-visible body + client owner overlay on top.
+  //
+  // CollectionConnectedShell wraps the body: it renders nothing extra during the
+  // server (cached) render and for anon visitors/crawlers, so this HTML stays
+  // cookie-free and byte-identical to cache; for a signed-in visitor it mounts
+  // the connected app frame (sidebar/top bar/bell/Save Flow) after hydration —
+  // restoring app coherence without contaminating the cache (same client-only,
+  // session-gated pattern as CollectionOwnerOverlay just below).
   if (collection) {
     return (
-      <>
+      <CollectionConnectedShell locale={locale}>
         <div className="pt-2xl">
           <CollectionOwnerOverlay collectionId={collection.id} locale={locale} />
           {/* Viewer follow toggle — client-side, keyed off the collection id, so
@@ -93,7 +101,7 @@ export default async function CollectionPage({ params }: PageProps) {
             emptyBody: t('emptyBody'),
           }}
         />
-      </>
+      </CollectionConnectedShell>
     )
   }
 
