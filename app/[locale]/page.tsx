@@ -5,7 +5,13 @@ import { buildMetadata } from '@/lib/seo/metadata'
 import { JsonLd, buildCollectionPage } from '@/lib/seo/json-ld'
 import { SITE_URL } from '@/lib/seo/config'
 import { checkInvitationToken } from '@/lib/auth/invitation'
-import { AccentText, Avatar, Badge, CollectionCard } from '@/components/ui'
+import {
+  AccentText,
+  Avatar,
+  Badge,
+  ButtonLink,
+  CollectionCard,
+} from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicShell } from '@/components/public/public-shell'
@@ -106,13 +112,12 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
           ) : null}
 
           <div className="mt-sm flex flex-col items-center gap-sm sm:flex-row">
-            <Link
+            <ButtonLink
               href={signupHref}
-              className="inline-flex h-11 items-center gap-sm rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors duration-base hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+              iconRight={<ArrowRight className="size-4" />}
             >
               {t('ctaBuild')}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
+            </ButtonLink>
             <Link
               href="/explore"
               className="inline-flex h-11 items-center gap-sm rounded-full border border-border px-lg font-sans text-body-small text-foreground/80 transition-colors duration-base hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
@@ -226,13 +231,13 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               <p className="max-w-md font-sans text-body-small text-foreground/70">
                 {t('universesEmptyBody')}
               </p>
-              <Link
+              <ButtonLink
                 href={signupHref}
-                className="mt-xs inline-flex h-11 items-center gap-sm rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors hover:opacity-90"
+                className="mt-xs"
+                iconRight={<ArrowRight className="size-4" />}
               >
                 {t('ctaBuild')}
-                <ArrowRight className="size-4" aria-hidden />
-              </Link>
+              </ButtonLink>
             </div>
           )}
         </div>

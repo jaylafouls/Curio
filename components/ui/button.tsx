@@ -41,6 +41,20 @@ const sizes: Record<ButtonSize, string> = {
   small: 'h-9 px-md text-meta',
 }
 
+/**
+ * The full pill class recipe for a given variant/size — the single source of
+ * truth for CTA styling. `Button` (a real <button>) and `ButtonLink` (a
+ * navigating <a>) both consume this so a link-styled CTA is byte-identical to a
+ * button one without duplicating the token classes at each call-site.
+ */
+export function buttonClasses(
+  variant: ButtonVariant = 'primary',
+  size: ButtonSize = 'default',
+  className?: string,
+) {
+  return cn(base, variants[variant], sizes[size], className)
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
@@ -59,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         type={type}
-        className={cn(base, variants[variant], sizes[size], className)}
+        className={buttonClasses(variant, size, className)}
         {...props}
       >
         {iconLeft ? (

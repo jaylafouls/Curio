@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { ArrowRight, Heart, Compass, Gem, Sprout } from 'lucide-react'
 import { buildMetadata } from '@/lib/seo/metadata'
-import { AccentText } from '@/components/ui'
-import { Link } from '@/lib/i18n/navigation'
+import { AccentText, ButtonLink } from '@/components/ui'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicShell } from '@/components/public/public-shell'
 import { getGlobalStats } from '@/lib/public/data'
@@ -127,13 +126,12 @@ export default async function AboutPage({ params }: PageProps) {
           className="text-balance"
         />
         <div className="mt-lg flex justify-center">
-          <Link
+          <ButtonLink
             href="/signup"
-            className="inline-flex h-11 items-center gap-sm rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+            iconRight={<ArrowRight className="size-4" />}
           >
             {t('cta')}
-            <ArrowRight className="size-4" aria-hidden />
-          </Link>
+          </ButtonLink>
         </div>
       </section>
     </PublicShell>
