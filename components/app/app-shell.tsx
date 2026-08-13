@@ -3,6 +3,9 @@ import { AppSidebar } from './app-sidebar'
 import { AppBottomNav } from './app-bottom-nav'
 import { NotificationBell } from './notification-bell'
 import { SaveFlowProvider } from './save-flow/save-flow-provider'
+import { BrandLockup } from '@/components/public/brand-lockup'
+import { Link } from '@/lib/i18n/navigation'
+import { getTranslations } from 'next-intl/server'
 import { getSaveTargets } from '@/lib/links/data'
 import { getSubcategoriesByTopic } from '@/lib/links/subcategories'
 import { getUnreadNotificationCount } from '@/lib/notifications/data'
@@ -16,11 +19,17 @@ import type { Locale } from '@/lib/i18n/routing'
  * beside a scrolling content column. Mobile (< lg): the sidebar is hidden and a
  * sticky bottom nav takes over (§7.3).
  *
- * The connected counterpart to PublicShell. It owns navigation + the Save Flow
- * entry point (chantier 11): each page renders its own header/content into
- * `children` (the greeting header on My Space, a section header on Saved, etc.),
- * so the shell stays neutral, while the Save Flow trigger (mobile FAB / desktop
- * "Add to Curio") lives here so it is present on every connected page.
+ * The connected counterpart to PublicShell. It owns navigation, the single
+ * connected top bar, and the Save Flow entry point (chantier 11). The top bar is
+ * the ONE header on every connected page: the mobile brand lockup and an
+ * optional page-supplied `header` slot sit on the left, the notification bell on
+ * the right. Pages that want a greeting (Home, My Space) pass <AppGreeting /> as
+ * `header`; section pages leave it empty and lead with their own in-flow header.
+ * This replaces the earlier double-bar layout where AppShell rendered a bell-only
+ * bar and Home/My Space stacked a second bordered greeting header beneath it.
+ *
+ * The Save Flow trigger (mobile FAB / desktop "Add to Curio") also lives here so
+ * it is present on every connected page.
  *
  * `user` is the signed-in user (guaranteed by the middleware guard on these
  * routes); `userId` is its auth id, used to load the Save Flow's target
@@ -31,11 +40,14 @@ export async function AppShell({
   user,
   userId,
   locale,
+  header,
   children,
 }: {
   user: { displayName: string; username: string; avatarUrl: string | null }
   userId: string
   locale: Locale
+  /** Optional left-slot content for the top bar (e.g. the greeting on Home). */
+  header?: ReactNode
   children: ReactNode
 }) {
   // Owner-scoped, RLS-safe read of the user's collections + sections for the
@@ -57,6 +69,10 @@ export async function AppShell({
   // is server-side, so the class is in the initial HTML: no client flash (FOUC).
   const themePreference = await getThemePreference()
 
+  // Localised accessible name for the mobile brand lockup link (matches the
+  // sidebar's "home" nav label, which previously carried this on AppHeader).
+  const nav = await getTranslations('AppNav')
+
   return (
     <div
       // data-app-shell marks this element as the connected theme boundary: the
@@ -70,10 +86,19 @@ export async function AppShell({
     >
       <AppSidebar user={user} locale={locale} />
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* Connected top bar — carries the notification bell on every connected
-            page (the greeting header only exists on Home/My Space). Sticky so
-            the bell stays reachable while the content column scrolls. */}
-        <div className="sticky top-0 z-30 flex justify-end border-b border-border bg-background/90 px-lg py-sm backdrop-blur-md lg:px-2xl">
+        {/* The single connected top bar. Left: mobile brand lockup (the sidebar
+            that would hold it is hidden below lg) + optional page header slot
+            (the greeting on Home/My Space). Right: the notification bell. Sticky
+            so it stays reachable while the content column scrolls. */}
+        <div className="sticky top-0 z-30 flex items-center gap-md border-b border-border bg-background/90 px-lg py-sm backdrop-blur-md lg:px-2xl">
+          <Link
+            href="/home"
+            className="shrink-0 rounded-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet lg:hidden"
+            aria-label={nav('home')}
+          >
+            <BrandLockup wordmark={false} />
+          </Link>
+          {header ? <div className="min-w-0 flex-1">{header}</div> : <div className="flex-1" />}
           <NotificationBell unreadCount={unreadCount} />
         </div>
         <main className="flex-1">{children}</main>
