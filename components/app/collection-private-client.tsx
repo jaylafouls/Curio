@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { Pencil, Lock, Globe } from 'lucide-react'
 import { Button } from '@/components/ui'
@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/public/empty-state'
 import { useRouter } from '@/lib/i18n/navigation'
 import { CollectionDetailBody } from './collection-detail-body'
 import { CollectionModal } from './collection-modal'
+import { CollectionConnectedShell } from './collection-connected-shell'
 import { fetchOwnerCollectionBySlug } from '@/lib/collections/actions'
 import type { CollectionDetail } from '@/lib/collections/data'
 import type { Locale } from '@/lib/i18n/routing'
@@ -56,25 +57,32 @@ export function CollectionPrivateClient({
     }
   }, [slug])
 
+  // Each of the three states computes its inner content into `body`; the single
+  // wrapper below applies the session-gated connected shell ONCE. A signed-in
+  // owner (or a signed-in non-owner hitting the not-found panel) keeps the app
+  // frame here, exactly as on every connected page; an anonymous visitor gets the
+  // bare content (the shell renders nothing without a session). Computing the body
+  // first and wrapping once means the shell's session check runs a single time
+  // regardless of which state is showing.
+  let body: ReactNode
+
   if (state.status === 'loading') {
-    return (
+    body = (
       <div className="mx-auto w-full max-w-4xl px-lg py-3xl lg:px-2xl">
         <div className="h-40 animate-pulse rounded-lg bg-foreground/[0.04]" />
       </div>
     )
-  }
-
-  // Not the owner / not signed in / no such slug → in-page not-found panel.
-  //
-  // We must NOT call notFound() here: this runs AFTER hydration (the owner check
-  // is async), and throwing the not-found signal from a client component
-  // post-hydration makes React try to swap the whole document tree client-side,
-  // which collides with the live DOM (HierarchyRequestError / "Only one element
-  // on document allowed"). The route already emits noindex metadata for a miss,
-  // so an in-page panel is the correct, crash-free 404 for anon and non-owners —
-  // and it never leaks the private collection (nothing is fetched for them).
-  if (state.status === 'missing') {
-    return (
+  } else if (state.status === 'missing') {
+    // Not the owner / not signed in / no such slug → in-page not-found panel.
+    //
+    // We must NOT call notFound() here: this runs AFTER hydration (the owner
+    // check is async), and throwing the not-found signal from a client component
+    // post-hydration makes React try to swap the whole document tree client-side,
+    // which collides with the live DOM (HierarchyRequestError / "Only one element
+    // on document allowed"). The route already emits noindex metadata for a miss,
+    // so an in-page panel is the correct, crash-free 404 for anon and non-owners
+    // — and it never leaks the private collection (nothing is fetched for them).
+    body = (
       <div className="mx-auto w-full max-w-2xl px-lg py-3xl lg:px-2xl">
         <EmptyState
           tag={t('private')}
@@ -83,12 +91,11 @@ export function CollectionPrivateClient({
         />
       </div>
     )
-  }
-
-  const { detail } = state
-  return (
-    <>
-      <div className="mx-auto w-full max-w-4xl px-lg pt-2xl lg:px-2xl">
+  } else {
+    const { detail } = state
+    body = (
+      <>
+        <div className="mx-auto w-full max-w-4xl px-lg pt-2xl lg:px-2xl">
         <div className="flex flex-wrap items-center justify-between gap-md rounded-lg border border-violet/30 bg-violet/[0.06] px-lg py-md">
           <div className="flex items-center gap-sm">
             {detail.isPublic ? (
@@ -151,6 +158,9 @@ export function CollectionPrivateClient({
           isPublic: detail.isPublic,
         }}
       />
-    </>
-  )
+      </>
+    )
+  }
+
+  return <CollectionConnectedShell locale={locale}>{body}</CollectionConnectedShell>
 }
