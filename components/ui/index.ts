@@ -32,3 +32,9 @@ export {
   type ThemeMode,
   type ThemeToggleProps,
 } from './theme-toggle'
+export {
+  PageContainer,
+  type PageContainerProps,
+  type PageContainerSize,
+  type PageContainerTag,
+} from './page-container'

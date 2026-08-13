@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { buildMetadata } from '@/lib/seo/metadata'
 import type { Locale } from '@/lib/i18n/routing'
+import { PageContainer } from '@/components/ui'
 import { AppShell } from '@/components/app/app-shell'
 import { SavedLinksClient } from '@/components/app/saved-links-client'
 import { getCurrentUser, getSavedLinks } from '@/lib/app/data'
@@ -55,7 +56,7 @@ export default async function SavedPage({ params }: PageProps) {
       userId={user.id}
       locale={locale}
     >
-      <div className="mx-auto w-full max-w-4xl px-lg py-2xl lg:px-2xl">
+      <PageContainer size="4xl">
         <header className="mb-2xl flex flex-col gap-2xs">
           <h1 className="font-serif text-h1 text-foreground">{t('title')}</h1>
           <p className="font-sans text-body-small text-foreground/60">
@@ -64,7 +65,7 @@ export default async function SavedPage({ params }: PageProps) {
         </header>
 
         <SavedLinksClient links={links} />
-      </div>
+      </PageContainer>
     </AppShell>
   )
 }

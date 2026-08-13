@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { buildMetadata } from '@/lib/seo/metadata'
 import type { Locale } from '@/lib/i18n/routing'
+import { PageContainer } from '@/components/ui'
 import { PublicShell } from '@/components/public/public-shell'
 import { ProfileIdentity } from '@/components/app/profile-identity'
 import { CollectionGrid } from '@/components/app/collection-grid'
@@ -80,7 +81,7 @@ export default async function ProfilePage({ params }: PageProps) {
 
   return (
     <PublicShell>
-      <div className="mx-auto w-full max-w-6xl px-lg py-2xl lg:px-2xl">
+      <PageContainer size="6xl">
         <section className="flex flex-col gap-xl border-b border-border pb-2xl">
           <ProfileIdentity
             displayName={profile.displayName}
@@ -117,7 +118,7 @@ export default async function ProfilePage({ params }: PageProps) {
             />
           )}
         </section>
-      </div>
+      </PageContainer>
     </PublicShell>
   )
 }

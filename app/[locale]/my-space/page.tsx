@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import { buildMetadata } from '@/lib/seo/metadata'
-import { AccentText, Avatar } from '@/components/ui'
+import { AccentText, Avatar, PageContainer } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { AppShell } from '@/components/app/app-shell'
@@ -91,9 +91,12 @@ export default async function MySpacePage({ params }: PageProps) {
       locale={locale}
       header={<AppPageTitle title={t('pageTitle')} />}
     >
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-2xl px-lg py-2xl lg:grid-cols-[1fr_18rem] lg:px-2xl">
+      <PageContainer
+        size="6xl"
+        className="grid grid-cols-1 gap-xl lg:grid-cols-[1fr_18rem]"
+      >
         {/* Main column. */}
-        <div className="flex min-w-0 flex-col gap-2xl">
+        <div className="flex min-w-0 flex-col gap-xl">
           {/* My Universe — the real interactive orbital view (§7.5). Hero of the
               page: You at the centre with your Projects and standalone
               Collections in orbit, each a real navigable node. Empty universe
@@ -250,7 +253,7 @@ export default async function MySpacePage({ params }: PageProps) {
             </Link>
           </section>
         </aside>
-      </div>
+      </PageContainer>
     </AppShell>
   )
 }
