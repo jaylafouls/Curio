@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { buildMetadata } from '@/lib/seo/metadata'
+import { PageContainer } from '@/components/ui'
 import { AppShell } from '@/components/app/app-shell'
 import { NotificationsClient } from '@/components/app/notifications-client'
 import { getCurrentUser } from '@/lib/app/data'
@@ -62,7 +63,7 @@ export default async function NotificationsPage({ params }: PageProps) {
       userId={user.id}
       locale={locale}
     >
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-2xl px-lg py-2xl lg:px-2xl">
+      <PageContainer size="3xl" className="flex flex-col gap-xl">
         <header className="flex flex-col gap-sm">
           <h1 className="font-serif text-h1 text-foreground">{t('title')}</h1>
           <p className="max-w-2xl font-sans text-body text-foreground/70">
@@ -71,7 +72,7 @@ export default async function NotificationsPage({ params }: PageProps) {
         </header>
 
         <NotificationsClient notifications={notifications} />
-      </div>
+      </PageContainer>
     </AppShell>
   )
 }

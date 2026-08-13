@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { ArrowRight, Compass } from 'lucide-react'
 import { buildMetadata } from '@/lib/seo/metadata'
-import { Avatar } from '@/components/ui'
+import { Avatar, PageContainer } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { AppShell } from '@/components/app/app-shell'
@@ -107,9 +107,12 @@ export default async function HomePage({ params }: PageProps) {
       locale={locale}
       header={<AppGreeting displayName={user.displayName} />}
     >
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-2xl px-lg py-2xl lg:grid-cols-[1fr_18rem] lg:px-2xl">
+      <PageContainer
+        size="6xl"
+        className="grid grid-cols-1 gap-xl lg:grid-cols-[1fr_18rem]"
+      >
         {/* Main column. */}
-        <div className="flex min-w-0 flex-col gap-2xl">
+        <div className="flex min-w-0 flex-col gap-xl">
           <HomeFeedClient
             following={following}
             forYou={forYou}
@@ -154,7 +157,7 @@ export default async function HomePage({ params }: PageProps) {
                 ))}
               </ul>
             ) : (
-              <p className="rounded-lg border border-border bg-foreground/[0.02] px-lg py-xl text-center font-sans text-body-small text-foreground/60">
+              <p className="rounded-lg border border-border bg-foreground/[0.02] px-lg py-3xl text-center font-sans text-body-small text-foreground/60">
                 {t('curatorsActivityEmpty')}
               </p>
             )}
@@ -275,7 +278,7 @@ export default async function HomePage({ params }: PageProps) {
             )}
           </section>
         </aside>
-      </div>
+      </PageContainer>
     </AppShell>
   )
 }

@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { buildMetadata } from '@/lib/seo/metadata'
 import type { Locale } from '@/lib/i18n/routing'
+import { PageContainer } from '@/components/ui'
 import { AppShell } from '@/components/app/app-shell'
 import { EmptyState } from '@/components/public/empty-state'
 import { Link } from '@/lib/i18n/navigation'
@@ -62,7 +63,7 @@ export default async function ProjectsPage({ params }: PageProps) {
       userId={user.id}
       locale={locale}
     >
-      <div className="mx-auto w-full max-w-5xl px-lg py-2xl lg:px-2xl">
+      <PageContainer size="5xl">
         <header className="mb-2xl flex flex-wrap items-end justify-between gap-md">
           <div className="flex flex-col gap-2xs">
             <h1 className="font-serif text-h1 text-foreground">{t('title')}</h1>
@@ -113,7 +114,7 @@ export default async function ProjectsPage({ params }: PageProps) {
             action={<NewProjectButton variant="primary" />}
           />
         )}
-      </div>
+      </PageContainer>
     </AppShell>
   )
 }
