@@ -312,6 +312,15 @@
     "curatorsYouFollowEmpty": "You're not following anyone yet.",
     "browseCurators": "Browse curators"
   },
+  "Personalize": {
+    "metaTitle": "Personalize your feed",
+    "metaDescription": "Fine-tune what shows up in your Curio feed.",
+    "pageTitle": "Personalize your feed",
+    "comingSoonTag": "Coming soon",
+    "comingSoonTitle": "Feed personalization is on the way",
+    "comingSoonBody": "Soon you'll be able to fine-tune exactly what appears in your feed. For now, your feed is shaped by the Topics you picked and the curators you follow — adjust those any time from My Universe.",
+    "editTopicsCta": "Edit my Topics"
+  },
   "AppNav": {
     "primary": "Main navigation",
     "mySpaceGroup": "My space",

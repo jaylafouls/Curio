@@ -83,10 +83,14 @@ export function AppSidebar({
         </div>
       </nav>
 
-      {/* User footer + log out. */}
+      {/* User footer + log out. The identity row links to the user's own PUBLIC
+          profile (§8.10) — what a "click my name" affordance means everywhere.
+          "My Universe" (/my-space) stays reachable via the sidebar nav above, so
+          it is deliberately not duplicated here. Settings (below) points at
+          /settings; the two were previously confusable (name → /my-space). */}
       <div className="mt-auto border-t border-border p-md">
         <Link
-          href="/my-space"
+          href={`/profile/${user.username}`}
           className="flex items-center gap-sm rounded-md px-sm py-sm transition-colors hover:bg-foreground/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
         >
           <Avatar src={user.avatarUrl ?? undefined} name={user.displayName} size="sm" />
