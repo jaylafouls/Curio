@@ -18,9 +18,12 @@ import type { AppTopic } from '@/lib/app/data'
  *
  * The three feeds are fetched server-side and passed in whole; switching a tab
  * or a Topic filter is pure client-side narrowing — no refetch, no algorithm
- * beyond the deterministic server queries. "Personalize" routes to /my-space
- * where the user edits the Topics that drive the For you feed (there is no
- * separate personalise surface in V1; it points at the real lever).
+ * beyond the deterministic server queries. "Personalize" routes to
+ * /home/personalize — a connected placeholder for the future feed-personalisation
+ * surface (no dedicated personalise UI exists in V1 yet). It deliberately does
+ * NOT jump to /my-space: sending the user to an unrelated page read as a bug in
+ * recette. The placeholder keeps the connected shell so the user never feels
+ * bounced out.
  *
  * Empty handling honours the project rule (no fake seeding): when the active
  * tab has nothing, the designed empty state shows. The Following tab's empty
@@ -89,7 +92,7 @@ export function HomeFeedClient({
           ))}
         </div>
         <Link
-          href="/my-space"
+          href="/home/personalize"
           className="inline-flex shrink-0 items-center gap-xs rounded-full border border-border px-md py-xs font-sans text-meta font-medium text-foreground/70 transition-colors hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
         >
           <SlidersHorizontal className="size-3.5" aria-hidden />

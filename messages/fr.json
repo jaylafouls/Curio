@@ -312,6 +312,15 @@
     "curatorsYouFollowEmpty": "Vous ne suivez encore personne.",
     "browseCurators": "Parcourir les curateurs"
   },
+  "Personalize": {
+    "metaTitle": "Personnaliser votre fil",
+    "metaDescription": "Affinez ce qui apparaît dans votre fil Curio.",
+    "pageTitle": "Personnaliser votre fil",
+    "comingSoonTag": "Bientôt disponible",
+    "comingSoonTitle": "La personnalisation du fil arrive bientôt",
+    "comingSoonBody": "Vous pourrez bientôt affiner précisément ce qui apparaît dans votre fil. Pour l'instant, votre fil s'appuie sur les Topics que vous avez choisis et les curateurs que vous suivez — ajustez-les à tout moment depuis Mon Univers.",
+    "editTopicsCta": "Modifier mes Topics"
+  },
   "AppNav": {
     "primary": "Navigation principale",
     "mySpaceGroup": "Mon espace",
