@@ -4,8 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { buildMetadata } from '@/lib/seo/metadata'
 import { JsonLd, buildPerson } from '@/lib/seo/json-ld'
 import { SITE_URL } from '@/lib/seo/config'
-import { AccentText } from '@/components/ui'
-import { Link } from '@/lib/i18n/navigation'
+import { AccentText, ButtonLink } from '@/components/ui'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicShell } from '@/components/public/public-shell'
 import { EmptyState } from '@/components/public/empty-state'
@@ -87,13 +86,12 @@ export default async function CuratorsPage({ params }: PageProps) {
             title={t('emptyTitle')}
             body={t('emptyBody')}
             action={
-              <Link
+              <ButtonLink
                 href="/signup"
-                className="inline-flex h-11 items-center gap-sm rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors hover:opacity-90"
+                iconRight={<ArrowRight className="size-4" />}
               >
                 {t('joinCta')}
-                <ArrowRight className="size-4" aria-hidden />
-              </Link>
+              </ButtonLink>
             }
           />
         )}

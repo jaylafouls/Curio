@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Menu, X, ArrowRight } from 'lucide-react'
 import { Link, usePathname } from '@/lib/i18n/navigation'
+import { ButtonLink } from '@/components/ui'
 import { cn } from '@/lib/ui/cn'
 import { BrandLockup } from './brand-lockup'
 
@@ -81,13 +82,13 @@ export function PublicHeader() {
           >
             {t('login')}
           </Link>
-          <Link
+          <ButtonLink
             href="/signup"
-            className="inline-flex h-9 items-center gap-xs rounded-full bg-[var(--button-primary)] px-md font-sans text-body-small font-medium text-[var(--button-text)] transition-colors duration-base hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+            size="small"
+            iconRight={<ArrowRight className="size-4" />}
           >
             {t('signup')}
-            <ArrowRight className="size-4" aria-hidden />
-          </Link>
+          </ButtonLink>
         </div>
 
         {/* Mobile toggle. */}
@@ -141,14 +142,13 @@ export function PublicHeader() {
             >
               {t('login')}
             </Link>
-            <Link
+            <ButtonLink
               href="/signup"
               onClick={() => setOpen(false)}
-              className="inline-flex h-11 items-center justify-center gap-xs rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors hover:opacity-90"
+              iconRight={<ArrowRight className="size-4" />}
             >
               {t('signup')}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
+            </ButtonLink>
           </div>
         </nav>
       ) : null}

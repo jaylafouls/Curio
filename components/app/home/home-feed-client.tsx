@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { SlidersHorizontal } from 'lucide-react'
 import { Link } from '@/lib/i18n/navigation'
-import { CollectionCard, type BadgeTopic } from '@/components/ui'
+import { ButtonLink, CollectionCard, type BadgeTopic } from '@/components/ui'
 import { EmptyState } from '@/components/public/empty-state'
 import { cn } from '@/lib/ui/cn'
 import type { FeedCollectionWithTeaser } from '@/lib/home/data'
@@ -157,12 +157,9 @@ export function HomeFeedClient({
             title={t('followingEmptyTitle')}
             body={t('followingEmptyBody')}
             action={
-              <Link
-                href="/curators"
-                className="inline-flex h-11 items-center gap-sm rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
-              >
+              <ButtonLink href="/curators">
                 {t('followingEmptyCta')}
-              </Link>
+              </ButtonLink>
             }
           />
         ) : (

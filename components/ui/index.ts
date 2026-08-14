@@ -2,7 +2,14 @@
  * Barrel for the base UI kit (Phase 1, chantier 2/7). Presentational
  * components only — no data logic. Consumed by later chantiers.
  */
-export { Button, type ButtonProps, type ButtonVariant, type ButtonSize } from './button'
+export {
+  Button,
+  buttonClasses,
+  type ButtonProps,
+  type ButtonVariant,
+  type ButtonSize,
+} from './button'
+export { ButtonLink, type ButtonLinkProps } from './button-link'
 export { Input, type InputProps, type InputVariant } from './input'
 export {
   Badge,

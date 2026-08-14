@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import { buildMetadata } from '@/lib/seo/metadata'
-import { AccentText, Avatar, PageContainer } from '@/components/ui'
+import { AccentText, Avatar, ButtonLink, PageContainer } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { AppShell } from '@/components/app/app-shell'
@@ -123,13 +123,12 @@ export default async function MySpacePage({ params }: PageProps) {
                 title={tUniverse('emptyTitle')}
                 body={tUniverse('emptyBody')}
                 action={
-                  <Link
+                  <ButtonLink
                     href="/projects"
-                    className="inline-flex h-11 items-center gap-sm rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors hover:opacity-90"
+                    iconRight={<ArrowRight className="size-4" />}
                   >
                     {tUniverse('emptyCta')}
-                    <ArrowRight className="size-4" aria-hidden />
-                  </Link>
+                  </ButtonLink>
                 }
               />
             )}
@@ -202,13 +201,12 @@ export default async function MySpacePage({ params }: PageProps) {
                 title={t('curatorsEmptyTitle')}
                 body={t('curatorsEmptyBody')}
                 action={
-                  <Link
+                  <ButtonLink
                     href="/curators"
-                    className="inline-flex h-11 items-center gap-sm rounded-full bg-[var(--button-primary)] px-lg font-sans text-body-small font-medium text-[var(--button-text)] transition-colors hover:opacity-90"
+                    iconRight={<ArrowRight className="size-4" />}
                   >
                     {t('curatorsEmptyCta')}
-                    <ArrowRight className="size-4" aria-hidden />
-                  </Link>
+                  </ButtonLink>
                 }
               />
             )}
