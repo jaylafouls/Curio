@@ -85,7 +85,7 @@ export default async function HomePage({ params }: PageProps) {
     getUserTopics(user.id, locale),
     getFollowingFeed(user.id),
     getForYouFeed(user.id),
-    getTrendingFeed(),
+    getTrendingFeed(user.id),
     getRecentCuratorActivity(user.id),
     getFollowedCurators(user.id, 6),
     getMySpaceStats(user.id),

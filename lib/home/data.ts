@@ -115,6 +115,9 @@ export async function getFollowingFeed(
     .from('collections')
     .select(FEED_SELECT)
     .in('owner_id', followedIds)
+    // Never surface the caller's own collections in their feed, even via a
+    // self-follow edge (§8.2: the feed is other curators' work, not a mirror).
+    .neq('owner_id', userId)
     .eq('is_public', true)
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -165,6 +168,10 @@ export async function getForYouFeed(
     .from('collections')
     .select(FEED_SELECT)
     .in('topic_id', topicIds)
+    // Exclude the caller's own collections: "For you" recommends OTHER curators'
+    // work matching your Topics, never mirrors your own back at you (recette P1
+    // #5 — a curator was seeing their own public collections in their feed).
+    .neq('owner_id', userId)
     .eq('is_public', true)
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -188,8 +195,13 @@ export async function getForYouFeed(
  * embedded follows aggregate and sort in memory: correct while the corpus is
  * small, and honest about the count rather than approximating it. `window`
  * bounds how many recent public collections we consider before ranking.
+ *
+ * `userId` excludes the caller's own collections (recette P1 #5): Trending shows
+ * what's popular among OTHER curators, not the caller's own work ranked back at
+ * them.
  */
 export async function getTrendingFeed(
+  userId: string,
   limit = 24,
   window = 200,
 ): Promise<FeedCollectionWithTeaser[]> {
@@ -198,6 +210,7 @@ export async function getTrendingFeed(
   const { data, error } = await supabase
     .from('collections')
     .select(FEED_SELECT)
+    .neq('owner_id', userId)
     .eq('is_public', true)
     .order('created_at', { ascending: false })
     .limit(window)
@@ -266,6 +279,8 @@ export async function getRecentCuratorActivity(
         'owner:users!collections_owner_id_fkey (display_name, avatar_url, username)',
     )
     .in('owner_id', followedIds)
+    // Same self-exclusion guard as the Following feed (self-follow edge).
+    .neq('owner_id', userId)
     .eq('is_public', true)
     .order('created_at', { ascending: false })
     .limit(limit)
