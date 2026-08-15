@@ -57,7 +57,7 @@ export function CollectionCard({
       <article
         className={cn(
           cardBase,
-          'relative aspect-[3/4] bg-violet-soft/20',
+          'relative aspect-[4/5] bg-violet-soft/20',
           className,
         )}
       >
