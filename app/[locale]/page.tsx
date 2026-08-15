@@ -48,16 +48,12 @@ export async function generateMetadata({
   })
 }
 
-// Static press wordmarks (spec §8.1 social proof). Text, not logo assets — no
-// binary to commit; on-brand type. These are illustrative press mentions.
-const PRESS = [
-  'Monocle',
-  'Kinfolk',
-  'Sight Unseen',
-  'The New York Times',
-  'Apartamento',
-  'Vogue',
-] as const
+// Press wordmarks were removed (recette item 7, option a): displaying
+// Monocle/Kinfolk/NYT/Vogue under a social-proof banner implied those brands
+// use or endorse Curio, which is false. GTM §1 frames "the first 1,000
+// curators" as the Founding Curators recruitment CTA (kept), but never claims
+// any press relationship. A reframed "in the spirit of…" inspiration strip is
+// a launch-time option (Decisions Log §19), deliberately deferred, not shipped.
 
 export default async function LandingPage({ params, searchParams }: PageProps) {
   const { locale } = await params
@@ -134,7 +130,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
         </div>
       </section>
 
-      {/* ── Social proof + press ─────────────────────────────────────────── */}
+      {/* ── Social proof (Founding Curators recruitment CTA, GTM §1) ──────── */}
       <section className="mx-auto w-full max-w-6xl px-lg py-xl">
         <div className="flex flex-col items-center gap-md">
           <div className="flex items-center gap-md">
@@ -147,17 +143,6 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               {t('socialProof')}
             </p>
           </div>
-
-          <ul className="mt-md flex flex-wrap items-center justify-center gap-x-xl gap-y-md">
-            {PRESS.map((name) => (
-              <li
-                key={name}
-                className="font-serif text-body text-foreground/40 transition-colors hover:text-foreground/70"
-              >
-                {name}
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
