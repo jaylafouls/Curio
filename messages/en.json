@@ -8,7 +8,7 @@
     "home": "Curio — home",
     "primary": "Primary",
     "explore": "Explore",
-    "curators": "Curators",
+    "curators": "Founding Curators",
     "editorial": "Editorial",
     "about": "About",
     "login": "Log in",
@@ -110,8 +110,8 @@
     "emptyBody": "The Curio editorial is on its way — guides, essays and interviews on curation and taste. Check back soon."
   },
   "Curators": {
-    "metaTitle": "Curators",
-    "metaDescription": "Meet the curious minds behind Curio — curators sharing the collections and links worth keeping.",
+    "metaTitle": "Founding Curators",
+    "metaDescription": "Meet the curious minds behind Curio — the first circle of founding curators sharing the collections and links worth keeping.",
     "titleBefore": "Meet the curious ",
     "titleAccent": "minds.",
     "subtitle": "The people building the internet worth keeping, one collection at a time.",
