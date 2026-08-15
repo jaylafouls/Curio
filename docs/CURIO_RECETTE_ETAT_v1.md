@@ -1,9 +1,9 @@
 # CURIO — État du projet pour la recette (UAT)
-**Version 3.0 — Août 2026 (post chantier "Cohérence globale UI/UX")**
+**Version 4.0 — Août 2026 (post lot "recette Home")**
 
 > Document complémentaire, pas une resynthèse. La source de vérité reste `CURIO_SPEC_PIVOT_v4_8.md` (produit), `CURIO_DATA_MODEL_v1_2_6.md` (DB) et `CURIO_DECISIONS_LOG_v5_3.md` (décisions + points ouverts §11, décisions détaillées §12-§18). Cette version est basée sur `git log`/`git branch` réels, pas sur la mémoire de conversation.
 >
-> **Ce fichier n'est pas suivi par git** (volontairement, pour rester un scratchpad de recette) — mais ça l'a rendu vulnérable à un `git clean`. Si tu veux qu'il survive aux nettoyages futurs, dis-le et on le fait suivre par git.
+> Suivi par git depuis le 15 août (perdu une fois à un `git clean` quand il était untracked).
 
 ---
 
@@ -19,6 +19,12 @@
   - `fix/ui-container-density` : primitive `<PageContainer>` (largeur/padding unique), gouttière desktop 48px→64px, rythme vertical resserré (gap-2xl→gap-xl), empty-states réconciliés.
   - `fix/ui-collection-shell` : `/collections/[id]` (page publique ISR) rend maintenant le shell complet pour un visiteur connecté, via wrapper client conditionné à la session — corps anonyme/SEO strictement inchangé.
   - `fix/ui-component-usage` : nouveau primitive `ButtonLink` (CTA navigants), 7 boutons primaires dupliqués migrés dessus.
+- Lot "recette Home" (5 branches, repéré en testant Home) :
+  - `fix/home-nav-destinations` : "Personnaliser" ouvre `/home/personalize` (placeholder) au lieu de "Mon Univers" ; menu utilisateur — nom → profil public, "Paramètres" → `/settings`.
+  - `fix/connected-shell-explore-curators` : `/explore` et `/curators` rendaient le shell anonyme (marketing) à un utilisateur connecté, donnant l'illusion d'une déconnexion — corrigé avec le même pattern shell-session-gated que la page Collection.
+  - `fix/home-feed-exclude-self` : les collections publiques du viewer n'apparaissent plus dans son propre "For You"/"Trending".
+  - `fix/home-card-density` + `fix/collection-card-below-density` : cartes de collection resserrées (variante overlay 4/5, variante below 16/9 + panneau resserré — 5 pages concernées : landing, My Space, profil public, Explorer, Project).
+  - `feat/collection-cover-fallback` : collections sans cover affichent désormais un lavis couleur + icône du Topic (au lieu d'un bloc vide) ; mosaïque auto-générée différée à un chantier séparé.
 - Déployé sur Vercel : **https://curio-neon.vercel.app** (Site URL Supabase pointé dessus, Redirect URLs couvrant aussi `localhost:3000`/`3100` pour le dev).
 
 ## 2. Tout est mergé — recette possible sur l'ensemble construit à ce jour, sur une base visuelle cohérente
@@ -38,6 +44,7 @@
 - Billing / Curator Pro payant : "Coming soon" dans `/settings`, différé en V2.
 - Extension Chrome : pas soumise au Chrome Web Store (volontairement différé, action manuelle CEO/PO plus tard). Un save via l'extension ne pose pas de Topic/sous-catégorie (catégorisable après coup sur `/saved`) — hors périmètre du chantier `link-subcategories`.
 - Sous-catégories Links : seuls Travel et Food en sont équipés en V1 (Hébergement/Restaurant/Lieu à voir/Activité/Transport/Autre pour Travel ; Restaurant/Recette/Bar-Café/Produit/Autre pour Food). Les 8 autres Topics n'en ont pas — voulu, pas un oubli.
+- Mosaïque auto-générée pour les collections sans cover mais avec des liens : différée à un chantier séparé. En attendant, une collection avec des liens mais sans cover personnalisée affiche le fallback Topic (couleur + icône), pas une mosaïque — voulu pour l'instant.
 
 ## 5. Parcours à prioriser pour la recette
 
