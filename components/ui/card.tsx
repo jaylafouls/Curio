@@ -105,7 +105,7 @@ export function CollectionCard({
 
   return (
     <article className={cn(cardBase, 'bg-foreground/[0.03]', className)}>
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-violet-soft/20">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-violet-soft/20">
         {cover ? (
           <Image
             src={cover}
@@ -119,7 +119,7 @@ export function CollectionCard({
           <Badge topic={topic} variant="solid" />
         </div>
       </div>
-      <div className="flex flex-col gap-sm p-md">
+      <div className="flex flex-col gap-xs p-sm">
         {/* Instrument Serif, size-only hierarchy (§2.1). Mode-aware text. */}
         <h3 className="font-serif text-h3 leading-tight text-foreground">
           {title}
