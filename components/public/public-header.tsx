@@ -11,7 +11,11 @@ import { BrandLockup } from './brand-lockup'
 /**
  * PublicHeader — the non-authenticated horizontal header (spec §7.1):
  *
- *   [C · curio]   Explore · Curators · Editorial · About   [Log in] [Sign up →]
+ *   [C · curio]   Explore · Curators   [Log in] [Sign up →]
+ *
+ * "Editorial" is temporarily delinked (its content was never written — Decisions
+ * Log §11.5, still open); the /editorial route stays live and re-adding the link
+ * is a one-liner. "About" moved to the footer to keep the primary nav minimal.
  *
  * No "Home" link — the landing IS the home, reached via the brand lockup. The
  * centre nav collapses into a slide-down menu below the `md` breakpoint so the
@@ -26,8 +30,6 @@ import { BrandLockup } from './brand-lockup'
 const NAV = [
   { href: '/explore', key: 'explore' },
   { href: '/curators', key: 'curators' },
-  { href: '/editorial', key: 'editorial' },
-  { href: '/about', key: 'about' },
 ] as const
 
 export function PublicHeader() {

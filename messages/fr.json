@@ -8,7 +8,7 @@
     "home": "Curio — accueil",
     "primary": "Principale",
     "explore": "Explorer",
-    "curators": "Curateurs",
+    "curators": "Curateurs fondateurs",
     "editorial": "Éditorial",
     "about": "À propos",
     "login": "Connexion",
@@ -110,8 +110,8 @@
     "emptyBody": "L'éditorial Curio arrive — guides, essais et entretiens sur la curation et le goût. Revenez bientôt."
   },
   "Curators": {
-    "metaTitle": "Curateurs",
-    "metaDescription": "Rencontrez les esprits curieux derrière Curio — des curateurs qui partagent les collections et les liens qui valent la peine d'être gardés.",
+    "metaTitle": "Curateurs fondateurs",
+    "metaDescription": "Rencontrez les esprits curieux derrière Curio — le premier cercle de curateurs fondateurs qui partagent les collections et les liens qui valent la peine d'être gardés.",
     "titleBefore": "Rencontrez les esprits ",
     "titleAccent": "curieux.",
     "subtitle": "Les personnes qui construisent l'internet qui vaut la peine d'être gardé, une collection à la fois.",
