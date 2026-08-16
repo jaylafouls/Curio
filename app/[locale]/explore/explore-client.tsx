@@ -56,7 +56,7 @@ export function ExploreClient({
       <section className="flex flex-col gap-lg">
         <h2 className="font-serif text-h2 text-foreground">{t('newTitle')}</h2>
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.slice(0, 6).map((c) => (
               <Link
                 key={c.id}
@@ -95,7 +95,7 @@ export function ExploreClient({
           {t('collectionsTitle')}
         </h2>
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((c) => (
               <Link
                 key={c.id}
@@ -127,7 +127,7 @@ export function ExploreClient({
           {t('popularTitle')}
         </h2>
         {curators.length > 0 ? (
-          <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {curators.slice(0, 6).map((c) => (
               <Link
                 key={c.id}
