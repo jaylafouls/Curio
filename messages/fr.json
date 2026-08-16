@@ -22,7 +22,7 @@
   },
   "Landing": {
     "metaTitle": "Curio — L'internet qui vaut la peine d'être gardé",
-    "metaDescription": "Curio est un réseau social de curation. Sauvegardez, organisez et partagez les liens qui comptent — et découvrez des univers inspirants créés par des esprits curieux.",
+    "metaDescription": "Curio est un réseau social de curation. Sauvegardez, organisez et partagez les liens qui comptent — et découvrez des collections inspirantes créées par des esprits curieux.",
     "eyebrow": "Un univers de curiosité humaine",
     "titleBefore": "L'internet qui vaut ",
     "titleAccent": "d'être gardé.",
@@ -31,12 +31,12 @@
     "ctaBuild": "Créez votre univers",
     "ctaExplore": "Explorer",
     "socialProof": "Rejoignez les 1 000 premiers curateurs.",
-    "universesBefore": "Explorez des univers ",
-    "universesAccent": "inspirants.",
+    "universesBefore": "Explorez des collections ",
+    "universesAccent": "inspirantes.",
     "universesSubtitle": "Des collections créées par des esprits curieux, sur ce qui vaut la peine d'être gardé.",
     "universesCta": "Explorer toutes les collections",
     "universesEmptyTag": "Bientôt",
-    "universesEmptyTitle": "Les premiers univers arrivent",
+    "universesEmptyTitle": "Les premières collections arrivent",
     "universesEmptyBody": "Curio ouvre tout juste ses portes. Soyez parmi les premiers à créer une collection publique qui compte.",
     "values": {
       "collect": {
@@ -135,7 +135,7 @@
     "curatorRole": "Curateur",
     "newTitle": "Nouveautés à découvrir",
     "newEmptyTitle": "De nouvelles collections arrivent",
-    "newEmptyBody": "À mesure que les curateurs publient leurs univers, les plus récents et les plus remarquables apparaîtront ici.",
+    "newEmptyBody": "À mesure que les curateurs publient leurs collections, les plus récentes et les plus remarquables apparaîtront ici.",
     "collectionsTitle": "Explorer par collections",
     "collectionsEmptyTitle": "Pas encore de collections publiques",
     "collectionsEmptyBody": "Les collections publiques apparaîtront ici dès que les membres commenceront à partager ce qu'ils gardent.",

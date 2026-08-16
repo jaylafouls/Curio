@@ -22,7 +22,7 @@
   },
   "Landing": {
     "metaTitle": "Curio — The internet worth keeping",
-    "metaDescription": "Curio is a curation social network. Save, organise and share the links worth keeping — and discover inspiring universes built by curious minds.",
+    "metaDescription": "Curio is a curation social network. Save, organise and share the links worth keeping — and discover inspiring collections built by curious minds.",
     "eyebrow": "A universe of human curiosity",
     "titleBefore": "The internet worth ",
     "titleAccent": "keeping.",
@@ -32,11 +32,11 @@
     "ctaExplore": "Explore",
     "socialProof": "Join the first 1,000 curators.",
     "universesBefore": "Explore inspiring ",
-    "universesAccent": "universes.",
+    "universesAccent": "collections.",
     "universesSubtitle": "Collections built by curious people, on the things worth keeping.",
     "universesCta": "Explore all collections",
     "universesEmptyTag": "Coming soon",
-    "universesEmptyTitle": "The first universes are on their way",
+    "universesEmptyTitle": "The first collections are on their way",
     "universesEmptyBody": "Curio is just opening its doors. Be one of the first to build a public collection worth keeping.",
     "values": {
       "collect": {
@@ -135,7 +135,7 @@
     "curatorRole": "Curator",
     "newTitle": "New & noteworthy",
     "newEmptyTitle": "Fresh collections are coming",
-    "newEmptyBody": "As curators publish their universes, the newest and most noteworthy will surface here.",
+    "newEmptyBody": "As curators publish their collections, the newest and most noteworthy will surface here.",
     "collectionsTitle": "Explore by collections",
     "collectionsEmptyTitle": "No public collections yet",
     "collectionsEmptyBody": "Public collections will appear here as people start sharing what they keep.",
