@@ -5,6 +5,10 @@ import { createClient } from '@/lib/supabase/server'
 import { emitNotification } from '@/lib/notifications/emit'
 import { BADGE_TOPICS } from '@/components/ui'
 import {
+  fetchConnectedShellData,
+  type ConnectedShellData,
+} from '@/lib/app/actions'
+import {
   getOwnerCollectionById,
   getOwnerCollectionBySlug,
   type CollectionDetail,
@@ -265,6 +269,30 @@ export async function fetchOwnerCollectionBySlug(
   slug: string,
 ): Promise<CollectionDetail | null> {
   return getOwnerCollectionBySlug(slug)
+}
+
+/**
+ * Combined private-view fetch — owner collection detail AND the connected-shell
+ * bundle in a SINGLE Server Action round-trip.
+ *
+ * The private fallback (CollectionPrivateClient) needs both: the owner-scoped
+ * collection to render, and the chrome bundle for the app frame. Fetched
+ * separately they were two parallel round-trips that resolved at different times,
+ * so the body and the sidebar/top bar popped in staggered — the "landed without
+ * the app" flash. Bundling them means one resolution: body and frame appear
+ * together. getCurrentUser()/auth.getUser() are cache()d within this single
+ * request, so the shared session read is done once here. Both halves are null
+ * for an unauthenticated caller (no leak — same boundary as the split actions).
+ */
+export async function fetchPrivateCollectionView(slug: string): Promise<{
+  detail: CollectionDetail | null
+  shell: ConnectedShellData | null
+}> {
+  const [detail, shell] = await Promise.all([
+    getOwnerCollectionBySlug(slug),
+    fetchConnectedShellData(),
+  ])
+  return { detail, shell }
 }
 
 /** Add a section to an owned collection (returns the new section id + order). */

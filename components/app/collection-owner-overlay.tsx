@@ -6,6 +6,7 @@ import { Pencil, Lock, Globe } from 'lucide-react'
 import { Button } from '@/components/ui'
 import { useRouter } from '@/lib/i18n/navigation'
 import { CollectionModal } from './collection-modal'
+import { CollectionBreadcrumb } from './collection-breadcrumb'
 import { fetchOwnerCollection } from '@/lib/collections/actions'
 import type { CollectionDetail } from '@/lib/collections/data'
 import type { Locale } from '@/lib/i18n/routing'
@@ -64,6 +65,7 @@ export function CollectionOwnerOverlay({
 
   return (
     <div className="mx-auto w-full max-w-4xl px-lg lg:px-2xl">
+      <CollectionBreadcrumb title={owned.title} className="mb-md" />
       <div className="mb-lg flex flex-wrap items-center justify-between gap-md rounded-lg border border-violet/30 bg-violet/[0.06] px-lg py-md">
         <div className="flex items-center gap-sm">
           {owned.isPublic ? (
