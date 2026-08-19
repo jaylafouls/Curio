@@ -2,10 +2,12 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { AppShellFrame } from './app-shell-frame'
+import { AppShellSkeleton } from './app-shell-skeleton'
 import {
   fetchConnectedShellData,
   type ConnectedShellData,
 } from '@/lib/app/actions'
+import { hasLikelySession } from '@/lib/auth/session-hint'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
@@ -38,46 +40,103 @@ import type { Locale } from '@/lib/i18n/routing'
 export function CollectionConnectedShell({
   locale,
   children,
+  shell: shellProp,
+  resolved: resolvedProp,
 }: {
   locale: Locale
   children: ReactNode
+  /**
+   * Pre-fetched chrome bundle, when a caller already resolved the session in the
+   * SAME round-trip as its own data (CollectionPrivateClient does this via
+   * fetchPrivateCollectionView to avoid a second session request). When provided,
+   * this shell skips its own fetch entirely.
+   */
+  shell?: ConnectedShellData | null
+  /**
+   * Whether `shell` reflects a COMPLETED session check. With shellProp given, a
+   * null shell is ambiguous (anon, or not-yet-fetched); `resolved` disambiguates
+   * so the skeleton shows only while genuinely pending, never after a real anon
+   * result.
+   */
+  resolved?: boolean
 }) {
-  const [shell, setShell] = useState<ConnectedShellData | null>(null)
+  const controlled = shellProp !== undefined
+  const [shell, setShell] = useState<ConnectedShellData | null>(
+    shellProp ?? null,
+  )
+  // Distinguish "still checking" from "checked, no session". Start pending only
+  // in the self-fetching mode; in controlled mode the parent owns resolution.
+  const [resolved, setResolved] = useState(controlled ? !!resolvedProp : false)
+
+  // Client-only hint: paint the skeleton frame while pending ONLY for a visitor
+  // who is likely signed in (carries the auth cookie). Anon visitors/crawlers
+  // fall straight through to the bare body, so the cookie-free render is
+  // untouched. Computed after mount to keep SSR output free of any session
+  // branch (useState initialiser would run on the server too).
+  const [likelySession, setLikelySession] = useState(false)
 
   useEffect(() => {
+    setLikelySession(hasLikelySession())
+  }, [])
+
+  useEffect(() => {
+    if (controlled) {
+      setShell(shellProp ?? null)
+      setResolved(!!resolvedProp)
+      return
+    }
     let active = true
     fetchConnectedShellData()
       .then((data) => {
-        if (active) setShell(data)
+        if (active) {
+          setShell(data)
+          setResolved(true)
+        }
       })
       .catch(() => {
         // Best-effort: a failed session check just means no chrome — the body
         // still renders bare, exactly as it does for anon.
+        if (active) setResolved(true)
       })
     return () => {
       active = false
     }
-  }, [])
+  }, [controlled, shellProp, resolvedProp])
 
-  // No session (anon, crawler, still checking, or the check failed) → the ISR
-  // body stands alone, byte-identical to the cached render.
-  if (!shell) return <>{children}</>
+  // Session resolved → the real connected frame.
+  if (shell) {
+    return renderFrame(shell)
+  }
 
-  return (
-    <AppShellFrame
-      user={{
-        displayName: shell.user.displayName,
-        username: shell.user.username,
-        avatarUrl: shell.user.avatarUrl,
-      }}
-      userId={shell.user.id}
-      locale={locale}
-      saveTargets={shell.saveTargets}
-      subcategoriesByTopic={shell.subcategoriesByTopic}
-      unreadCount={shell.unreadCount}
-      themePreference={shell.themePreference}
-    >
-      {children}
-    </AppShellFrame>
-  )
+  // Still checking AND the visitor carries an auth cookie → paint the skeleton
+  // chrome so a client-side navigation into this cookie-free page keeps the app
+  // silhouette instead of flashing blank. This never runs on the server render
+  // (likelySession is false until after mount) and never for anon (no cookie).
+  if (!resolved && likelySession) {
+    return <AppShellSkeleton>{children}</AppShellSkeleton>
+  }
+
+  // No session (anon, crawler, or the check resolved empty) → the ISR body
+  // stands alone, byte-identical to the cached render.
+  return <>{children}</>
+
+  function renderFrame(data: ConnectedShellData) {
+    return (
+      <AppShellFrame
+        user={{
+          displayName: data.user.displayName,
+          username: data.user.username,
+          avatarUrl: data.user.avatarUrl,
+        }}
+        userId={data.user.id}
+        locale={locale}
+        saveTargets={data.saveTargets}
+        subcategoriesByTopic={data.subcategoriesByTopic}
+        unreadCount={data.unreadCount}
+        themePreference={data.themePreference}
+      >
+        {children}
+      </AppShellFrame>
+    )
+  }
 }

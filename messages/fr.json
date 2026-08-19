@@ -497,6 +497,7 @@
   },
   "CollectionDetail": {
     "back": "Retour",
+    "breadcrumbMySpace": "Mon espace",
     "by": "par {name}",
     "edit": "Modifier la collection",
     "manageOwner": "Vous possédez cette collection.",
