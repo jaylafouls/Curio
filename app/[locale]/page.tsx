@@ -201,6 +201,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
                         title={c.title}
                         topic={c.topic}
                         cover={c.cover ?? undefined}
+                        mosaic={c.mosaic}
                         owner={{
                           name: c.owner.name,
                           avatar: c.owner.avatar ?? undefined,

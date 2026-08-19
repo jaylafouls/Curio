@@ -3,6 +3,8 @@ import Image from 'next/image'
 import { ExternalLink } from 'lucide-react'
 import { Avatar, Badge } from '@/components/ui'
 import { EmptyState } from '@/components/public/empty-state'
+import { TopicScene } from '@/components/brand/topic-scene'
+import { cn } from '@/lib/ui/cn'
 import type {
   CollectionDetail,
   CollectionLink,
@@ -96,10 +98,20 @@ export function CollectionDetailBody({
     }
   }
 
+  // Cover resolution for the 3/1 hero (recette point 5), mirroring the cards:
+  //   1. custom cover  2. 2×2 mosaic from up to 4 link images  3. branded scene.
+  // The detail body already holds every link, so the mosaic images come straight
+  // from `links` — no extra query. A coverless collection now always shows a
+  // designed banner instead of jumping straight to the title.
+  const heroImages = links
+    .map((l) => l.image)
+    .filter((src): src is string => Boolean(src))
+    .slice(0, 4)
+
   return (
     <article className="mx-auto w-full max-w-4xl px-lg py-2xl lg:px-2xl">
-      {collection.cover ? (
-        <div className="relative mb-xl aspect-[3/1] w-full overflow-hidden rounded-lg border border-border bg-foreground/[0.03]">
+      <div className="relative mb-xl aspect-[3/1] w-full overflow-hidden rounded-lg border border-border bg-foreground/[0.03]">
+        {collection.cover ? (
           <Image
             src={collection.cover}
             alt=""
@@ -108,8 +120,33 @@ export function CollectionDetailBody({
             sizes="(max-width: 896px) 100vw, 896px"
             className="object-cover"
           />
-        </div>
-      ) : null}
+        ) : heroImages.length > 0 ? (
+          <div
+            aria-hidden
+            className={cn(
+              'absolute inset-0 grid gap-px',
+              heroImages.length >= 4
+                ? 'grid-cols-4'
+                : heroImages.length === 3
+                  ? 'grid-cols-3'
+                  : heroImages.length === 2
+                    ? 'grid-cols-2'
+                    : 'grid-cols-1',
+            )}
+          >
+            {heroImages.map((src, i) => (
+              <div key={`${src}-${i}`} className="relative overflow-hidden">
+                <img src={src} alt="" className="size-full object-cover" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <TopicScene
+            topic={collection.topic}
+            className="absolute inset-0 size-full"
+          />
+        )}
+      </div>
 
       <header className="mb-2xl flex flex-col gap-md">
         <Badge topic={collection.topic} />
