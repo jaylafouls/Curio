@@ -67,6 +67,7 @@ export function ExploreClient({
                   title={c.title}
                   topic={c.topic}
                   cover={c.cover ?? undefined}
+                  mosaic={c.mosaic}
                   owner={{ name: c.owner.name, avatar: c.owner.avatar ?? undefined }}
                   linksCount={c.linksCount}
                 />
@@ -106,6 +107,7 @@ export function ExploreClient({
                   title={c.title}
                   topic={c.topic}
                   cover={c.cover ?? undefined}
+                  mosaic={c.mosaic}
                   owner={{ name: c.owner.name, avatar: c.owner.avatar ?? undefined }}
                   linksCount={c.linksCount}
                 />

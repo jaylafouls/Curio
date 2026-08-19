@@ -143,6 +143,7 @@ export function HomeFeedClient({
                     title={c.title}
                     topic={c.topic}
                     cover={c.cover ?? undefined}
+                    mosaic={c.mosaic}
                     description={c.description ?? undefined}
                     owner={{
                       name: c.owner.name,

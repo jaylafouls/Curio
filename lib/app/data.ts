@@ -1,6 +1,7 @@
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
+import { getOwnerCollectionMosaics } from '@/lib/collections/data'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
@@ -166,6 +167,12 @@ export type AppCollection = {
   /** Real count from collections.links_count (trigger-maintained, chantier 10). */
   linksCount: number
   owner: { name: string; avatar: string | null; username: string }
+  /**
+   * Up to 4 link-image URLs for the automatic 2×2 mosaic cover, populated only
+   * for coverless collections (cover-resolution tier 2). Undefined/empty →
+   * the card falls through to the branded Topic scene (tier 3).
+   */
+  mosaic?: string[]
 }
 
 type CollectionRow = {
@@ -200,6 +207,23 @@ function mapCollection(row: CollectionRow): AppCollection {
   }
 }
 
+/**
+ * Attach 2×2 mosaic images to the COVERLESS collections in a list (cover-
+ * resolution tier 2). Collections with a custom cover are left untouched; only
+ * the coverless ones are looked up, in one batched query. Best-effort — a lookup
+ * failure just leaves `mosaic` undefined and the card shows the Topic scene.
+ */
+async function withMosaics(
+  collections: AppCollection[],
+): Promise<AppCollection[]> {
+  const coverlessIds = collections.filter((c) => !c.cover).map((c) => c.id)
+  if (coverlessIds.length === 0) return collections
+  const mosaics = await getOwnerCollectionMosaics(coverlessIds)
+  return collections.map((c) =>
+    c.cover ? c : { ...c, mosaic: mosaics[c.id] },
+  )
+}
+
 const COLLECTION_SELECT =
   'id, slug, name, cover_image_url, topic_id, is_public, links_count, ' +
   'owner:users!collections_owner_id_fkey (display_name, avatar_url, username)'
@@ -228,9 +252,11 @@ export async function getMyCollections(
     return []
   }
 
-  return ((data ?? []) as unknown as CollectionRow[])
-    .filter((row) => isBadgeTopic(row.topic_id))
-    .map(mapCollection)
+  return withMosaics(
+    ((data ?? []) as unknown as CollectionRow[])
+      .filter((row) => isBadgeTopic(row.topic_id))
+      .map(mapCollection),
+  )
 }
 
 /**
@@ -259,9 +285,11 @@ export async function getPublicCollectionsByOwner(
     return []
   }
 
-  return ((data ?? []) as unknown as CollectionRow[])
-    .filter((row) => isBadgeTopic(row.topic_id))
-    .map(mapCollection)
+  return withMosaics(
+    ((data ?? []) as unknown as CollectionRow[])
+      .filter((row) => isBadgeTopic(row.topic_id))
+      .map(mapCollection),
+  )
 }
 
 // ── Projects (/projects index) ──────────────────────────────────────────────

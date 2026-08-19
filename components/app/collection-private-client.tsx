@@ -10,6 +10,7 @@ import { CollectionDetailBody } from './collection-detail-body'
 import { CollectionBreadcrumb } from './collection-breadcrumb'
 import { CollectionModal } from './collection-modal'
 import { CollectionConnectedShell } from './collection-connected-shell'
+import { AddFirstLinkCta } from './add-first-link-cta'
 import { fetchPrivateCollectionView } from '@/lib/collections/actions'
 import type { ConnectedShellData } from '@/lib/app/actions'
 import type { CollectionDetail } from '@/lib/collections/data'
@@ -148,7 +149,12 @@ export function CollectionPrivateClient({
           unsectioned: t('unsectioned'),
           emptyTitle: t('emptyTitle'),
           emptyBody: t('emptyBody'),
+          emptyOwnerTitle: t('emptyOwnerTitle'),
+          emptyOwnerBody: t('emptyOwnerBody'),
         }}
+        // This block only renders when the caller OWNS the collection, so the
+        // empty state always gets the guiding "Add a first link" CTA (P3 #3).
+        ownerCta={<AddFirstLinkCta />}
       />
 
       <CollectionModal
