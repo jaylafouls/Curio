@@ -24,6 +24,8 @@ export type OgMetadata = {
   title: string | null
   description: string | null
   image: string | null
+  /** Absolute http(s) favicon URL, best-effort (may be the /favicon.ico guess). */
+  favicon: string | null
 }
 
 const FETCH_TIMEOUT_MS = 6000
@@ -93,12 +95,61 @@ function titleTag(html: string): string | null {
 }
 
 /**
+ * Best-effort favicon URL. Scans every <link> tag in <head> whose rel names an
+ * icon, then prefers a real declared icon over apple-touch-icon; falls back to
+ * the well-known <origin>/favicon.ico when the markup declares none. The href is
+ * resolved absolute against the page URL (handles protocol- and path-relative);
+ * only an http(s) result is trusted. Returns null only if even the resolve of
+ * the /favicon.ico guess fails (never for a normal http(s) page).
+ */
+export function faviconUrl(html: string, base: URL): string | null {
+  // Grab each <link ...> tag, then read its rel + href regardless of attr order.
+  const links = html.match(/<link\b[^>]*>/gi) ?? []
+  let declaredIcon: string | null = null
+  let appleIcon: string | null = null
+
+  for (const tag of links) {
+    const rel = tag.match(/\brel=["']([^"']*)["']/i)?.[1]?.toLowerCase()
+    if (!rel || !rel.includes('icon')) continue
+    const href = tag.match(/\bhref=["']([^"']*)["']/i)?.[1]
+    if (!href) continue
+    if (rel.includes('apple-touch-icon')) {
+      appleIcon ??= href
+    } else {
+      // "icon", "shortcut icon", "mask-icon", "fluid-icon" — a real declared icon.
+      declaredIcon ??= href
+    }
+  }
+
+  // Resolve candidates in priority order, taking the first that yields a trusted
+  // http(s) URL. A declared-but-untrusted icon (e.g. a data: URI) must NOT shadow
+  // the /favicon.ico fallback, so we try the next candidate rather than bail.
+  for (const candidate of [declaredIcon, appleIcon, '/favicon.ico']) {
+    if (!candidate) continue
+    try {
+      const resolved = new URL(candidate, base)
+      if (resolved.protocol === 'http:' || resolved.protocol === 'https:') {
+        return resolved.toString()
+      }
+    } catch {
+      // Unparseable href — skip to the next candidate.
+    }
+  }
+  return null
+}
+
+/**
  * Fetch and parse OG metadata for `url`. Always resolves (never throws) — on any
  * failure it returns all-null so the caller uses its URL fallback. Only ever
  * called for a brand-new canonical Link (existing Links reuse stored metadata).
  */
 export async function fetchOgMetadata(url: string): Promise<OgMetadata> {
-  const empty: OgMetadata = { title: null, description: null, image: null }
+  const empty: OgMetadata = {
+    title: null,
+    description: null,
+    image: null,
+    favicon: null,
+  }
 
   let parsed: URL
   try {
@@ -196,5 +247,6 @@ function parseOg(html: string, base: URL): OgMetadata {
       image = null
     }
   }
-  return { title, description, image }
+  const favicon = faviconUrl(html, base)
+  return { title, description, image, favicon }
 }

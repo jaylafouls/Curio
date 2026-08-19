@@ -180,9 +180,11 @@ Objet canonique — cœur du modèle économique.
 | `id` | `uuid` | PK, `default gen_random_uuid()` | |
 | `url_normalized` | `text` | `not null`, `unique` | Clé de canonicalisation |
 | `url_first_origin` | `text` | `not null` | URL brute du tout premier save |
-| `title` | `text` | `not null`, max 100 car. | Figé au 1er save pour tous les utilisateurs suivants |
+| `title` | `text` | `not null`, max 100 car. | Figé au 1er save pour tous les utilisateurs suivants — **sauf cas dégradé** : voir `title_is_fallback` |
 | `description` | `text` | nullable, max 300 car. | |
 | `image_url` | `text` | nullable | Stocké Supabase Storage |
+| `favicon_url` | `text` | nullable | *(nouveau, chantier Add-to-Curio)* Favicon du site (URL http(s) absolue), extrait best-effort au 1er fetch OG (`<link rel="icon">`/`shortcut icon`/`apple-touch-icon`, sinon `<origin>/favicon.ico`). Nullable — ne bloque jamais un save |
+| `title_is_fallback` | `boolean` | `not null`, `default false` | *(nouveau, chantier Add-to-Curio)* `true` quand `title` n'est que le fallback URL lisible (fetch OG sans vrai titre : 403, timeout, page JS-only, non-HTML). Permet un **re-fetch conditionnel scopé** : `resolveLink` ne re-fetch un titre gelé QUE sur un dedup hit dont ce flag est `true`, et met la ligne à jour en place si un vrai titre apparaît (corrige "le titre reste l'URL pour toujours" quand le 1er save a échoué). Une ligne saine (`false`) n'est jamais re-fetchée |
 | `latitude` | `numeric` | nullable | |
 | `longitude` | `numeric` | nullable | |
 | `address` | `text` | nullable | Champ texte unique, non décomposé |
@@ -196,7 +198,7 @@ Objet canonique — cœur du modèle économique.
 | `created_at` | `timestamptz` | `default now()` | |
 
 **Décisions actées** :
-- Titre/description/image canoniques **figés après le 1er save** — non modifiables ensuite, même par le premier saveur a posteriori.
+- Titre/description/image canoniques **figés après le 1er save** — non modifiables ensuite, même par le premier saveur a posteriori. **Exception dégradée acté chantier Add-to-Curio** : quand le titre gelé n'est que le fallback URL (`title_is_fallback = true`, le 1er fetch OG n'a trouvé aucun vrai titre), un save ultérieur déclenche un re-fetch conditionnel unique et met la ligne à jour en place si un vrai titre apparaît. Ce n'est PAS une réouverture générale du gel : une ligne saine n'est jamais re-fetchée, et une édition personnelle passe toujours par `user_links.title_override`.
 - Compteurs dénormalisés (via triggers sur `user_links`), pas calculés à la volée.
 - Pas de `owner_id` — un Link canonique n'appartient à personne en propre.
 - Pas de `TypeTag` — entité retirée du scope (absente de la spec v4.1).
