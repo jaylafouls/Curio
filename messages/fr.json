@@ -548,6 +548,7 @@
     "tagsPlaceholder": "Ajouter un tag",
     "tagAdd": "Ajouter",
     "tagRemove": "Retirer {name}",
+    "suggestedTags": "Tags suggérés",
     "noteLabel": "Pourquoi enregistrez-vous ceci ?",
     "notePlaceholder": "Ajoutez une note privée pour vous…",
     "notePrivate": "Vous seul pouvez voir cette note.",

@@ -25,6 +25,7 @@ import { cn } from '@/lib/ui/cn'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from '@/lib/i18n/navigation'
 import { isSavableUrl } from '@/lib/links/normalize'
+import { topicFromDomain, tagCandidatesFromMeta } from '@/lib/links/prefill'
 import {
   resolveLink,
   saveLink,
@@ -120,6 +121,9 @@ export function SaveFlowModal({
   const [note, setNote] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState('')
+  // Suggested tags derived from the fetched title/description (Point 2). Rendered
+  // as unchecked chips under the tags field — never auto-applied to `tags`.
+  const [tagCandidates, setTagCandidates] = useState<string[]>([])
   const [image, setImage] = useState<string | null>(null)
   const [favicon, setFavicon] = useState<string | null>(null)
   const [customImage, setCustomImage] = useState<string | null>(null)
@@ -165,6 +169,7 @@ export function SaveFlowModal({
     setNote('')
     setTags([])
     setNewTag('')
+    setTagCandidates([])
     setImage(null)
     setFavicon(null)
     setCustomImage(null)
@@ -225,6 +230,11 @@ export function SaveFlowModal({
       setImage(res.image)
       setFavicon(res.favicon)
 
+      // Suggested tags from the fetched metadata (Point 2) — unchecked chips the
+      // user may click to add. Never auto-applied. Hide any that are already on
+      // the (fresh) tags list so we don't offer a duplicate.
+      setTagCandidates(tagCandidatesFromMeta(res.title, res.description))
+
       // Prefill the categorisation from the most-recent filing of the same
       // canonical link by ANY user (§18 cross-user inheritance). Best-effort: a
       // miss or error just leaves the pickers empty, to be inherited from the
@@ -243,6 +253,13 @@ export function SaveFlowModal({
             ? sug.suggestion.subcategoryId
             : null,
         )
+      } else {
+        // No cross-user inheritance (the strong signal). Fall back to a weak
+        // domain → Topic guess (Point 2) — only fills when inheritance is empty,
+        // and only prefills the picker (touchedTopic stays false, so a later
+        // Collection pick can still override it). No sub-category is guessed.
+        const domainTopic = topicFromDomain(raw)
+        if (domainTopic) setTopicId(domainTopic)
       }
 
       // Lead with the custom-image picker when the flow was opened via
@@ -294,6 +311,28 @@ export function SaveFlowModal({
     setTags((prev) => [...prev, v])
     setNewTag('')
   }
+
+  // Accept a suggested-tag chip (Point 2): add it to tags and remove it from the
+  // candidate list so the chip disappears once picked. De-dupes case-insensitively
+  // against existing tags, matching addTag's rule.
+  function acceptTagCandidate(candidate: string) {
+    setTagCandidates((prev) => prev.filter((c) => c !== candidate))
+    setTags((prev) =>
+      prev.some((x) => x.toLowerCase() === candidate.toLowerCase())
+        ? prev
+        : [...prev, candidate],
+    )
+  }
+
+  // Suggested-tag chips still worth showing: drop any candidate the user has
+  // already added (case-insensitive), so an accepted chip never lingers.
+  const visibleTagCandidates = useMemo(
+    () =>
+      tagCandidates.filter(
+        (c) => !tags.some((x) => x.toLowerCase() === c.toLowerCase()),
+      ),
+    [tagCandidates, tags],
+  )
 
   // ── Step 3 helpers ──────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
@@ -663,6 +702,29 @@ export function SaveFlowModal({
                 {t('tagAdd')}
               </Button>
             </div>
+            {/* Suggested tags (Point 2): unchecked chips derived from the fetched
+                metadata. Clicking one adds it; never auto-applied. Hidden once a
+                candidate is already on the tags list. */}
+            {visibleTagCandidates.length > 0 ? (
+              <div className="flex flex-col gap-xs">
+                <span className="font-sans text-meta text-text-dark/50">
+                  {t('suggestedTags')}
+                </span>
+                <div className="flex flex-wrap gap-xs">
+                  {visibleTagCandidates.map((candidate) => (
+                    <button
+                      key={candidate}
+                      type="button"
+                      onClick={() => acceptTagCandidate(candidate)}
+                      className="inline-flex items-center gap-xs rounded-full border border-border bg-transparent px-md py-xs font-sans text-meta text-text-dark/70 transition-colors hover:border-violet hover:text-text-dark"
+                    >
+                      <Plus className="size-3" aria-hidden />
+                      {candidate}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* Private note (500). */}
