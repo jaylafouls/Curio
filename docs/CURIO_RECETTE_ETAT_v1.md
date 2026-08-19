@@ -27,6 +27,13 @@
   - `feat/collection-cover-fallback` : collections sans cover affichent désormais un lavis couleur + icône du Topic (au lieu d'un bloc vide) ; mosaïque auto-générée différée à un chantier séparé.
 - Déployé sur Vercel : **https://curio-neon.vercel.app** (Site URL Supabase pointé dessus, Redirect URLs couvrant aussi `localhost:3000`/`3100` pour le dev).
 
+### 1.1. En cours sur `feat/smart-prefill` (pas encore mergé — lot "Add-to-Curio metadata pass")
+
+Enrichissement additif du Save Flow. Ne remplace jamais l'héritage cross-user (`suggestInheritedCategory`, §18.6) qui reste autoritaire pour le Topic.
+
+- **Point 1** (`70c7fdc`) : extraction du favicon (`links.favicon_url`, migration 0016, parser `faviconUrl()` dans `lib/links/og.ts`, affiché dans le Save Flow et la route resolve de l'extension) + re-fetch conditionnel des titres dégradés (`links.title_is_fallback` — un re-fetch scopé sur un hit de dédup dont le flag est posé).
+- **Point 2** (`e67c102`) : smart-prefill domaine + métadonnées. `lib/links/prefill.ts` — `topicFromDomain()` (table de règles domaine → Topic ; ne remplit le picker que si l'héritage est vide, `touchedTopic` reste false pour qu'un choix de Collection puisse toujours écraser) et `tagCandidatesFromMeta()` (tokenisation Unicode + stop-words EN/FR + dédup, cap 6). Les tags suggérés sont des chips cliquables **non cochées** sous le champ tags, jamais auto-appliquées. i18n "Suggested tags"/"Tags suggérés".
+
 ## 2. Tout est mergé — recette possible sur l'ensemble construit à ce jour, sur une base visuelle cohérente
 
 ## 3. Écarts visuels connus — ne pas resignaler comme bugs
@@ -49,7 +56,7 @@
 ## 5. Parcours à prioriser pour la recette
 
 1. Onboarding Découvreur
-2. Save Flow (web + extension une fois `chore/extension-prod-domain` mergée)
+2. Save Flow (web + extension une fois `chore/extension-prod-domain` mergée) — inclut, sur `feat/smart-prefill`, le favicon, le re-fetch de titre dégradé (Point 1) et le smart-prefill Topic-par-domaine + tags suggérés (Point 2, cf. §1.1)
 3. **Nouveau** : catégorisation Topic/sous-catégorie au save (Travel/Food), suggestion héritée quand un autre utilisateur a déjà catégorisé le même lien, filtre par Topic/sous-catégorie sur `/saved`
 4. Collection Flow / Project Flow
 5. Universe / My Space
