@@ -69,6 +69,48 @@ function LinkRow({ link }: { link: CollectionLink }) {
   )
 }
 
+/**
+ * LinkSection — one titled shelf of links. The rows sit inside a single
+ * bordered, hairline-divided panel so a section reads as an organized surface
+ * (a workspace shelf) rather than a loose stack of links (recette P3 #4). The
+ * header pairs the section name with its link count for a stat-like rhythm;
+ * `muted` softens the "Unsectioned" bucket so named sections lead.
+ */
+function LinkSection({
+  title,
+  links,
+  muted = false,
+}: {
+  title?: string
+  links: CollectionLink[]
+  muted?: boolean
+}) {
+  return (
+    <section className="flex flex-col gap-md">
+      {title ? (
+        <div className="flex items-baseline gap-sm">
+          <h2
+            className={cn(
+              'font-serif text-h3',
+              muted ? 'text-foreground/70' : 'text-foreground',
+            )}
+          >
+            {title}
+          </h2>
+          <span className="font-sans text-meta tabular-nums text-foreground/40">
+            {links.length}
+          </span>
+        </div>
+      ) : null}
+      <div className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border bg-foreground/[0.02] p-xs">
+        {links.map((link) => (
+          <LinkRow key={link.id} link={link} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export function CollectionDetailBody({
   collection,
   labels,
@@ -169,7 +211,7 @@ export function CollectionDetailBody({
             {collection.description}
           </p>
         ) : null}
-        <div className="flex items-center gap-md">
+        <div className="flex flex-wrap items-center gap-x-sm gap-y-xs">
           <div className="flex items-center gap-sm">
             <Avatar
               src={collection.owner.avatar ?? undefined}
@@ -180,7 +222,10 @@ export function CollectionDetailBody({
               {labels.by}
             </span>
           </div>
-          <span className="font-sans text-meta text-foreground/50">
+          <span className="text-foreground/25" aria-hidden>
+            ·
+          </span>
+          <span className="font-sans text-body-small tabular-nums text-foreground/60">
             {labels.linksCount}
           </span>
         </div>
@@ -204,32 +249,22 @@ export function CollectionDetailBody({
             const secLinks = bySection.get(section.id) ?? []
             if (secLinks.length === 0) return null
             return (
-              <section key={section.id} className="flex flex-col gap-sm">
-                <h2 className="font-serif text-h3 text-foreground">
-                  {section.name}
-                </h2>
-                <div className="flex flex-col">
-                  {secLinks.map((link) => (
-                    <LinkRow key={link.id} link={link} />
-                  ))}
-                </div>
-              </section>
+              <LinkSection
+                key={section.id}
+                title={section.name}
+                links={secLinks}
+              />
             )
           })}
 
           {unsectioned.length > 0 ? (
-            <section className="flex flex-col gap-sm">
-              {sections.length > 0 ? (
-                <h2 className="font-serif text-h3 text-foreground/70">
-                  {labels.unsectioned}
-                </h2>
-              ) : null}
-              <div className="flex flex-col">
-                {unsectioned.map((link) => (
-                  <LinkRow key={link.id} link={link} />
-                ))}
-              </div>
-            </section>
+            <LinkSection
+              // Only label the loose bucket when there are also named sections;
+              // a single-bucket collection needs no "Unsectioned" heading.
+              title={sections.length > 0 ? labels.unsectioned : undefined}
+              muted
+              links={unsectioned}
+            />
           ) : null}
         </div>
       )}
