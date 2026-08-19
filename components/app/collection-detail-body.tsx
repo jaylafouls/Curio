@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import type { ReactNode } from 'react'
 import Image from 'next/image'
 import { ExternalLink } from 'lucide-react'
 import { Avatar, Badge } from '@/components/ui'
@@ -71,6 +72,7 @@ function LinkRow({ link }: { link: CollectionLink }) {
 export function CollectionDetailBody({
   collection,
   labels,
+  ownerCta,
 }: {
   collection: CollectionDetail
   labels: {
@@ -79,7 +81,16 @@ export function CollectionDetailBody({
     unsectioned: string
     emptyTitle: string
     emptyBody: string
+    /** Owner-only empty-state copy, used with `ownerCta` (recette P3 #3). */
+    emptyOwnerTitle?: string
+    emptyOwnerBody?: string
   }
+  /**
+   * Owner-only action rendered inside the empty state (the "Add a first link"
+   * CTA). Present only when the current viewer owns the collection; the public/
+   * anon ISR render never receives it, so the cached HTML stays cookie-free.
+   */
+  ownerCta?: ReactNode
 }) {
   const { sections, links } = collection
 
@@ -177,10 +188,15 @@ export function CollectionDetailBody({
 
       {links.length === 0 ? (
         <EmptyState
-          tag={labels.emptyTitle}
+          tag={ownerCta ? (labels.emptyOwnerTitle ?? labels.emptyTitle) : labels.emptyTitle}
           tagTopic={collection.topic}
-          title={labels.emptyTitle}
-          body={labels.emptyBody}
+          title={
+            ownerCta ? (labels.emptyOwnerTitle ?? labels.emptyTitle) : labels.emptyTitle
+          }
+          body={
+            ownerCta ? (labels.emptyOwnerBody ?? labels.emptyBody) : labels.emptyBody
+          }
+          action={ownerCta}
         />
       ) : (
         <div className="flex flex-col gap-2xl">
