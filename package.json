@@ -11,7 +11,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:migrate": "node scripts/db-migrate.mjs",
-    "db:verify": "node scripts/db-migrate.mjs --verify"
+    "db:verify": "node scripts/db-migrate.mjs --verify",
+    "seed:demo": "node scripts/seed-demo-curators.mjs",
+    "seed:demo:verify": "node scripts/seed-demo-curators.mjs --verify",
+    "seed:demo:purge": "node scripts/seed-demo-curators.mjs --purge"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

@@ -7,10 +7,12 @@ import { Button } from '@/components/ui'
 import { EmptyState } from '@/components/public/empty-state'
 import { useRouter } from '@/lib/i18n/navigation'
 import { CollectionDetailBody } from './collection-detail-body'
+import { CollectionBreadcrumb } from './collection-breadcrumb'
 import { CollectionModal } from './collection-modal'
 import { CollectionConnectedShell } from './collection-connected-shell'
 import { AddFirstLinkCta } from './add-first-link-cta'
-import { fetchOwnerCollectionBySlug } from '@/lib/collections/actions'
+import { fetchPrivateCollectionView } from '@/lib/collections/actions'
+import type { ConnectedShellData } from '@/lib/app/actions'
 import type { CollectionDetail } from '@/lib/collections/data'
 import type { Locale } from '@/lib/i18n/routing'
 
@@ -42,16 +44,25 @@ export function CollectionPrivateClient({
     | { status: 'owned'; detail: CollectionDetail }
     | { status: 'missing' }
   >({ status: 'loading' })
+  // The connected-shell bundle, resolved in the SAME round-trip as the owner
+  // detail (fetchPrivateCollectionView) and handed to the shell so it does not
+  // fire a second session request — body and app frame appear together.
+  const [shell, setShell] = useState<ConnectedShellData | null>(null)
+  const [shellResolved, setShellResolved] = useState(false)
 
   useEffect(() => {
     let active = true
-    fetchOwnerCollectionBySlug(slug)
-      .then((detail) => {
+    fetchPrivateCollectionView(slug)
+      .then(({ detail, shell: shellData }) => {
         if (!active) return
+        setShell(shellData)
+        setShellResolved(true)
         setState(detail ? { status: 'owned', detail } : { status: 'missing' })
       })
       .catch(() => {
-        if (active) setState({ status: 'missing' })
+        if (!active) return
+        setShellResolved(true)
+        setState({ status: 'missing' })
       })
     return () => {
       active = false
@@ -97,6 +108,7 @@ export function CollectionPrivateClient({
     body = (
       <>
         <div className="mx-auto w-full max-w-4xl px-lg pt-2xl lg:px-2xl">
+        <CollectionBreadcrumb title={detail.title} className="mb-md" />
         <div className="flex flex-wrap items-center justify-between gap-md rounded-lg border border-violet/30 bg-violet/[0.06] px-lg py-md">
           <div className="flex items-center gap-sm">
             {detail.isPublic ? (
@@ -168,5 +180,13 @@ export function CollectionPrivateClient({
     )
   }
 
-  return <CollectionConnectedShell locale={locale}>{body}</CollectionConnectedShell>
+  return (
+    <CollectionConnectedShell
+      locale={locale}
+      shell={shell}
+      resolved={shellResolved}
+    >
+      {body}
+    </CollectionConnectedShell>
+  )
 }

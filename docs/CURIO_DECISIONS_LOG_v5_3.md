@@ -393,6 +393,33 @@ Design Token File avant tout code. Comparaison screenshot maquette/rendu à chaq
 
 ---
 
+## 19. Recette Landing & parcours pré-connexion — Corrections (v5.4)
+
+**Contexte** : recette de la landing page et du parcours pré-connexion (non connecté). Neuf retours instruits ; ce §19 consigne les trois qui portent une décision produit (6, 7, 9). Les autres retours étaient soit des fixes UI directs sans arbitrage (nav : Éditorial délinké, À propos déplacé au footer), soit des vérifications ayant conclu « comportement déjà correct » (5 Explorer liste bien toutes les collections publiques ; 8 les CTA d'auth convergent vers `/signup` par design, cf. Parcours UX §2 — tout inscrit est curateur, le parcours Founding Curator est le même signup + badge après token, sans entrée dédiée).
+
+**Décisions actées (CEO/PO)** :
+
+**19.1 — Répertoire `/curators` = Founding Curators uniquement, scope explicité dans le titre (retour 6).** Le répertoire filtre strictement `is_founding_curator = true` (`lib/public/data.ts` `getPublicCurators`) — comportement **confirmé correct**, cohérent avec GTM §1 (recrutement Founding Curators) et avec le traitement « suggestions best-effort / empty-state, pas de seeding » déjà acté. Rappel structurel : `users` n'a aucun flag de visibilité (RLS `users_select_public using(true)`), donc *toute* page `/profile/[username]` est publique ; un utilisateur au profil public mais non-Founding n'apparaît **pas** dans `/curators`, et c'est voulu. Pour lever l'ambiguïté « profil public ≠ présent dans l'annuaire », le **titre de page** et le **libellé de nav** passent de « Curateurs » à « Curateurs fondateurs » / « Founding Curators » (`Curators.metaTitle` + `Nav.curators`, EN/FR). Le titre éditorial du corps de page (« Rencontrez les esprits curieux » / « Meet the curious minds ») est **inchangé**.
+
+**19.2 — Retrait des wordmarks de presse de la landing (retour 7, option a).** La landing affichait des wordmarks de presse (Monocle, Kinfolk, Sight Unseen, The New York Times, Apartamento, Vogue) sous le bandeau de preuve sociale, ce qui **laissait croire à un endorsement** de ces marques — faux et trompeur. Le bloc est **retiré sans remplacement**. La ligne « Rejoignez les 1 000 premiers curateurs » / « Join the first 1,000 curators » (`Landing.socialProof`) est **conservée** : GTM §1 acte ce cadrage comme CTA de recrutement Founding Curators, ce n'est pas une fausse affirmation. Une strip « dans l'esprit de… » (inspiration assumée, pas clients) reste une **piste de lancement (option b), volontairement différée** — à rouvrir plus tard, hors de ce chantier.
+
+**19.3 — Distinction lexicale Curateur / Univers / Collection (retour 9).** Le vocabulaire public mélangeait « univers » et « collection ». Direction actée : **« Univers » = l'espace personnel d'un curateur** (usage réservé au hero-slogan et à la forme « l'univers de [curateur] » sur le profil) ; **« Collection »** pour toute carte issue de `getPublicCollections` (landing strip, Explorer). **Curateur = la personne** (identité/réputation) ; **Univers = son espace** ; **Collection = une unité dedans**. Au minimum, le titre « Explorez des univers inspirants » est reformulé avec « collections ». Le libellé exact (fr.json + en.json, toutes occurrences concernées) est **validé par le CEO/PO avant modification** des fichiers de traduction (branche `fix/curator-universe-wording`, en attente de validation du wording au moment de cette entrée).
+
+**Raison** :
+
+- *Titre « Curateurs fondateurs » (19.1)* : la donnée est autoritaire (le répertoire ne peut montrer que des Founding Curators tant que c'est le seul flag), et l'attente recette « les profils publics apparaissent sur Curateurs » venait d'un titre trop générique. Expliciter le scope dans le titre aligne l'attente sur le comportement sans changer la logique ni introduire de seeding.
+- *Retrait presse (19.2)* : afficher des marques tierces sous une preuve sociale est une affirmation implicite d'usage/endorsement qu'aucune donnée ni aucun accord ne soutient — c'est le seul retour de ce lot qui touchait à l'honnêteté du produit, prioritaire sur l'esthétique du bandeau. Le CTA de recrutement, lui, est adossé à une stratégie actée (GTM §1) et reste légitime.
+- *Lexique (19.3)* : le modèle produit distingue nettement personne / espace / unité ; utiliser « univers » tantôt comme slogan tantôt comme synonyme de « collection publique » brouille cette frontière côté public. Réserver « univers » à l'espace personnel et « collection » aux cartes restaure la cohérence avec le modèle, sans re-trancher le fond produit.
+
+**Conséquence** :
+
+- `fix/public-nav-simplify` : nav header simplifiée (Explorer · Curateurs fondateurs) ; Éditorial délinké header + footer (route `/editorial` conservée, cf. §11.5 toujours ouvert) ; À propos retiré du header (conservé au footer) ; `Curators.metaTitle` + `Nav.curators` → « Curateurs fondateurs » / « Founding Curators » (EN/FR). Note : ceci écarte sciemment l'ordre de nav décrit en spec §8.1 (« Explore · Curators · Editorial · About »), la spec restant la référence fonctionnelle mais ce point relevant du visuel/éditorial de la landing.
+- `fix/landing-press-honesty` : retrait du bloc `PRESS` de `app/[locale]/page.tsx` ; `socialProof` conservé.
+- `fix/curator-universe-wording` : à livrer après validation du wording (19.3) — au minimum le titre de la section « univers inspirants » de la landing.
+- Non-négociables projet respectés : i18n EN/FR sur toute chaîne modifiée, aucun impact région Supabase / cookies, SEO (`generateMetadata`) inchangé côté structure.
+
+---
+
 ## 11. Points encore ouverts
 
 1. ~~Couleurs exactes badges par Topic~~ — **TRANCHÉ provisoirement (CEO/PO)** : voir Design Tokens v1.2 §1.5. 7/10 valeurs en attente de confirmation designer, non bloquant.

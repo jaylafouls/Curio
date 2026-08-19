@@ -5,6 +5,7 @@ import { buildMetadata } from '@/lib/seo/metadata'
 import type { Locale } from '@/lib/i18n/routing'
 import { PageContainer } from '@/components/ui'
 import { PublicShell } from '@/components/public/public-shell'
+import { PublicConnectedShell } from '@/components/app/public-connected-shell'
 import { ProfileIdentity } from '@/components/app/profile-identity'
 import { CollectionGrid } from '@/components/app/collection-grid'
 import { StatList } from '@/components/app/stat-list'
@@ -23,10 +24,15 @@ export const revalidate = 3600
 
 /**
  * /[locale]/profile/[username] — a curator's PUBLIC profile (spec §8.10). Stays
- * public (no noindex): logged-out visitors and crawlers read it, so it goes in
- * the PublicShell, not the connected AppShell. Only public data is surfaced —
- * public collections, follower/following counts (data layer + RLS both enforce
- * this). Unknown username → 404. Distinct from /curators, the directory (§8.4).
+ * public (no noindex): logged-out visitors and crawlers read it, so the anon
+ * render is the marketing PublicShell. Only public data is surfaced — public
+ * collections, follower/following counts (data layer + RLS both enforce this).
+ * Unknown username → 404. Distinct from /curators, the directory (§8.4).
+ *
+ * A signed-in visitor gets the connected app chrome instead, via
+ * PublicConnectedShell — the same session-gated swap already on /explore,
+ * /curators and /collections/[id]. It is entirely client-side and post-hydration,
+ * so the cookie-free ISR/anon render stays byte-identical (SEO + cache intact).
  */
 type PageProps = {
   params: Promise<{ locale: Locale; username: string }>
@@ -79,46 +85,56 @@ export default async function ProfilePage({ params }: PageProps) {
     { month: 'long', year: 'numeric' },
   )
 
-  return (
-    <PublicShell>
-      <PageContainer size="6xl">
-        <section className="flex flex-col gap-xl border-b border-border pb-2xl">
-          <ProfileIdentity
-            displayName={profile.displayName}
-            username={profile.username}
-            avatarUrl={profile.avatarUrl}
-            bio={profile.bio}
-            location={profile.location}
-            websiteUrl={profile.websiteUrl}
-            joinedLabel={joinedLabel}
-            planBadge={plan.badge}
-            planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
-          />
-          <StatList
-            layout="inline"
-            stats={[
-              { label: t('collections'), value: stats.collections },
-              { label: t('followers'), value: stats.followers },
-              { label: t('following'), value: stats.following },
-            ]}
-          />
-        </section>
+  // Built once, handed to PublicConnectedShell twice: wrapped in <PublicShell>
+  // for the server-rendered anon frame, and bare for the connected AppShellFrame
+  // path. The wrapper picks one at runtime by session (same idiom as /explore).
+  const content = (
+    <PageContainer size="6xl">
+      <section className="flex flex-col gap-xl border-b border-border pb-2xl">
+        <ProfileIdentity
+          displayName={profile.displayName}
+          username={profile.username}
+          avatarUrl={profile.avatarUrl}
+          bio={profile.bio}
+          location={profile.location}
+          websiteUrl={profile.websiteUrl}
+          joinedLabel={joinedLabel}
+          planBadge={plan.badge}
+          planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
+        />
+        <StatList
+          layout="inline"
+          stats={[
+            { label: t('collections'), value: stats.collections },
+            { label: t('followers'), value: stats.followers },
+            { label: t('following'), value: stats.following },
+          ]}
+        />
+      </section>
 
-        <section className="flex flex-col gap-lg pt-2xl">
-          <h2 className="font-serif text-h2 text-foreground">
-            {t('publicCollections')}
-          </h2>
-          {collections.length > 0 ? (
-            <CollectionGrid collections={collections} />
-          ) : (
-            <EmptyState
-              tag={t('collectionsEmptyTag')}
-              title={t('collectionsEmptyTitle')}
-              body={t('collectionsEmptyBody')}
-            />
-          )}
-        </section>
-      </PageContainer>
-    </PublicShell>
+      <section className="flex flex-col gap-lg pt-2xl">
+        <h2 className="font-serif text-h2 text-foreground">
+          {t('publicCollections')}
+        </h2>
+        {collections.length > 0 ? (
+          <CollectionGrid collections={collections} />
+        ) : (
+          <EmptyState
+            tag={t('collectionsEmptyTag')}
+            title={t('collectionsEmptyTitle')}
+            body={t('collectionsEmptyBody')}
+          />
+        )}
+      </section>
+    </PageContainer>
+  )
+
+  return (
+    <PublicConnectedShell
+      locale={locale}
+      anon={<PublicShell>{content}</PublicShell>}
+    >
+      {content}
+    </PublicConnectedShell>
   )
 }

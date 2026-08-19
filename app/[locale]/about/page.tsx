@@ -4,6 +4,7 @@ import { ArrowRight, Heart, Compass, Gem, Sprout } from 'lucide-react'
 import { buildMetadata } from '@/lib/seo/metadata'
 import { AccentText, ButtonLink } from '@/components/ui'
 import type { Locale } from '@/lib/i18n/routing'
+import { PublicConnectedShell } from '@/components/app/public-connected-shell'
 import { PublicShell } from '@/components/public/public-shell'
 import { getGlobalStats } from '@/lib/public/data'
 
@@ -57,8 +58,11 @@ export default async function AboutPage({ params }: PageProps) {
     { value: stats.links, key: 'links' },
   ] as const
 
-  return (
-    <PublicShell>
+  // Built once, handed to PublicConnectedShell twice: wrapped in <PublicShell>
+  // for the server-rendered anon frame, and bare for the connected AppShellFrame
+  // path. The wrapper picks one at runtime by session (same idiom as /explore).
+  const content = (
+    <>
       {/* Mission */}
       <section className="mx-auto w-full max-w-3xl px-lg py-3xl text-center">
         <span className="font-sans text-meta font-medium uppercase tracking-widest text-foreground/50">
@@ -134,6 +138,15 @@ export default async function AboutPage({ params }: PageProps) {
           </ButtonLink>
         </div>
       </section>
-    </PublicShell>
+    </>
+  )
+
+  return (
+    <PublicConnectedShell
+      locale={locale}
+      anon={<PublicShell>{content}</PublicShell>}
+    >
+      {content}
+    </PublicConnectedShell>
   )
 }

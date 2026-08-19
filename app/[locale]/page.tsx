@@ -14,6 +14,7 @@ import {
 } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
+import { PublicConnectedShell } from '@/components/app/public-connected-shell'
 import { PublicShell } from '@/components/public/public-shell'
 import { OrbitalViz } from '@/components/public/orbital-viz'
 import { getPublicTopics, getPublicCollections } from '@/lib/public/data'
@@ -30,8 +31,10 @@ type PageProps = {
  * one is dropped (visitor proceeds as a normal Découvreur).
  *
  * Light Archive surface (the authoritative high-res landing mockup is light,
- * not Cosmic) — see D on the spec-text-vs-mockup conflict. Rendered inside the
- * shared PublicShell (header + footer). generateMetadata per brief rule 1.
+ * not Cosmic) — see D on the spec-text-vs-mockup conflict. Wrapped in
+ * PublicConnectedShell so a signed-in visitor gets the connected app chrome
+ * while the cookie-free anon/crawler render stays the shared PublicShell (header
+ * + footer), byte-identical to before. generateMetadata per brief rule 1.
  */
 export async function generateMetadata({
   params,
@@ -48,16 +51,12 @@ export async function generateMetadata({
   })
 }
 
-// Static press wordmarks (spec §8.1 social proof). Text, not logo assets — no
-// binary to commit; on-brand type. These are illustrative press mentions.
-const PRESS = [
-  'Monocle',
-  'Kinfolk',
-  'Sight Unseen',
-  'The New York Times',
-  'Apartamento',
-  'Vogue',
-] as const
+// Press wordmarks were removed (recette item 7, option a): displaying
+// Monocle/Kinfolk/NYT/Vogue under a social-proof banner implied those brands
+// use or endorse Curio, which is false. GTM §1 frames "the first 1,000
+// curators" as the Founding Curators recruitment CTA (kept), but never claims
+// any press relationship. A reframed "in the spirit of…" inspiration strip is
+// a launch-time option (Decisions Log §19), deliberately deferred, not shipped.
 
 export default async function LandingPage({ params, searchParams }: PageProps) {
   const { locale } = await params
@@ -83,8 +82,14 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
     { icon: Sparkles, key: 'keep' },
   ] as const
 
-  return (
-    <PublicShell>
+  // Built once, handed to PublicConnectedShell twice: wrapped in <PublicShell>
+  // for the server-rendered anon frame, and bare for the connected AppShellFrame
+  // path. The wrapper picks one at runtime by session (same idiom as /explore).
+  // The landing reads only cookie-free clients (checkInvitationToken via
+  // createAdminClient, getPublicTopics/getPublicCollections via the anon client),
+  // so the anon path stays byte-identical to the previous server render.
+  const content = (
+    <>
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="mx-auto w-full max-w-6xl px-lg pt-2xl pb-xl sm:pt-3xl">
         <div className="flex flex-col items-center gap-lg text-center">
@@ -134,7 +139,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
         </div>
       </section>
 
-      {/* ── Social proof + press ─────────────────────────────────────────── */}
+      {/* ── Social proof (Founding Curators recruitment CTA, GTM §1) ──────── */}
       <section className="mx-auto w-full max-w-6xl px-lg py-xl">
         <div className="flex flex-col items-center gap-md">
           <div className="flex items-center gap-md">
@@ -147,17 +152,6 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               {t('socialProof')}
             </p>
           </div>
-
-          <ul className="mt-md flex flex-wrap items-center justify-center gap-x-xl gap-y-md">
-            {PRESS.map((name) => (
-              <li
-                key={name}
-                className="font-serif text-body text-foreground/40 transition-colors hover:text-foreground/70"
-              >
-                {name}
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
@@ -262,6 +256,15 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
           ))}
         </div>
       </section>
-    </PublicShell>
+    </>
+  )
+
+  return (
+    <PublicConnectedShell
+      locale={locale}
+      anon={<PublicShell>{content}</PublicShell>}
+    >
+      {content}
+    </PublicConnectedShell>
   )
 }
