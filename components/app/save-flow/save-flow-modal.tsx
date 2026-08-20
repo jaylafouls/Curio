@@ -25,6 +25,7 @@ import { cn } from '@/lib/ui/cn'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from '@/lib/i18n/navigation'
 import { isSavableUrl } from '@/lib/links/normalize'
+import { topicFromDomain, tagCandidatesFromMeta } from '@/lib/links/prefill'
 import {
   resolveLink,
   saveLink,
@@ -58,6 +59,17 @@ import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
 
 const IMAGE_BUCKET = 'user-images'
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+const NOTE_MAX = 500 // user_links.note cap (data model §9); mirrors the textarea maxLength
+
+/** The canned "why are you saving this" chips (i18n keys under SaveFlow.noteQuick). */
+const NOTE_QUICK_KEYS = [
+  'buyLater',
+  'inspiration',
+  'toShare',
+  'forTrip',
+  'gift',
+  'compare',
+] as const
 
 type Step = 'url' | 'customize' | 'saveTo' | 'done'
 
@@ -106,7 +118,11 @@ export function SaveFlowModal({
   const [note, setNote] = useState('')
   const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState('')
+  // Suggested tags derived from the fetched title/description (Point 2). Rendered
+  // as unchecked chips under the tags field — never auto-applied to `tags`.
+  const [tagCandidates, setTagCandidates] = useState<string[]>([])
   const [image, setImage] = useState<string | null>(null)
+  const [favicon, setFavicon] = useState<string | null>(null)
   const [customImage, setCustomImage] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
 
@@ -150,7 +166,9 @@ export function SaveFlowModal({
     setNote('')
     setTags([])
     setNewTag('')
+    setTagCandidates([])
     setImage(null)
+    setFavicon(null)
     setCustomImage(null)
     setQuery('')
     setCollectionId(null)
@@ -196,6 +214,12 @@ export function SaveFlowModal({
       setCanonicalTitle(res.title)
       setDescription(res.description ?? '')
       setImage(res.image)
+      setFavicon(res.favicon)
+
+      // Suggested tags from the fetched metadata (Point 2) — unchecked chips the
+      // user may click to add. Never auto-applied. Hide any that are already on
+      // the (fresh) tags list so we don't offer a duplicate.
+      setTagCandidates(tagCandidatesFromMeta(res.title, res.description))
 
       // Prefill the categorisation from the most-recent filing of the same
       // canonical link by ANY user (§18 cross-user inheritance). Best-effort: a
@@ -215,6 +239,13 @@ export function SaveFlowModal({
             ? sug.suggestion.subcategoryId
             : null,
         )
+      } else {
+        // No cross-user inheritance (the strong signal). Fall back to a weak
+        // domain → Topic guess (Point 2) — only fills when inheritance is empty,
+        // and only prefills the picker (touchedTopic stays false, so a later
+        // Collection pick can still override it). No sub-category is guessed.
+        const domainTopic = topicFromDomain(raw)
+        if (domainTopic) setTopicId(domainTopic)
       }
 
       setStep('customize')
@@ -252,6 +283,20 @@ export function SaveFlowModal({
     }
   }
 
+  // ── Note quick-reasons ──────────────────────────────────────────────────────
+  // Append a canned reason to the free-text note (space-joined), skipping it when
+  // that exact phrase is already present. The textarea stays fully editable.
+  function appendNoteReason(phrase: string) {
+    setNote((prev) => {
+      const current = prev.trim()
+      if (!current) return phrase
+      // Word-boundary-ish contains check so re-tapping a chip is a no-op.
+      if (current.toLowerCase().includes(phrase.toLowerCase())) return current
+      const joined = `${current} ${phrase}`
+      return joined.length > NOTE_MAX ? joined.slice(0, NOTE_MAX) : joined
+    })
+  }
+
   // ── Tags ──────────────────────────────────────────────────────────────────
   function addTag() {
     const v = newTag.trim()
@@ -263,6 +308,28 @@ export function SaveFlowModal({
     setTags((prev) => [...prev, v])
     setNewTag('')
   }
+
+  // Accept a suggested-tag chip (Point 2): add it to tags and remove it from the
+  // candidate list so the chip disappears once picked. De-dupes case-insensitively
+  // against existing tags, matching addTag's rule.
+  function acceptTagCandidate(candidate: string) {
+    setTagCandidates((prev) => prev.filter((c) => c !== candidate))
+    setTags((prev) =>
+      prev.some((x) => x.toLowerCase() === candidate.toLowerCase())
+        ? prev
+        : [...prev, candidate],
+    )
+  }
+
+  // Suggested-tag chips still worth showing: drop any candidate the user has
+  // already added (case-insensitive), so an accepted chip never lingers.
+  const visibleTagCandidates = useMemo(
+    () =>
+      tagCandidates.filter(
+        (c) => !tags.some((x) => x.toLowerCase() === c.toLowerCase()),
+      ),
+    [tagCandidates, tags],
+  )
 
   // ── Step 3 helpers ──────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
@@ -473,9 +540,23 @@ export function SaveFlowModal({
               <p className="truncate font-sans text-body-small font-medium text-text-dark">
                 {title || canonicalTitle || url}
               </p>
-              <p className="truncate font-sans text-meta text-text-dark/50">
-                {url}
-              </p>
+              <span className="flex min-w-0 items-center gap-xs">
+                {favicon ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={favicon}
+                    alt=""
+                    className="size-3.5 shrink-0 rounded-[2px] object-contain"
+                    // A broken favicon should just disappear, never show an alt box.
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                ) : null}
+                <span className="truncate font-sans text-meta text-text-dark/50">
+                  {url}
+                </span>
+              </span>
               {existing && savesCount > 0 ? (
                 <span className="mt-2xs inline-flex items-center gap-xs font-sans text-meta text-violet">
                   <Users className="size-3" aria-hidden />
@@ -618,6 +699,29 @@ export function SaveFlowModal({
                 {t('tagAdd')}
               </Button>
             </div>
+            {/* Suggested tags (Point 2): unchecked chips derived from the fetched
+                metadata. Clicking one adds it; never auto-applied. Hidden once a
+                candidate is already on the tags list. */}
+            {visibleTagCandidates.length > 0 ? (
+              <div className="flex flex-col gap-xs">
+                <span className="font-sans text-meta text-text-dark/50">
+                  {t('suggestedTags')}
+                </span>
+                <div className="flex flex-wrap gap-xs">
+                  {visibleTagCandidates.map((candidate) => (
+                    <button
+                      key={candidate}
+                      type="button"
+                      onClick={() => acceptTagCandidate(candidate)}
+                      className="inline-flex items-center gap-xs rounded-full border border-border bg-transparent px-md py-xs font-sans text-meta text-text-dark/70 transition-colors hover:border-violet hover:text-text-dark"
+                    >
+                      <Plus className="size-3" aria-hidden />
+                      {candidate}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
 
           {/* Private note (500). */}
@@ -628,6 +732,26 @@ export function SaveFlowModal({
             >
               {t('noteLabel')}
             </label>
+            {/* Quick reasons — tap to append a canned phrase; free text stays. */}
+            <div
+              role="group"
+              aria-label={t('noteQuickLabel')}
+              className="flex flex-wrap gap-xs"
+            >
+              {NOTE_QUICK_KEYS.map((key) => {
+                const phrase = t(`noteQuick.${key}`)
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => appendNoteReason(phrase)}
+                    className="rounded-full border border-border px-md py-xs font-sans text-meta text-text-dark/70 transition-colors duration-fast hover:border-violet hover:text-text-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+                  >
+                    {phrase}
+                  </button>
+                )
+              })}
+            </div>
             <textarea
               id="save-note"
               value={note}

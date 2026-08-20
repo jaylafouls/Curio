@@ -84,6 +84,20 @@ export function SaveFlowProvider({
     return () => document.removeEventListener('keydown', onKey)
   }, [surface])
 
+// Open the Save Flow from anywhere in the connected shell via a window event,
+  // e.g. the empty-collection "Add a first link" CTA (recette P3 #3). Decoupled
+  // so a server-rendered surface can trigger the client wizard without prop
+  // drilling through the tree. `detail.action` picks which surface opens
+  // (default the link wizard). This provider is mounted once per connected page
+  // by AppShellFrame, so exactly one listener is live.
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const action = (e as CustomEvent<{ action?: Surface }>).detail?.action
+      setSurface(action ?? 'wizard')
+    }
+    window.addEventListener('curio:save-flow', onOpen)
+    return () => window.removeEventListener('curio:save-flow', onOpen)
+  }, [])
   const actions: {
     key: 'save' | 'collection'
     icon: typeof Link2

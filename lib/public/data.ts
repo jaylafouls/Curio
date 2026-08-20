@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
 import { requireSupabaseEnv } from '@/lib/supabase/env'
+import { getPublicCollectionMosaics } from '@/lib/collections/data'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
@@ -112,6 +113,8 @@ export type PublicCollection = {
   description: string | null
   linksCount: number
   owner: { name: string; avatar: string | null; username: string }
+  /** Up to 4 link-image URLs for the coverless 2×2 mosaic (cover tier 2). */
+  mosaic?: string[]
 }
 
 /**
@@ -157,7 +160,7 @@ export async function getPublicCollections(
       | null
   }
 
-  return ((data ?? []) as unknown as Row[])
+  const collections: PublicCollection[] = ((data ?? []) as unknown as Row[])
     .filter((row) => isBadgeTopic(row.topic_id))
     .map((row) => {
       // Supabase types a to-one embed as an array; normalise to the single row.
@@ -177,6 +180,14 @@ export async function getPublicCollections(
         },
       }
     })
+
+  // Tier-2 mosaic for coverless public collections, batched over the anon client.
+  const coverlessIds = collections.filter((c) => !c.cover).map((c) => c.id)
+  if (coverlessIds.length === 0) return collections
+  const mosaics = await getPublicCollectionMosaics(coverlessIds)
+  return collections.map((c) =>
+    c.cover ? c : { ...c, mosaic: mosaics[c.id] },
+  )
 }
 
 // ── Public curators (curators page) ─────────────────────────────────────────

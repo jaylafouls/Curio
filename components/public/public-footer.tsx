@@ -11,12 +11,15 @@ import { BrandLockup } from './brand-lockup'
  * content does not exist (a rédactionnel task, flagged as a launch blocker in
  * chantier 7). Rather than ship dead links that 404, they land here once the
  * pages exist. The nav below points only at routes that render.
+ *
+ * "Editorial" is temporarily delinked here too (content never written —
+ * Decisions Log §11.5). "About" lives in the footer only (removed from the
+ * header) to keep the primary nav minimal.
  */
 
 const NAV = [
   { href: '/explore', key: 'explore' },
   { href: '/curators', key: 'curators' },
-  { href: '/editorial', key: 'editorial' },
   { href: '/about', key: 'about' },
 ] as const
 

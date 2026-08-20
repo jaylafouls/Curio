@@ -150,6 +150,7 @@ export function ProjectDetailClient({
                   title={c.title}
                   topic={c.topic}
                   cover={c.cover ?? undefined}
+                  mosaic={c.mosaic}
                   owner={{
                     name: c.owner.name,
                     avatar: c.owner.avatar ?? undefined,

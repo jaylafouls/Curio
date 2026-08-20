@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
+import { getOwnerCollectionMosaics } from '@/lib/collections/data'
 import type { AppCollection } from '@/lib/app/data'
 
 /**
@@ -84,6 +85,20 @@ function mapFeedRow(row: FeedRow): FeedCollectionWithTeaser {
   }
 }
 
+/**
+ * Attach tier-2 mosaic images to coverless feed cards. Feed collections are
+ * other users' PUBLIC collections read through the session client; their public
+ * links are visible under RLS, so the owner-context batch is correct here.
+ */
+async function withFeedMosaics(
+  rows: FeedCollectionWithTeaser[],
+): Promise<FeedCollectionWithTeaser[]> {
+  const coverlessIds = rows.filter((c) => !c.cover).map((c) => c.id)
+  if (coverlessIds.length === 0) return rows
+  const mosaics = await getOwnerCollectionMosaics(coverlessIds)
+  return rows.map((c) => (c.cover ? c : { ...c, mosaic: mosaics[c.id] }))
+}
+
 // ── Following: chronological collections from followed curators ──────────────
 
 /**
@@ -129,9 +144,11 @@ export async function getFollowingFeed(
     return []
   }
 
-  return ((data ?? []) as unknown as FeedRow[])
-    .filter((row) => isBadgeTopic(row.topic_id))
-    .map(mapFeedRow)
+  return withFeedMosaics(
+    ((data ?? []) as unknown as FeedRow[])
+      .filter((row) => isBadgeTopic(row.topic_id))
+      .map(mapFeedRow),
+  )
 }
 
 // ── For you: public collections matching the user's onboarding Topics ────────
@@ -181,9 +198,11 @@ export async function getForYouFeed(
     return []
   }
 
-  return ((data ?? []) as unknown as FeedRow[])
-    .filter((row) => isBadgeTopic(row.topic_id))
-    .map(mapFeedRow)
+  return withFeedMosaics(
+    ((data ?? []) as unknown as FeedRow[])
+      .filter((row) => isBadgeTopic(row.topic_id))
+      .map(mapFeedRow),
+  )
 }
 
 // ── Trending: public collections by follower count then recency ──────────────
@@ -222,17 +241,19 @@ export async function getTrendingFeed(
     return []
   }
 
-  return ((data ?? []) as unknown as FeedRow[])
-    .filter((row) => isBadgeTopic(row.topic_id))
-    .map(mapFeedRow)
-    .sort((a, b) => {
-      if (b.followers !== a.followers) return b.followers - a.followers
-      // Tie-break on recency: mapFeedRow drops created_at, so rows already
-      // arrive newest-first from the query — a stable sort preserves that for
-      // equal follower counts.
-      return 0
-    })
-    .slice(0, limit)
+  return withFeedMosaics(
+    ((data ?? []) as unknown as FeedRow[])
+      .filter((row) => isBadgeTopic(row.topic_id))
+      .map(mapFeedRow)
+      .sort((a, b) => {
+        if (b.followers !== a.followers) return b.followers - a.followers
+        // Tie-break on recency: mapFeedRow drops created_at, so rows already
+        // arrive newest-first from the query — a stable sort preserves that for
+        // equal follower counts.
+        return 0
+      })
+      .slice(0, limit),
+  )
 }
 
 // ── From your curators: recent public activity from follows ──────────────────

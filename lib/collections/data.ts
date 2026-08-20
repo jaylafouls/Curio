@@ -1,5 +1,8 @@
 import { cache } from 'react'
-import { createClient as createAnonClient } from '@supabase/supabase-js'
+import {
+  createClient as createAnonClient,
+  type SupabaseClient,
+} from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { requireSupabaseEnv } from '@/lib/supabase/env'
 import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
@@ -321,4 +324,79 @@ function buildDetail(
     links: ((links ?? []) as unknown as LinkRow[]).map(mapLink),
     isOwner,
   }
+}
+
+// ── Cover mosaics (card cover-resolution tier 2) ────────────────────────────
+
+/**
+ * For a set of collection ids, return up to `perCollection` link-image URLs each
+ * — the material for the automatic 2×2 mosaic cover a coverless collection card
+ * shows (recette point 5, tier 2). One batched query for the whole grid instead
+ * of an N+1 per card.
+ *
+ * The caller passes its OWN Supabase client so the read stays in that surface's
+ * RLS context: the anon client for public grids (Explore, Home, profile), the
+ * session client for My Space. RLS already scopes user_links to what the caller
+ * may see, so a private link never leaks into a public card's mosaic.
+ *
+ * The image is the personal custom image when set, else the canonical link image
+ * (data model §9), matching how the detail body renders each link. Rows with no
+ * image are skipped; collections that end up with zero images simply aren't in
+ * the returned map and the card falls through to the branded Topic scene.
+ */
+export async function getCollectionMosaics(
+  supabase: SupabaseClient,
+  collectionIds: string[],
+  perCollection = 4,
+): Promise<Record<string, string[]>> {
+  const out: Record<string, string[]> = {}
+  const ids = collectionIds.filter(Boolean)
+  if (ids.length === 0) return out
+
+  const { data, error } = await supabase
+    .from('user_links')
+    .select(
+      'collection_id, custom_image_url, saved_at, ' +
+        'link:links!user_links_link_id_fkey (image_url)',
+    )
+    .in('collection_id', ids)
+    .order('saved_at', { ascending: false })
+
+  if (error) {
+    console.error('collections: mosaic read failed', { message: error.message })
+    return out
+  }
+
+  type Row = {
+    collection_id: string | null
+    custom_image_url: string | null
+    link: { image_url: string | null } | { image_url: string | null }[] | null
+  }
+
+  for (const row of (data ?? []) as unknown as Row[]) {
+    const cid = row.collection_id
+    if (!cid) continue
+    if ((out[cid]?.length ?? 0) >= perCollection) continue
+    const link = Array.isArray(row.link) ? row.link[0] : row.link
+    const image = row.custom_image_url ?? link?.image_url ?? null
+    if (!image) continue
+    ;(out[cid] ??= []).push(image)
+  }
+
+  return out
+}
+
+/** Convenience wrapper for public/anon surfaces (Explore, Home, profile). */
+export async function getPublicCollectionMosaics(
+  collectionIds: string[],
+): Promise<Record<string, string[]>> {
+  return getCollectionMosaics(anonClient(), collectionIds)
+}
+
+/** Convenience wrapper for the signed-in My Space grid (session RLS). */
+export async function getOwnerCollectionMosaics(
+  collectionIds: string[],
+): Promise<Record<string, string[]>> {
+  const supabase = await createClient()
+  return getCollectionMosaics(supabase, collectionIds)
 }

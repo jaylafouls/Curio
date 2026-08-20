@@ -9,7 +9,13 @@ import { resolve } from 'node:path'
  */
 export default defineConfig({
   resolve: {
-    alias: { '@': resolve(__dirname, '.') },
+    alias: {
+      '@': resolve(__dirname, '.'),
+      // `server-only` throws when imported outside an RSC bundler; stub it to an
+      // empty module so pure server-side helpers (e.g. lib/links/og.ts) can be
+      // unit-tested in the node env without pulling in a bundler.
+      'server-only': resolve(__dirname, 'test/stubs/server-only.ts'),
+    },
   },
   test: {
     environment: 'node',

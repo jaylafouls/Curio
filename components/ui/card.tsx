@@ -2,7 +2,7 @@ import Image from 'next/image'
 import type { ReactNode } from 'react'
 import { Bookmark, Users } from 'lucide-react'
 import { cn } from '@/lib/ui/cn'
-import { TopicIcon } from '@/components/brand/topic-icon'
+import { TopicScene } from '@/components/brand/topic-scene'
 import { Avatar } from './avatar'
 import { Badge, type BadgeTopic } from './badge'
 
@@ -31,6 +31,12 @@ export interface CollectionCardProps {
   title: string
   topic: BadgeTopic
   cover?: string
+  /**
+   * Up to 4 link-image URLs, used to build an automatic 2×2 mosaic cover when
+   * the collection has no custom `cover` (cover-resolution tier 2). Ignored when
+   * `cover` is set. Fewer than 4 adapt (1 = full bleed, 2 = split, 3 = 2+1).
+   */
+  mosaic?: string[]
   owner: { name: string; avatar?: string }
   linksCount: number
   /** Layout shape. `below` (default) = My Space; `overlay` = Home "Picked for you". */
@@ -40,98 +46,68 @@ export interface CollectionCardProps {
   className?: string
 }
 
-// Topic → lucide icon name, mirroring the DB seed (migration 0003) which is the
-// single source of truth for each Topic's icon. The card only receives `topic`,
-// not the icon string (that lives in the topics table), so the coverless
-// fallback resolves the same icon locally — no data-layer or call-site change.
-// If the seed's icon choices change, update these to match.
-const topicIcon: Record<BadgeTopic, string> = {
-  travel: 'plane',
-  design: 'pen-tool',
-  food: 'utensils',
-  books: 'book-open',
-  culture: 'landmark',
-  ideas: 'lightbulb',
-  style: 'shirt',
-  photography: 'camera',
-  beauty: 'sparkles',
-  wellness: 'heart-pulse',
-}
-
-// Per-topic soft wash + matching icon colour, written as literals so Tailwind's
-// JIT keeps them (mirrors the soft-badge maps in badge.tsx; the bg-badge-* set
-// is also safelisted). The /15 wash tints the cover area with the topic colour
-// while staying light enough for the corner Badge and the icon to sit on it.
-const fallbackBg: Record<BadgeTopic, string> = {
-  travel: 'bg-badge-travel/15',
-  design: 'bg-badge-design/15',
-  food: 'bg-badge-food/15',
-  books: 'bg-badge-books/15',
-  culture: 'bg-badge-culture/15',
-  ideas: 'bg-badge-ideas/15',
-  style: 'bg-badge-style/15',
-  photography: 'bg-badge-photography/15',
-  beauty: 'bg-badge-beauty/15',
-  wellness: 'bg-badge-wellness/15',
-}
-
-// Overlay variant needs a deeper wash (/35) than `below` (/15): the dark
-// text-legibility scrim is laid over it, so a faint tint would wash out to grey.
-const overlayFallbackBg: Record<BadgeTopic, string> = {
-  travel: 'bg-badge-travel/35',
-  design: 'bg-badge-design/35',
-  food: 'bg-badge-food/35',
-  books: 'bg-badge-books/35',
-  culture: 'bg-badge-culture/35',
-  ideas: 'bg-badge-ideas/35',
-  style: 'bg-badge-style/35',
-  photography: 'bg-badge-photography/35',
-  beauty: 'bg-badge-beauty/35',
-  wellness: 'bg-badge-wellness/35',
-}
-
-const fallbackIconText: Record<BadgeTopic, string> = {
-  travel: 'text-badge-travel',
-  design: 'text-badge-design',
-  food: 'text-badge-food',
-  books: 'text-badge-books',
-  culture: 'text-badge-culture',
-  ideas: 'text-badge-ideas',
-  style: 'text-badge-style',
-  photography: 'text-badge-photography',
-  beauty: 'text-badge-beauty',
-  wellness: 'text-badge-wellness',
-}
-
 /**
- * CoverFallback — the `below`-variant coverless treatment. Instead of a
- * near-empty tinted panel, it fills the cover area with a soft wash of the
- * Topic's own colour and centres the Topic icon, reusing the exact colour+icon
- * vocabulary already designed for badges and the orbital sidebar. Decorative:
- * the Badge in the corner already announces the topic in text.
+ * Collection cover resolution has three tiers (recette point 5):
+ *   1. a custom `cover` the owner uploaded  → handled inline by each variant.
+ *   2. no cover but the collection has links with images → an automatic 2×2
+ *      `CoverMosaic` built from up to 4 of them.
+ *   3. no cover and no link images → a branded per-Topic `TopicScene`.
+ *
+ * `CoverArt` picks between tiers 2 and 3 (tier 1 short-circuits before it), so
+ * both card variants and the detail hero share one resolution and always show a
+ * designed object, never an empty tinted panel.
  */
-function CoverFallback({ topic }: { topic: BadgeTopic }) {
+function CoverMosaic({ images }: { images: string[] }) {
+  // Take at most 4; adapt the grid to how many we actually have so 1–3 images
+  // still fill the frame edge-to-edge with no empty slots.
+  const imgs = images.slice(0, 4)
+  const grid =
+    imgs.length >= 4
+      ? 'grid-cols-2 grid-rows-2'
+      : imgs.length === 3
+        ? 'grid-cols-2 grid-rows-2'
+        : imgs.length === 2
+          ? 'grid-cols-2 grid-rows-1'
+          : 'grid-cols-1 grid-rows-1'
+
   return (
-    <div
-      aria-hidden
-      className={cn(
-        'absolute inset-0 flex items-center justify-center',
-        fallbackBg[topic],
-      )}
-    >
-      <TopicIcon
-        name={topicIcon[topic]}
-        className={cn('size-10 opacity-70', fallbackIconText[topic])}
-        strokeWidth={1.5}
-      />
+    <div aria-hidden className={cn('absolute inset-0 grid gap-px', grid)}>
+      {imgs.map((src, i) => (
+        <div
+          key={`${src}-${i}`}
+          className={cn(
+            'relative overflow-hidden bg-foreground/[0.04]',
+            // With 3 images, the first spans both rows on the left so the pair
+            // stacks on the right — a balanced 2+1 rather than an empty cell.
+            imgs.length === 3 && i === 0 && 'row-span-2',
+          )}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt="" className="size-full object-cover" />
+        </div>
+      ))}
     </div>
   )
+}
+
+function CoverArt({
+  topic,
+  mosaic,
+}: {
+  topic: BadgeTopic
+  mosaic?: string[]
+}) {
+  if (mosaic && mosaic.length > 0) {
+    return <CoverMosaic images={mosaic} />
+  }
+  return <TopicScene topic={topic} className="absolute inset-0 size-full" />
 }
 
 export function CollectionCard({
   title,
   topic,
   cover,
+  mosaic,
   owner,
   linksCount,
   variant = 'below',
@@ -159,32 +135,16 @@ export function CollectionCard({
             className="object-cover transition-transform duration-base group-hover:scale-[1.02]"
           />
         ) : (
-          // Coverless: topic-coloured wash behind the scrim (see icon below it).
-          <div
-            aria-hidden
-            className={cn('absolute inset-0', overlayFallbackBg[topic])}
-          />
+          // Coverless: automatic 2×2 mosaic if the collection has link images,
+          // otherwise the branded per-Topic scene (cover-resolution tiers 2–3).
+          <CoverArt topic={topic} mosaic={mosaic} />
         )}
-        {/* Dark scrim so overlaid light text stays legible over any cover. */}
+        {/* Dark scrim so overlaid light text stays legible over any cover —
+            including the mosaic and scene, which the bottom text sits on. */}
         <div
           className="absolute inset-0 bg-gradient-to-t from-cosmic/80 via-cosmic/20 to-transparent"
           aria-hidden
         />
-        {/* Coverless: Topic icon above the scrim so it isn't buried, light to
-            read on the darkened wash. Sits in the upper area, clear of the
-            bottom text block. */}
-        {cover ? null : (
-          <div
-            aria-hidden
-            className="absolute inset-x-0 top-0 flex justify-center pt-[26%]"
-          >
-            <TopicIcon
-              name={topicIcon[topic]}
-              className="size-11 text-archive/70"
-              strokeWidth={1.5}
-            />
-          </div>
-        )}
         <div className="absolute left-md top-md">
           <Badge topic={topic} variant="solid" />
         </div>
@@ -225,7 +185,7 @@ export function CollectionCard({
             className="object-cover transition-transform duration-base group-hover:scale-[1.02]"
           />
         ) : (
-          <CoverFallback topic={topic} />
+          <CoverArt topic={topic} mosaic={mosaic} />
         )}
         <div className="absolute left-md top-md">
           <Badge topic={topic} variant="solid" />
