@@ -24,6 +24,30 @@ import type { ProjectDetail, AttachableCollection } from '@/lib/projects/data'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
+ * A localized "time ago" string (e.g. "3 days ago" / "il y a 3 jours") from an
+ * ISO timestamp, via Intl.RelativeTimeFormat — no dependency, locale-correct.
+ * Picks the largest sensible unit; "just now" for anything under a minute.
+ */
+function relativeTime(iso: string, locale: Locale): string {
+  const then = new Date(iso).getTime()
+  const diffSec = Math.round((then - Date.now()) / 1000) // negative = past
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+  const abs = Math.abs(diffSec)
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+    ['year', 31_536_000],
+    ['month', 2_592_000],
+    ['week', 604_800],
+    ['day', 86_400],
+    ['hour', 3_600],
+    ['minute', 60],
+  ]
+  for (const [unit, secs] of units) {
+    if (abs >= secs) return rtf.format(Math.round(diffSec / secs), unit)
+  }
+  return rtf.format(0, 'second') // "now" / "maintenant"
+}
+
+/**
  * ProjectDetailClient — the interactive owner view of /projects/[id]. The server
  * page has already resolved ownership (the route only renders for the owner), so
  * everything here is owner-scoped by construction: edit name/colour, add a new or
@@ -112,6 +136,10 @@ export function ProjectDetailClient({
               {t('collectionsCount', { count: project.collections.length })}
               {' · '}
               {t('linksCount', { count: project.totalLinks })}
+              {' · '}
+              {t('lastModified', {
+                when: relativeTime(project.updatedAt, locale),
+              })}
             </p>
             {project.description ? (
               <p className="mt-xs max-w-2xl font-sans text-body-small text-foreground/70">

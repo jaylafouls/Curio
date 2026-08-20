@@ -26,6 +26,8 @@ export type ProjectDetail = {
   collections: AppCollection[]
   /** Total links across the project's collections (sum of links_count). */
   totalLinks: number
+  /** Last-modified timestamp (projects.updated_at, ISO string) for the "last modified" line. */
+  updatedAt: string
 }
 
 type CollectionRow = {
@@ -79,7 +81,7 @@ export async function getOwnerProjectById(
 
   const { data: project, error } = await supabase
     .from('projects')
-    .select('id, name, description, color, cover_image_url')
+    .select('id, name, description, color, cover_image_url, updated_at')
     .eq('id', projectId)
     .eq('owner_id', user.id)
     .maybeSingle()
@@ -114,6 +116,7 @@ export async function getOwnerProjectById(
     color: project.color,
     coverImageUrl: (project as { cover_image_url: string | null })
       .cover_image_url,
+    updatedAt: (project as { updated_at: string }).updated_at,
     collections: mapped,
     totalLinks: mapped.reduce((sum, c) => sum + c.linksCount, 0),
   }
