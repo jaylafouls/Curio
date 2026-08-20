@@ -41,6 +41,8 @@ export type UniverseNode =
       collectionsCount: number
       /** Total links across the project's collections (sum of links_count). */
       linksCount: number
+      /** Last-updated ISO timestamp — drives the hero's "most recent" slice. */
+      updatedAt: string
     }
   | {
       kind: 'collection'
@@ -53,11 +55,25 @@ export type UniverseNode =
       isPublic: boolean
       /** Real trigger-maintained count (collections.links_count). */
       linksCount: number
+      /** Last-updated ISO timestamp — drives the hero's "most recent" slice. */
+      updatedAt: string
     }
 
+/** How many nodes the orbital hero shows before the companion list takes over. */
+export const UNIVERSE_HERO_SIZE = 8
+
 export type MyUniverse = {
-  /** Ordered nodes for the ring: projects first, then standalone collections. */
+  /**
+   * Every node, ordered most-recently-updated first — the companion list's
+   * source (points 4 & 7: the real navigation, access to ALL collections).
+   */
   nodes: UniverseNode[]
+  /**
+   * The orbital hero slice: the {@link UNIVERSE_HERO_SIZE} most-recent nodes.
+   * The orbit is a fixed decorative hero, never scales — the list below is the
+   * navigation once the universe grows.
+   */
+  hero: UniverseNode[]
   /** Rollup for the centre "You" node and the empty-state decision. */
   totals: {
     projects: number
@@ -66,7 +82,12 @@ export type MyUniverse = {
   }
 }
 
-type ProjectRow = { id: string; name: string; color: string | null }
+type ProjectRow = {
+  id: string
+  name: string
+  color: string | null
+  updated_at: string
+}
 
 type CollectionRow = {
   id: string
@@ -76,6 +97,7 @@ type CollectionRow = {
   is_public: boolean
   links_count: number
   project_id: string | null
+  updated_at: string
 }
 
 /**
@@ -86,6 +108,7 @@ type CollectionRow = {
 export async function getMyUniverse(): Promise<MyUniverse> {
   const empty: MyUniverse = {
     nodes: [],
+    hero: [],
     totals: { projects: 0, collections: 0, links: 0 },
   }
 
@@ -98,12 +121,14 @@ export async function getMyUniverse(): Promise<MyUniverse> {
   const [projectsRes, collectionsRes] = await Promise.all([
     supabase
       .from('projects')
-      .select('id, name, color')
+      .select('id, name, color, updated_at')
       .eq('owner_id', user.id)
       .order('updated_at', { ascending: false }),
     supabase
       .from('collections')
-      .select('id, slug, name, topic_id, is_public, links_count, project_id')
+      .select(
+        'id, slug, name, topic_id, is_public, links_count, project_id, updated_at',
+      )
       .eq('owner_id', user.id)
       .order('updated_at', { ascending: false }),
   ])
@@ -149,6 +174,7 @@ export async function getMyUniverse(): Promise<MyUniverse> {
         topic: c.topic_id as BadgeTopic,
         isPublic: c.is_public,
         linksCount: links,
+        updatedAt: c.updated_at,
       })
     }
   }
@@ -162,13 +188,20 @@ export async function getMyUniverse(): Promise<MyUniverse> {
       color: p.color,
       collectionsCount: roll.collections,
       linksCount: roll.links,
+      updatedAt: p.updated_at,
     }
   })
 
+  // One recency-ordered list across BOTH kinds. This is the companion list's
+  // source (all projects + standalone collections, the real navigation) and the
+  // hero's source: the orbit shows the top-N most-recent, the list shows all.
+  const nodes = [...projectNodes, ...standalone].sort((a, b) =>
+    b.updatedAt.localeCompare(a.updatedAt),
+  )
+
   return {
-    // Projects orbit first, then standalone collections — a stable, readable
-    // order that keeps the same category adjacent on the ring.
-    nodes: [...projectNodes, ...standalone],
+    nodes,
+    hero: nodes.slice(0, UNIVERSE_HERO_SIZE),
     totals: {
       projects: projects.length,
       collections: collections.length,

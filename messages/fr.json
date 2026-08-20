@@ -380,7 +380,10 @@
     "legendCollection": "Collection",
     "legendCountProject": "nombre = collections à l'intérieur",
     "legendCountCollection": "nombre = liens enregistrés",
-    "legendCaption": "La position des points est décorative — elle n'a pas de signification."
+    "legendCaption": "La position des points est décorative — elle n'a pas de signification.",
+    "allTitle": "Tout votre univers",
+    "projectRowMeta": "Projet · {collections, plural, =0 {aucune collection} one {# collection} other {# collections}} · {links, plural, =0 {aucun lien} one {# lien} other {# liens}}",
+    "collectionRowMeta": "Collection · {links, plural, =0 {aucun lien} one {# lien} other {# liens}}"
   },
   "Saved": {
     "metaTitle": "Enregistrés",

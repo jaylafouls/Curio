@@ -380,7 +380,10 @@
     "legendCollection": "Collection",
     "legendCountProject": "number = collections inside",
     "legendCountCollection": "number = saved links",
-    "legendCaption": "Node placement is decorative — position carries no meaning."
+    "legendCaption": "Node placement is decorative — position carries no meaning.",
+    "allTitle": "Everything in your universe",
+    "projectRowMeta": "Project · {collections, plural, =0 {no collections} one {# collection} other {# collections}} · {links, plural, =0 {no links} one {# link} other {# links}}",
+    "collectionRowMeta": "Collection · {links, plural, =0 {no links} one {# link} other {# links}}"
   },
   "Saved": {
     "metaTitle": "Saved",

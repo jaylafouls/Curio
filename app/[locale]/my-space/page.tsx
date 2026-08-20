@@ -12,6 +12,7 @@ import { ProfileIdentity } from '@/components/app/profile-identity'
 import { CollectionGrid } from '@/components/app/collection-grid'
 import { StatList } from '@/components/app/stat-list'
 import { UniverseOrbital } from '@/components/app/universe-orbital'
+import { UniverseList } from '@/components/app/universe-list'
 import { EmptyState } from '@/components/public/empty-state'
 import {
   getCurrentUser,
@@ -127,12 +128,18 @@ export default async function MySpacePage({ params }: PageProps) {
               </p>
             </div>
             {universe.nodes.length > 0 ? (
-              <div className="rounded-lg border border-border bg-foreground/[0.02] px-lg py-xl">
-                <UniverseOrbital
-                  nodes={universe.nodes}
-                  centerLabel={tUniverse('you')}
-                />
-              </div>
+              <>
+                {/* Orbit = fixed decorative hero (top-8 most recent). It never
+                    has to scale; the companion list below is the real
+                    navigation to ALL projects and collections (points 4 & 7). */}
+                <div className="rounded-lg border border-border bg-foreground/[0.02] px-lg py-xl">
+                  <UniverseOrbital
+                    nodes={universe.hero}
+                    centerLabel={tUniverse('you')}
+                  />
+                </div>
+                <UniverseList nodes={universe.nodes} locale={locale} />
+              </>
             ) : (
               <EmptyState
                 tag={tUniverse('emptyTag')}
