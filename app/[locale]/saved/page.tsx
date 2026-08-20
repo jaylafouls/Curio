@@ -6,7 +6,8 @@ import type { Locale } from '@/lib/i18n/routing'
 import { PageContainer } from '@/components/ui'
 import { AppShell } from '@/components/app/app-shell'
 import { SavedLinksClient } from '@/components/app/saved-links-client'
-import { getCurrentUser, getSavedLinks } from '@/lib/app/data'
+import { getCurrentUser, searchSavedLinks } from '@/lib/app/data'
+import { getSaveTargets } from '@/lib/links/data'
 
 /**
  * /[locale]/saved — the signed-in user's saved links (spec §8.9): every
@@ -44,7 +45,12 @@ export default async function SavedPage({ params }: PageProps) {
   if (!user) redirect(`/${locale}`)
 
   const t = await getTranslations({ locale, namespace: 'Saved' })
-  const links = await getSavedLinks(user.id)
+  // Seed the first page (Inbox by default) + the move-target collection list.
+  // Every later filter / page fetch goes through searchSavedLinksAction.
+  const [initial, collections] = await Promise.all([
+    searchSavedLinks({ userId: user.id, scope: 'inbox' }),
+    getSaveTargets(user.id),
+  ])
 
   return (
     <AppShell
@@ -64,7 +70,14 @@ export default async function SavedPage({ params }: PageProps) {
           </p>
         </header>
 
-        <SavedLinksClient links={links} />
+        <SavedLinksClient
+          initial={initial}
+          collections={collections.map((c) => ({
+            id: c.id,
+            name: c.name,
+            topic: c.topic,
+          }))}
+        />
       </PageContainer>
     </AppShell>
   )

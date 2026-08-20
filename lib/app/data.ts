@@ -309,6 +309,8 @@ export type SavedLink = {
   urlOrigin: string
   collectionId: string | null
   savedAt: string
+  /** Personal free tags (§9). Empty array when none. */
+  tags: string[]
   /** Personal categorisation Topic (§9bis), null when uncategorised. */
   topic: BadgeTopic | null
   /** Personal sub-category id + label, null when none chosen. */
@@ -316,7 +318,11 @@ export type SavedLink = {
   subcategoryLabel: string | null
 }
 
-type SavedLinkRow = {
+/**
+ * One row of the search_saved_links(...) RPC — the joined user_links + canonical
+ * link + sub-category label, flattened server-side (see migration 0017).
+ */
+type SavedLinkRpcRow = {
   id: string
   title_override: string | null
   custom_image_url: string | null
@@ -325,66 +331,147 @@ type SavedLinkRow = {
   saved_at: string
   topic_id: string | null
   subcategory_id: string | null
-  link:
-    | { title: string; description: string | null; image_url: string | null }
-    | { title: string; description: string | null; image_url: string | null }[]
-    | null
-  subcategory:
-    | { label: string }
-    | { label: string }[]
-    | null
+  tags: string[] | null
+  link_title: string | null
+  link_description: string | null
+  link_image_url: string | null
+  subcategory_label: string | null
 }
 
-function mapSavedLink(row: SavedLinkRow): SavedLink {
-  const link = Array.isArray(row.link) ? row.link[0] : row.link
-  const sub = Array.isArray(row.subcategory)
-    ? row.subcategory[0]
-    : row.subcategory
+function mapSavedLinkRpc(row: SavedLinkRpcRow): SavedLink {
   return {
     id: row.id,
     // Personal display override wins over the canonical title (data model §9).
-    title: row.title_override ?? link?.title ?? row.url_origin,
-    description: link?.description ?? null,
+    title: row.title_override ?? row.link_title ?? row.url_origin,
+    description: row.link_description ?? null,
     // Personal custom image overrides the canonical image for this user only.
-    image: row.custom_image_url ?? link?.image_url ?? null,
+    image: row.custom_image_url ?? row.link_image_url ?? null,
     urlOrigin: row.url_origin,
     collectionId: row.collection_id,
     savedAt: row.saved_at,
+    tags: row.tags ?? [],
     topic: row.topic_id && isBadgeTopic(row.topic_id) ? row.topic_id : null,
     subcategoryId: row.subcategory_id,
-    subcategoryLabel: sub?.label ?? null,
+    subcategoryLabel: row.subcategory_label ?? null,
   }
 }
 
-const SAVED_LINK_SELECT =
-  'id, title_override, custom_image_url, url_origin, collection_id, saved_at, ' +
-  'topic_id, subcategory_id, ' +
-  'link:links!user_links_link_id_fkey (title, description, image_url), ' +
-  'subcategory:link_subcategories!user_links_subcategory_id_fkey (label)'
+/** Scope of the /saved search. inbox = Unsorted (collection_id IS NULL). */
+export type SavedScope = 'all' | 'inbox' | 'collection'
+
+/** Opaque keyset cursor: the (saved_at, id) of the last item of a page. */
+export type SavedCursor = { savedAt: string; id: string }
+
+export type SearchSavedLinksParams = {
+  userId: string
+  q?: string
+  scope?: SavedScope
+  topicId?: string | null
+  subcategoryId?: string | null
+  collectionId?: string | null
+  tags?: string[] | null
+  cursor?: SavedCursor | null
+  /** Page size. The RPC is asked for limit+1 to detect a further page. */
+  limit?: number
+}
+
+export type SearchSavedLinksResult = {
+  items: SavedLink[]
+  /** Non-null when a further page exists; pass it back as `cursor`. */
+  nextCursor: SavedCursor | null
+  /** Server-computed tab counts under the same text + structured filters. */
+  counts: { total: number; inbox: number }
+}
+
+const SAVED_PAGE_SIZE = 30
 
 /**
- * All of the user's saved links, newest first (owner RLS). `/saved` shows the
- * full set; the "Unsorted" view filters to collection_id IS NULL client-side
- * (both slices come from one query, no second round-trip).
+ * Server-driven, keyset-paginated search over the user's saves (owner RLS via a
+ * SECURITY INVOKER RPC — migration 0017). Replaces the old "fetch newest 60,
+ * filter in memory" getSavedLinks: search spans title_override / canonical
+ * title / description / tags / url_origin (unaccent-folded), and the result is
+ * paginated on (saved_at desc, id desc) with no OFFSET.
+ *
+ * `counts` is fetched in parallel and reflects the SAME text + structured
+ * filters (a search narrows every scope tab, not just the active list), so the
+ * Inbox / All tab badges stay honest without the client counting anything.
+ *
+ * Structured filters and search are independent of `scope`; `counts` is always
+ * computed scope-agnostically (total = every match, inbox = matches with no
+ * collection) so both tabs read correctly regardless of the active scope.
  */
-export async function getSavedLinks(
-  userId: string,
-  limit = 60,
-): Promise<SavedLink[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('user_links')
-    .select(SAVED_LINK_SELECT)
-    .eq('user_id', userId)
-    .order('saved_at', { ascending: false })
-    .limit(limit)
+export async function searchSavedLinks(
+  params: SearchSavedLinksParams,
+): Promise<SearchSavedLinksResult> {
+  const {
+    userId,
+    q,
+    scope = 'inbox',
+    topicId = null,
+    subcategoryId = null,
+    collectionId = null,
+    tags = null,
+    cursor = null,
+    limit = SAVED_PAGE_SIZE,
+  } = params
 
-  if (error) {
-    console.error('app: failed to load saved links', { message: error.message })
-    return []
+  const supabase = await createClient()
+  const normalizedQ = q?.trim() ? q.trim() : null
+  const normalizedTags = tags && tags.length > 0 ? tags : null
+
+  // Ask for one more than the page size: its presence signals "has more" and
+  // its predecessor supplies the next cursor. We never return the extra row.
+  const [listRes, countsRes] = await Promise.all([
+    supabase.rpc('search_saved_links', {
+      p_user_id: userId,
+      p_q: normalizedQ,
+      p_scope: scope,
+      p_topic_id: topicId,
+      p_subcategory_id: subcategoryId,
+      p_collection_id: collectionId,
+      p_tags: normalizedTags,
+      p_cursor_saved_at: cursor?.savedAt ?? null,
+      p_cursor_id: cursor?.id ?? null,
+      p_limit: limit + 1,
+    }),
+    supabase.rpc('saved_links_counts', {
+      p_user_id: userId,
+      p_q: normalizedQ,
+      p_topic_id: topicId,
+      p_subcategory_id: subcategoryId,
+      p_tags: normalizedTags,
+    }),
+  ])
+
+  if (listRes.error) {
+    console.error('app: saved search failed', { message: listRes.error.message })
+    return { items: [], nextCursor: null, counts: { total: 0, inbox: 0 } }
   }
 
-  return ((data ?? []) as unknown as SavedLinkRow[]).map(mapSavedLink)
+  const rows = (listRes.data ?? []) as unknown as SavedLinkRpcRow[]
+  const hasMore = rows.length > limit
+  const pageRows = hasMore ? rows.slice(0, limit) : rows
+  const items = pageRows.map(mapSavedLinkRpc)
+
+  const last = items[items.length - 1]
+  const nextCursor =
+    hasMore && last ? { savedAt: last.savedAt, id: last.id } : null
+
+  // Counts are best-effort: a count failure must not blank the (working) list.
+  const countRow = (countsRes.data ?? [])[0] as
+    | { total: number | string; inbox: number | string }
+    | undefined
+  if (countsRes.error) {
+    console.error('app: saved counts failed', {
+      message: countsRes.error.message,
+    })
+  }
+  const counts = {
+    total: Number(countRow?.total ?? items.length),
+    inbox: Number(countRow?.inbox ?? 0),
+  }
+
+  return { items, nextCursor, counts }
 }
 
 // ── Followed curators (My Space "Curators you follow") ──────────────────────
