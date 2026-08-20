@@ -494,11 +494,18 @@
     "color_vert": "Green",
     "color_bleu": "Blue",
     "color_rose": "Pink",
+    "coverLabel": "Cover",
+    "coverUpload": "Upload cover",
+    "coverRemove": "Remove",
+    "uploading": "Uploading…",
     "cancel": "Cancel",
     "save": "Save",
     "create": "Create",
     "saving": "Saving…",
     "errorName": "Please enter a name.",
+    "errorImageType": "Please choose an image file.",
+    "errorImageSize": "That image is too large (max 5 MB).",
+    "errorUpload": "The cover couldn't be uploaded. Please try again.",
     "errorServer": "Something went wrong. Please try again."
   },
   "ProjectDetail": {

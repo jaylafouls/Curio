@@ -299,6 +299,7 @@ export type AppProject = {
   name: string
   description: string | null
   color: string | null
+  coverImageUrl: string | null
 }
 
 /**
@@ -314,7 +315,7 @@ export async function getMyProjects(
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('projects')
-    .select('id, name, description, color')
+    .select('id, name, description, color, cover_image_url')
     .eq('owner_id', ownerId)
     .order('updated_at', { ascending: false })
     .limit(limit)
@@ -324,7 +325,19 @@ export async function getMyProjects(
     return []
   }
 
-  return (data ?? []) as AppProject[]
+  return ((data ?? []) as {
+    id: string
+    name: string
+    description: string | null
+    color: string | null
+    cover_image_url: string | null
+  }[]).map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    color: p.color,
+    coverImageUrl: p.cover_image_url,
+  }))
 }
 
 // ── Saved links (/saved) ────────────────────────────────────────────────────

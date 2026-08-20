@@ -494,11 +494,18 @@
     "color_vert": "Vert",
     "color_bleu": "Bleu",
     "color_rose": "Rose",
+    "coverLabel": "Couverture",
+    "coverUpload": "Ajouter une couverture",
+    "coverRemove": "Retirer",
+    "uploading": "Envoi…",
     "cancel": "Annuler",
     "save": "Enregistrer",
     "create": "Créer",
     "saving": "Enregistrement…",
     "errorName": "Veuillez saisir un nom.",
+    "errorImageType": "Veuillez choisir un fichier image.",
+    "errorImageSize": "Cette image est trop lourde (5 Mo max).",
+    "errorUpload": "La couverture n'a pas pu être envoyée. Veuillez réessayer.",
     "errorServer": "Une erreur est survenue. Veuillez réessayer."
   },
   "ProjectDetail": {

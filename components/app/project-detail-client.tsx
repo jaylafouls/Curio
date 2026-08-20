@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { Pencil, Trash2, X } from 'lucide-react'
@@ -84,6 +85,19 @@ export function ProjectDetailClient({
       >
         ← {t('back')}
       </Link>
+
+      {project.coverImageUrl ? (
+        <div className="relative mb-xl aspect-[3/1] w-full overflow-hidden rounded-lg bg-foreground/5">
+          <Image
+            src={project.coverImageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 100vw, 64rem"
+            priority
+            className="object-cover"
+          />
+        </div>
+      ) : null}
 
       <header className="mb-2xl flex flex-wrap items-start justify-between gap-md">
         <div className="flex items-start gap-md">
@@ -190,11 +204,17 @@ export function ProjectDetailClient({
       <ProjectModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
+        userId={userId}
         onSaved={() => {
           setEditOpen(false)
           refresh()
         }}
-        project={{ id: project.id, name: project.name, color: project.color }}
+        project={{
+          id: project.id,
+          name: project.name,
+          color: project.color,
+          cover: project.coverImageUrl,
+        }}
       />
     </div>
   )

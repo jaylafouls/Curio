@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { buildMetadata } from '@/lib/seo/metadata'
@@ -71,7 +72,7 @@ export default async function ProjectsPage({ params }: PageProps) {
               {t('subtitle')}
             </p>
           </div>
-          {projects.length > 0 ? <NewProjectButton /> : null}
+          {projects.length > 0 ? <NewProjectButton userId={user.id} /> : null}
         </header>
 
         {projects.length > 0 ? (
@@ -86,8 +87,20 @@ export default async function ProjectsPage({ params }: PageProps) {
                 <li key={p.id}>
                   <Link
                     href={`/projects/${p.id}`}
-                    className="flex h-full flex-col gap-sm rounded-lg border border-border bg-foreground/[0.02] p-lg transition-colors duration-fast hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+                    className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-foreground/[0.02] transition-colors duration-fast hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
                   >
+                    {p.coverImageUrl ? (
+                      <div className="relative aspect-[16/9] w-full bg-foreground/5">
+                        <Image
+                          src={p.coverImageUrl}
+                          alt=""
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : null}
+                    <div className="flex h-full flex-col gap-sm p-lg">
                     <span
                       className="size-3 rounded-full"
                       style={{ backgroundColor: dot }}
@@ -101,6 +114,7 @@ export default async function ProjectsPage({ params }: PageProps) {
                         {p.description}
                       </p>
                     ) : null}
+                    </div>
                   </Link>
                 </li>
               )
@@ -111,7 +125,7 @@ export default async function ProjectsPage({ params }: PageProps) {
             tag={t('emptyTag')}
             title={t('emptyTitle')}
             body={t('emptyBody')}
-            action={<NewProjectButton variant="primary" />}
+            action={<NewProjectButton userId={user.id} variant="primary" />}
           />
         )}
       </PageContainer>
