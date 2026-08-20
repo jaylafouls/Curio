@@ -556,6 +556,15 @@
     "noteLabel": "Pourquoi enregistrez-vous ceci ?",
     "notePlaceholder": "Ajoutez une note privée pour vous…",
     "notePrivate": "Vous seul pouvez voir cette note.",
+    "noteQuickLabel": "Raisons rapides",
+    "noteQuick": {
+      "buyLater": "Acheter plus tard",
+      "inspiration": "Inspiration",
+      "toShare": "À partager",
+      "forTrip": "Pour un voyage",
+      "gift": "Cadeau",
+      "compare": "Comparer"
+    },
     "searchPlaceholder": "Rechercher dans vos collections",
     "searchResults": "Résultats",
     "recentCollections": "Collections récentes",

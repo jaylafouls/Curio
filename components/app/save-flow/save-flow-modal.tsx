@@ -59,6 +59,17 @@ import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
 
 const IMAGE_BUCKET = 'user-images'
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+const NOTE_MAX = 500 // user_links.note cap (data model §9); mirrors the textarea maxLength
+
+/** The canned "why are you saving this" chips (i18n keys under SaveFlow.noteQuick). */
+const NOTE_QUICK_KEYS = [
+  'buyLater',
+  'inspiration',
+  'toShare',
+  'forTrip',
+  'gift',
+  'compare',
+] as const
 
 type Step = 'url' | 'customize' | 'saveTo' | 'done'
 
@@ -298,6 +309,20 @@ export function SaveFlowModal({
     } finally {
       setUploading(false)
     }
+  }
+
+  // ── Note quick-reasons ──────────────────────────────────────────────────────
+  // Append a canned reason to the free-text note (space-joined), skipping it when
+  // that exact phrase is already present. The textarea stays fully editable.
+  function appendNoteReason(phrase: string) {
+    setNote((prev) => {
+      const current = prev.trim()
+      if (!current) return phrase
+      // Word-boundary-ish contains check so re-tapping a chip is a no-op.
+      if (current.toLowerCase().includes(phrase.toLowerCase())) return current
+      const joined = `${current} ${phrase}`
+      return joined.length > NOTE_MAX ? joined.slice(0, NOTE_MAX) : joined
+    })
   }
 
   // ── Tags ──────────────────────────────────────────────────────────────────
@@ -735,6 +760,26 @@ export function SaveFlowModal({
             >
               {t('noteLabel')}
             </label>
+            {/* Quick reasons — tap to append a canned phrase; free text stays. */}
+            <div
+              role="group"
+              aria-label={t('noteQuickLabel')}
+              className="flex flex-wrap gap-xs"
+            >
+              {NOTE_QUICK_KEYS.map((key) => {
+                const phrase = t(`noteQuick.${key}`)
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => appendNoteReason(phrase)}
+                    className="rounded-full border border-border px-md py-xs font-sans text-meta text-text-dark/70 transition-colors duration-fast hover:border-violet hover:text-text-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+                  >
+                    {phrase}
+                  </button>
+                )
+              })}
+            </div>
             <textarea
               id="save-note"
               value={note}

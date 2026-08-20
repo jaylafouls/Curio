@@ -556,6 +556,15 @@
     "noteLabel": "Why are you saving this?",
     "notePlaceholder": "Add a private note for yourself…",
     "notePrivate": "Only you can see this note.",
+    "noteQuickLabel": "Quick reasons",
+    "noteQuick": {
+      "buyLater": "Buy later",
+      "inspiration": "Inspiration",
+      "toShare": "To share",
+      "forTrip": "For a trip",
+      "gift": "Gift",
+      "compare": "Compare"
+    },
     "searchPlaceholder": "Search your collections",
     "searchResults": "Results",
     "recentCollections": "Recent collections",
