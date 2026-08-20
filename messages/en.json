@@ -523,8 +523,6 @@
     "panelTitle": "Add to Curio",
     "actionSaveLink": "Save link",
     "actionSaveLinkHint": "Add a link from anywhere",
-    "actionAddImage": "Add a custom image",
-    "actionAddImageHint": "Capture and save inspiration",
     "actionCreateCollection": "Create collection",
     "actionCreateCollectionHint": "Organize your ideas",
     "titleUrl": "Save a link",

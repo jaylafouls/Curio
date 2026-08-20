@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Plus, Link2, ImagePlus, FolderPlus, X } from 'lucide-react'
+import { Plus, Link2, FolderPlus, X } from 'lucide-react'
 import { cn } from '@/lib/ui/cn'
 import { useRouter } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import type { SaveTargetCollection } from '@/lib/links/data'
 import type { LinkSubcategory } from '@/lib/links/subcategories'
 import { CollectionModal } from '@/components/app/collection-modal'
-import { SaveFlowModal, type SaveFlowInitialAction } from './save-flow-modal'
+import { SaveFlowModal } from './save-flow-modal'
 
 /**
  * SaveFlowProvider — the Save Flow entry point on every authenticated page
@@ -17,12 +17,11 @@ import { SaveFlowModal, type SaveFlowInitialAction } from './save-flow-modal'
  * is open; the actual work lives in two already-built modals.
  *
  * Tap the trigger → the "Add to Curio" PANEL opens first (§2.1/§3.1, Parcours UX
- * "Panel s'ouvre"), a short menu of the three actions:
+ * "Panel s'ouvre"), a short menu of the two actions:
  *  - Save link         → the Save Flow wizard (paste URL → OG fetch → customize
- *                        → save to).
- *  - Add a custom image → the SAME wizard, opened with initialAction='image' so
- *                        the custom-image picker leads instead of the auto OG
- *                        fetch.
+ *                        → save to). A custom image is still available in-flow at
+ *                        the Customize step; the redundant standalone entry point
+ *                        was removed (Decisions Log).
  *  - Create collection → the CollectionModal from chantier 10, opened DIRECTLY
  *                        (never through the link wizard); on success we route to
  *                        the new collection.
@@ -62,7 +61,6 @@ export function SaveFlowProvider({
   const router = useRouter()
 
   const [surface, setSurface] = useState<Surface>(null)
-  const [wizardAction, setWizardAction] = useState<SaveFlowInitialAction>('save')
 
   // Pick the wizard/panel layout from the viewport: sheet on mobile, center on
   // desktop. lg = 1024px (Tailwind default), the same breakpoint the sidebar /
@@ -86,7 +84,7 @@ export function SaveFlowProvider({
     return () => document.removeEventListener('keydown', onKey)
   }, [surface])
 
-  // Open the Save Flow from anywhere in the connected shell via a window event,
+// Open the Save Flow from anywhere in the connected shell via a window event,
   // e.g. the empty-collection "Add a first link" CTA (recette P3 #3). Decoupled
   // so a server-rendered surface can trigger the client wizard without prop
   // drilling through the tree. `detail.action` picks which surface opens
@@ -100,14 +98,8 @@ export function SaveFlowProvider({
     window.addEventListener('curio:save-flow', onOpen)
     return () => window.removeEventListener('curio:save-flow', onOpen)
   }, [])
-
-  function openWizard(action: SaveFlowInitialAction) {
-    setWizardAction(action)
-    setSurface('wizard')
-  }
-
   const actions: {
-    key: SaveFlowInitialAction | 'collection'
+    key: 'save' | 'collection'
     icon: typeof Link2
     title: string
     subtitle: string
@@ -118,14 +110,7 @@ export function SaveFlowProvider({
       icon: Link2,
       title: t('actionSaveLink'),
       subtitle: t('actionSaveLinkHint'),
-      onClick: () => openWizard('save'),
-    },
-    {
-      key: 'image',
-      icon: ImagePlus,
-      title: t('actionAddImage'),
-      subtitle: t('actionAddImageHint'),
-      onClick: () => openWizard('image'),
+      onClick: () => setSurface('wizard'),
     },
     {
       key: 'collection',
@@ -252,7 +237,7 @@ export function SaveFlowProvider({
         </div>
       ) : null}
 
-      {/* Save link / Add a custom image → the wizard. */}
+      {/* Save link → the wizard. */}
       <SaveFlowModal
         open={surface === 'wizard'}
         onClose={() => setSurface(null)}
@@ -260,7 +245,6 @@ export function SaveFlowProvider({
         userId={userId}
         targets={targets}
         subcategoriesByTopic={subcategoriesByTopic}
-        initialAction={wizardAction}
       />
 
       {/* Create collection → the chantier-10 modal, opened directly. */}

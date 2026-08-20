@@ -41,12 +41,12 @@ import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
  * responsive by the `variant` prop the provider passes (center on desktop,
  * bottom sheet on mobile). Four steps:
  *
- *   1. URL      — paste the URL (or start from "Add a custom image" / "Create
- *                 collection", the two other panel actions). On Next, resolveLink
- *                 canonicalizes: a dedup hit shows the "X people saved this"
- *                 signal and reuses the frozen metadata; a miss OG-fetches.
+ *   1. URL      — paste the URL. On Next, resolveLink canonicalizes: a dedup hit
+ *                 shows the "X people saved this" signal and reuses the frozen
+ *                 metadata; a miss OG-fetches.
  *   2. Customize — title (100), description (300), free tags, private note (500,
- *                 "Why are you saving this?"), and the custom image.
+ *                 "Why are you saving this?"), and an optional custom image
+ *                 (uploaded in-flow, replacing the OG image for this user).
  *   3. Save to   — search + recent collections + optional section + "+ Create new
  *                 collection" + "Save to Unsorted". Writes user_links.
  *   4. Saved!    — "Saved to [name]" + "View in collection" / "Continue exploring".
@@ -73,17 +73,6 @@ const NOTE_QUICK_KEYS = [
 
 type Step = 'url' | 'customize' | 'saveTo' | 'done'
 
-/**
- * How the flow was opened from the "Add to Curio" panel (§2.1/§3.1):
- *  - 'save'  → the plain link save (default): paste URL, OG-fetch prefills.
- *  - 'image' → "Add a custom image": same wizard, but on reaching Customize the
- *              file picker opens automatically so the user leads with their own
- *              image rather than the auto OG fetch.
- * ("Create collection" never opens this modal — the provider opens the
- * CollectionModal directly.)
- */
-export type SaveFlowInitialAction = 'save' | 'image'
-
 export type SaveFlowModalProps = {
   open: boolean
   onClose: () => void
@@ -93,8 +82,6 @@ export type SaveFlowModalProps = {
   targets: SaveTargetCollection[]
   /** Sub-categories grouped by Topic id (Decisions Log §18); Travel/Food only. */
   subcategoriesByTopic: Record<string, LinkSubcategory[]>
-  /** Which panel action opened the flow (default: save a link). */
-  initialAction?: SaveFlowInitialAction
 }
 
 function isBadgeTopic(id: string): id is BadgeTopic {
@@ -108,7 +95,6 @@ export function SaveFlowModal({
   userId,
   targets,
   subcategoriesByTopic,
-  initialAction = 'save',
 }: SaveFlowModalProps) {
   const t = useTranslations('SaveFlow')
   const router = useRouter()
@@ -203,17 +189,6 @@ export function SaveFlowModal({
     }
   }, [open, reset])
 
-  // "Add a custom image" (§2.1/§3.1): once the link resolves and we land on the
-  // Customize step, open the file picker automatically so the user leads with
-  // their own image instead of the auto OG fetch. Fires once per resolve.
-  const autoPickImage = useRef(false)
-  useEffect(() => {
-    if (open && step === 'customize' && autoPickImage.current) {
-      autoPickImage.current = false
-      fileRef.current?.click()
-    }
-  }, [open, step])
-
   function handleClose() {
     onClose()
   }
@@ -273,9 +248,6 @@ export function SaveFlowModal({
         if (domainTopic) setTopicId(domainTopic)
       }
 
-      // Lead with the custom-image picker when the flow was opened via
-      // "Add a custom image"; the effect fires it on entering Customize.
-      autoPickImage.current = initialAction === 'image'
       setStep('customize')
     })
   }
