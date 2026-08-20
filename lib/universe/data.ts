@@ -209,3 +209,148 @@ export async function getMyUniverse(): Promise<MyUniverse> {
     },
   }
 }
+
+/**
+ * A single actionable nudge for the My Universe sidebar (point 5), chosen from
+ * data ALREADY tracked today — no dependency on click/view analytics (Decisions
+ * Log §11 pt 13, which does not exist yet). Priority order surfaces the most
+ * useful first step: get a first project, then file unsorted links. `kind: 'none'`
+ * means the universe is in good shape and the card renders a neutral recap
+ * instead of a chore.
+ *
+ * A `coverless_collections` nudge was considered but dropped: there is no
+ * grouped cover-editing screen that would actually resolve it (covers are set
+ * per-collection in each collection's edit flow), so the CTA had no honest
+ * destination. Reopenable if such a screen ever lands.
+ */
+export type UniverseNudge =
+  | { kind: 'first_project' }
+  | { kind: 'unsorted_links'; count: number }
+  | { kind: 'none' }
+
+/**
+ * Richer "universe at a glance" figures (point 6), all from tracked columns:
+ * the project/collection mix, how the collections split standalone vs filed in
+ * a project, the most-used Topic, and the age span of the oldest collection.
+ * No click/view metrics.
+ */
+export type UniverseInsights = {
+  stats: {
+    projects: number
+    collections: number
+    /** Standalone collections (project_id NULL) — hang directly off You. */
+    standaloneCollections: number
+    /** Collections filed inside a project. */
+    filedCollections: number
+    /** The user's most-used Topic across their collections, if any. */
+    topTopic: BadgeTopic | null
+    /** ISO date of the oldest collection's creation, for an "active since" line. */
+    oldestCreatedAt: string | null
+  }
+  nudge: UniverseNudge
+}
+
+type InsightProjectRow = { id: string }
+type InsightCollectionRow = {
+  topic_id: string
+  project_id: string | null
+  created_at: string
+}
+
+/**
+ * Compute the sidebar's richer stats + the one actionable nudge in a single
+ * authenticated pass. Returns a zeroed/`none` shape when unauthenticated or on
+ * error, so the sidebar degrades to a neutral state rather than a broken card.
+ */
+export async function getUniverseInsights(): Promise<UniverseInsights> {
+  const empty: UniverseInsights = {
+    stats: {
+      projects: 0,
+      collections: 0,
+      standaloneCollections: 0,
+      filedCollections: 0,
+      topTopic: null,
+      oldestCreatedAt: null,
+    },
+    nudge: { kind: 'none' },
+  }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return empty
+
+  const [projectsRes, collectionsRes, unsortedRes] = await Promise.all([
+    supabase.from('projects').select('id').eq('owner_id', user.id),
+    supabase
+      .from('collections')
+      .select('topic_id, project_id, created_at')
+      .eq('owner_id', user.id),
+    // Unsorted = saved links not yet placed in any collection (collection_id
+    // NULL, data model §9). A pure count, head-only, no rows fetched.
+    supabase
+      .from('user_links')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .is('collection_id', null),
+  ])
+
+  if (projectsRes.error || collectionsRes.error) {
+    console.error('universe insights: failed to load', {
+      projects: projectsRes.error?.message,
+      collections: collectionsRes.error?.message,
+    })
+    return empty
+  }
+
+  const projects = (projectsRes.data ?? []) as InsightProjectRow[]
+  const collections = (collectionsRes.data ?? []) as InsightCollectionRow[]
+  const unsortedLinks = unsortedRes.count ?? 0
+
+  let standalone = 0
+  let filed = 0
+  let oldest: string | null = null
+  const topicTally = new Map<BadgeTopic, number>()
+
+  for (const c of collections) {
+    if (c.project_id) filed += 1
+    else standalone += 1
+
+    if (!oldest || c.created_at < oldest) oldest = c.created_at
+
+    if (isBadgeTopic(c.topic_id)) {
+      topicTally.set(c.topic_id, (topicTally.get(c.topic_id) ?? 0) + 1)
+    }
+  }
+
+  let topTopic: BadgeTopic | null = null
+  let topCount = 0
+  for (const [topic, n] of topicTally) {
+    if (n > topCount) {
+      topCount = n
+      topTopic = topic
+    }
+  }
+
+  // Nudge priority: a first project unlocks organisation; then file loose
+  // links. All from tracked data.
+  let nudge: UniverseNudge = { kind: 'none' }
+  if (projects.length === 0) {
+    nudge = { kind: 'first_project' }
+  } else if (unsortedLinks > 0) {
+    nudge = { kind: 'unsorted_links', count: unsortedLinks }
+  }
+
+  return {
+    stats: {
+      projects: projects.length,
+      collections: collections.length,
+      standaloneCollections: standalone,
+      filedCollections: filed,
+      topTopic,
+      oldestCreatedAt: oldest,
+    },
+    nudge,
+  }
+}
