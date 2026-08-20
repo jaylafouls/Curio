@@ -375,7 +375,12 @@
     "emptyTag": "Rien pour l'instant",
     "emptyTitle": "Votre univers ne demande qu'à prendre forme",
     "emptyBody": "Créez un projet ou une collection : il apparaîtra ici, en orbite autour de vous.",
-    "emptyCta": "Créer un projet"
+    "emptyCta": "Créer un projet",
+    "legendProject": "Projet",
+    "legendCollection": "Collection",
+    "legendCountProject": "nombre = collections à l'intérieur",
+    "legendCountCollection": "nombre = liens enregistrés",
+    "legendCaption": "La position des points est décorative — elle n'a pas de signification."
   },
   "Saved": {
     "metaTitle": "Enregistrés",

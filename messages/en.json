@@ -375,7 +375,12 @@
     "emptyTag": "Nothing yet",
     "emptyTitle": "Your universe is waiting to take shape",
     "emptyBody": "Create a project or a collection and it will appear here, orbiting around you.",
-    "emptyCta": "Start a project"
+    "emptyCta": "Start a project",
+    "legendProject": "Project",
+    "legendCollection": "Collection",
+    "legendCountProject": "number = collections inside",
+    "legendCountCollection": "number = saved links",
+    "legendCaption": "Node placement is decorative — position carries no meaning."
   },
   "Saved": {
     "metaTitle": "Saved",

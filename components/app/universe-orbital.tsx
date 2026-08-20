@@ -87,11 +87,12 @@ export function UniverseOrbital({
   const t = useTranslations('MyUniverse')
 
   return (
-    <div
-      className="relative mx-auto aspect-square w-full max-w-[22rem] sm:max-w-[30rem]"
-      role="group"
-      aria-label={t('figureLabel')}
-    >
+    <div className="flex flex-col items-center gap-lg">
+      <div
+        className="relative mx-auto aspect-square w-full max-w-[22rem] sm:max-w-[30rem]"
+        role="group"
+        aria-label={t('figureLabel')}
+      >
       {/* Decorative orbit rings + spokes to each node. aria-hidden: the nodes
           below carry the real, announced content. */}
       <svg
@@ -156,6 +157,40 @@ export function UniverseOrbital({
           </div>
         )
       })}
+      </div>
+
+      {/* Legend — decodes the figure (point 3): the two node KINDS with their
+          real shape/icon, what the count chip means for each, and a caption
+          stating position is decorative so nobody hunts for meaning in it. */}
+      <div className="flex flex-col items-center gap-sm">
+        <ul className="flex flex-wrap items-center justify-center gap-x-lg gap-y-xs">
+          <li className="flex items-center gap-xs font-sans text-meta text-foreground/70">
+            <span
+              className="flex size-5 items-center justify-center rounded-[0.3rem] bg-violet-soft text-foreground"
+              aria-hidden
+            >
+              <FolderOpen className="size-3" strokeWidth={2} />
+            </span>
+            <span>
+              {t('legendProject')} · {t('legendCountProject')}
+            </span>
+          </li>
+          <li className="flex items-center gap-xs font-sans text-meta text-foreground/70">
+            <span
+              className="flex size-5 items-center justify-center rounded-full bg-violet text-archive"
+              aria-hidden
+            >
+              <Sparkles className="size-3" strokeWidth={2} />
+            </span>
+            <span>
+              {t('legendCollection')} · {t('legendCountCollection')}
+            </span>
+          </li>
+        </ul>
+        <p className="text-center font-sans text-meta text-foreground/50">
+          {t('legendCaption')}
+        </p>
+      </div>
     </div>
   )
 }
@@ -203,7 +238,12 @@ function UniverseNodeLink({
     >
       <span
         className={cn(
-          'relative flex size-11 items-center justify-center rounded-full text-archive shadow-sm sm:size-12',
+          'relative flex size-11 items-center justify-center text-archive shadow-sm sm:size-12',
+          // Project vs Collection read as different KINDS at a glance, not just
+          // different icons (point 3): a project is a rounded-square container,
+          // a collection is a circle. Two same-named nodes ("Test 2" project +
+          // "Test 2" collection) are now distinguishable without the legend.
+          isProject ? 'rounded-lg' : 'rounded-full',
           // Cosmic: the near-black drop shadow is invisible on #0D0E15, so use
           // the documented violet glow (§5) instead — flat in Archive, glowing
           // in Cosmic, with a stronger glow on hover.
