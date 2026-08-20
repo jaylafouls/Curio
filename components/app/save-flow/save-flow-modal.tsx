@@ -121,6 +121,7 @@ export function SaveFlowModal({
   const [tags, setTags] = useState<string[]>([])
   const [newTag, setNewTag] = useState('')
   const [image, setImage] = useState<string | null>(null)
+  const [favicon, setFavicon] = useState<string | null>(null)
   const [customImage, setCustomImage] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
 
@@ -165,6 +166,7 @@ export function SaveFlowModal({
     setTags([])
     setNewTag('')
     setImage(null)
+    setFavicon(null)
     setCustomImage(null)
     setQuery('')
     setCollectionId(null)
@@ -221,6 +223,7 @@ export function SaveFlowModal({
       setCanonicalTitle(res.title)
       setDescription(res.description ?? '')
       setImage(res.image)
+      setFavicon(res.favicon)
 
       // Prefill the categorisation from the most-recent filing of the same
       // canonical link by ANY user (§18 cross-user inheritance). Best-effort: a
@@ -501,9 +504,23 @@ export function SaveFlowModal({
               <p className="truncate font-sans text-body-small font-medium text-text-dark">
                 {title || canonicalTitle || url}
               </p>
-              <p className="truncate font-sans text-meta text-text-dark/50">
-                {url}
-              </p>
+              <span className="flex min-w-0 items-center gap-xs">
+                {favicon ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={favicon}
+                    alt=""
+                    className="size-3.5 shrink-0 rounded-[2px] object-contain"
+                    // A broken favicon should just disappear, never show an alt box.
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                ) : null}
+                <span className="truncate font-sans text-meta text-text-dark/50">
+                  {url}
+                </span>
+              </span>
               {existing && savesCount > 0 ? (
                 <span className="mt-2xs inline-flex items-center gap-xs font-sans text-meta text-violet">
                   <Users className="size-3" aria-hidden />

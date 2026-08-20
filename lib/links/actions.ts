@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeUrl } from './normalize'
-import { fetchOgMetadata } from './og'
+import { fetchOgMetadata, type OgMetadata } from './og'
 import {
   getInheritedCategory,
   type InheritedCategory,
@@ -101,10 +101,59 @@ export type ResolveLinkResult = {
   title: string
   description: string | null
   image: string | null
+  /** Canonical favicon URL, or null when none was found. */
+  favicon: string | null
   /** True when this canonical Link already existed (dedup hit). */
   existing: boolean
   /** How many users have saved this canonical Link (the "X people saved" signal). */
   savesCount: number
+}
+
+/**
+ * A readable last-resort title from a normalized URL when the OG fetch found no
+ * real title (403, timeout, JS-only shell, non-HTML). "https://example.com/a/b?x"
+ * → "example.com/a/b" — the host + decoded path, far more legible than the full
+ * normalized URL. Truncated to the title cap. Rows built from this are flagged
+ * `title_is_fallback` so a later save can re-fetch and upgrade them.
+ */
+function readableFallbackTitle(normalized: string): string {
+  let readable = normalized
+  try {
+    const u = new URL(normalized)
+    const path = decodeURIComponent(u.pathname).replace(/\/+$/, '')
+    readable = `${u.host}${path}${u.search}`
+  } catch {
+    // Keep the normalized string as-is if it somehow doesn't parse.
+  }
+  return readable.slice(0, TITLE_MAX)
+}
+
+/**
+ * Turn a best-effort OG fetch into the canonical fields to persist. When the OG
+ * title is missing we fall back to a readable URL title AND flag the row degraded
+ * (titleIsFallback) so resolveLink can re-fetch it on a later save. A real OG
+ * title clears the flag.
+ */
+function canonicalFieldsFromOg(
+  og: OgMetadata,
+  normalized: string,
+): {
+  title: string
+  description: string | null
+  image: string | null
+  favicon: string | null
+  titleIsFallback: boolean
+} {
+  const ogTitle = clip(og.title, TITLE_MAX)
+  const titleIsFallback = ogTitle === null
+  const title = ogTitle ?? readableFallbackTitle(normalized)
+  const description = clip(og.description, DESC_MAX)
+  // Only trust an http(s) image URL from the fetch (parseOg already absolutised
+  // it); a data: or junk value is dropped.
+  const image = og.image && /^https?:\/\//i.test(og.image) ? og.image : null
+  const favicon =
+    og.favicon && /^https?:\/\//i.test(og.favicon) ? og.favicon : null
+  return { title, description, image, favicon, titleIsFallback }
 }
 
 /**
@@ -129,10 +178,13 @@ export async function resolveLink(
   // is already service-role, so either admin client works identically here.
   const admin = createAdminClient()
 
+  const CANONICAL_SELECT =
+    'id, title, description, image_url, favicon_url, saves_count, title_is_fallback'
+
   // 1. Dedup lookup by the unique canonicalization key.
   const { data: found, error: findErr } = await admin
     .from('links')
-    .select('id, title, description, image_url, saves_count')
+    .select(CANONICAL_SELECT)
     .eq('url_normalized', normalized)
     .maybeSingle()
 
@@ -142,36 +194,35 @@ export async function resolveLink(
   }
 
   if (found) {
-    return {
-      ok: true,
-      linkId: found.id,
-      title: found.title,
-      description: found.description ?? null,
-      image: found.image_url ?? null,
-      existing: true,
-      savesCount: found.saves_count ?? 0,
+    const row = found as unknown as CanonicalLinkRow
+    // Scoped conditional re-fetch: the canonical title is normally frozen (never
+    // re-fetched), but when it is only the URL fallback (title_is_fallback) a
+    // later save gets one chance to fetch a real title and upgrade the row in
+    // place — the fix for "the title stays the URL forever" when the FIRST save
+    // degraded. Healthy rows (flag false) are never re-fetched.
+    if (row.title_is_fallback) {
+      const upgraded = await tryUpgradeDegradedLink(admin, row, normalized)
+      return { ok: true, ...canonicalResult(upgraded, true) }
     }
+    return { ok: true, ...canonicalResult(row, true) }
   }
 
   // 2. New canonical Link: best-effort OG fetch, then insert.
   const og = await fetchOgMetadata(normalized)
-  const title = clip(og.title, TITLE_MAX) ?? normalized.slice(0, TITLE_MAX)
-  const description = clip(og.description, DESC_MAX)
-  // Only trust an http(s) image URL from the fetch (parseOg already absolutised
-  // it); a data: or junk value is dropped.
-  const image =
-    og.image && /^https?:\/\//i.test(og.image) ? og.image : null
+  const fields = canonicalFieldsFromOg(og, normalized)
 
   const { data: inserted, error: insErr } = await admin
     .from('links')
     .insert({
       url_normalized: normalized,
       url_first_origin: rawUrl.trim().slice(0, 2048),
-      title,
-      description,
-      image_url: image,
+      title: fields.title,
+      description: fields.description,
+      image_url: fields.image,
+      favicon_url: fields.favicon,
+      title_is_fallback: fields.titleIsFallback,
     })
-    .select('id, title, description, image_url, saves_count')
+    .select(CANONICAL_SELECT)
     .single()
 
   if (insErr || !inserted) {
@@ -180,19 +231,11 @@ export async function resolveLink(
     // user still gets a canonical Link rather than an error.
     const { data: race } = await admin
       .from('links')
-      .select('id, title, description, image_url, saves_count')
+      .select(CANONICAL_SELECT)
       .eq('url_normalized', normalized)
       .maybeSingle()
     if (race) {
-      return {
-        ok: true,
-        linkId: race.id,
-        title: race.title,
-        description: race.description ?? null,
-        image: race.image_url ?? null,
-        existing: true,
-        savesCount: race.saves_count ?? 0,
-      }
+      return { ok: true, ...canonicalResult(race as unknown as CanonicalLinkRow, true) }
     }
     console.error('resolveLink: insert failed', { message: insErr?.message })
     return { ok: false, error: 'server' }
@@ -200,13 +243,85 @@ export async function resolveLink(
 
   return {
     ok: true,
-    linkId: inserted.id,
-    title: inserted.title,
-    description: inserted.description ?? null,
-    image: inserted.image_url ?? null,
-    existing: false,
-    savesCount: inserted.saves_count ?? 0,
+    ...canonicalResult(inserted as unknown as CanonicalLinkRow, false),
   }
+}
+
+/** The canonical `links` columns resolveLink reads/returns. */
+type CanonicalLinkRow = {
+  id: string
+  title: string
+  description: string | null
+  image_url: string | null
+  favicon_url: string | null
+  saves_count: number | null
+  title_is_fallback: boolean
+}
+
+/** Shape a canonical row into the ResolveLinkResult payload. */
+function canonicalResult(
+  row: CanonicalLinkRow,
+  existing: boolean,
+): Omit<ResolveLinkResult, never> {
+  return {
+    linkId: row.id,
+    title: row.title,
+    description: row.description ?? null,
+    image: row.image_url ?? null,
+    favicon: row.favicon_url ?? null,
+    existing,
+    savesCount: row.saves_count ?? 0,
+  }
+}
+
+/**
+ * One re-fetch attempt for a canonical Link whose title is still the URL
+ * fallback. If the OG fetch now yields a real title, upgrade the row in place
+ * (title + description + image + favicon, clearing the flag) and return the
+ * upgraded row; otherwise return the row unchanged (still flagged, so the next
+ * save can try again). Never throws — a failed upgrade just leaves the row as-is.
+ */
+async function tryUpgradeDegradedLink(
+  admin: ReturnType<typeof createAdminClient>,
+  row: CanonicalLinkRow,
+  normalized: string,
+): Promise<CanonicalLinkRow> {
+  const og = await fetchOgMetadata(normalized)
+  const fields = canonicalFieldsFromOg(og, normalized)
+  // Still no real title — nothing to upgrade, keep the row flagged.
+  if (fields.titleIsFallback) return row
+
+  const { data: updated, error: updErr } = await admin
+    .from('links')
+    .update({
+      title: fields.title,
+      description: fields.description ?? row.description,
+      image_url: fields.image ?? row.image_url,
+      favicon_url: fields.favicon ?? row.favicon_url,
+      title_is_fallback: false,
+    })
+    .eq('id', row.id)
+    // Only upgrade a row that is still flagged, so a concurrent upgrade doesn't
+    // clobber a freshly-written real title.
+    .eq('title_is_fallback', true)
+    .select(
+      'id, title, description, image_url, favicon_url, saves_count, title_is_fallback',
+    )
+    .maybeSingle()
+
+  if (updErr || !updated) {
+    // Update lost a race or errored — return what we have (the freshly fetched
+    // title is still the best value to surface for this save).
+    return {
+      ...row,
+      title: fields.title,
+      description: fields.description ?? row.description,
+      image_url: fields.image ?? row.image_url,
+      favicon_url: fields.favicon ?? row.favicon_url,
+      title_is_fallback: false,
+    }
+  }
+  return updated as unknown as CanonicalLinkRow
 }
 
 // ── saveLink — write `user_links` (caller's session, RLS) ───────────────────

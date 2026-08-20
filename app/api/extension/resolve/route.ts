@@ -12,7 +12,7 @@ import {
  * prefix (middleware excludes /api from the next-intl rewrite).
  *
  * Body: { url: string }
- * 200:  { ok: true, linkId, title, description, image, existing, savesCount }
+ * 200:  { ok: true, linkId, title, description, image, favicon, existing, savesCount }
  * 400:  { ok: false, error: 'invalid_url' | 'invalid' }
  * 401:  { ok: false, error: 'unauthorized' }
  * 500:  { ok: false, error: 'server' }
