@@ -552,6 +552,7 @@
     "tagsPlaceholder": "Add a tag",
     "tagAdd": "Add",
     "tagRemove": "Remove {name}",
+    "suggestedTags": "Suggested tags",
     "noteLabel": "Why are you saving this?",
     "notePlaceholder": "Add a private note for yourself…",
     "notePrivate": "Only you can see this note.",
