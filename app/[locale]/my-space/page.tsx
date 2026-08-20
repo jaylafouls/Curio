@@ -97,6 +97,22 @@ export default async function MySpacePage({ params }: PageProps) {
       >
         {/* Main column. */}
         <div className="flex min-w-0 flex-col gap-xl">
+          {/* Profile identity — the real header of My Universe (point 1): avatar,
+              name, bio, location and active Topics sit at the very top of the
+              page, above the constellation, not buried beneath it. */}
+          <ProfileIdentity
+            displayName={user.displayName}
+            username={user.username}
+            avatarUrl={user.avatarUrl}
+            bio={user.bio}
+            location={user.location}
+            websiteUrl={user.websiteUrl}
+            joinedLabel={joinedLabel}
+            planBadge={plan.badge}
+            planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
+            topics={topics}
+          />
+
           {/* My Universe — the real interactive orbital view (§7.5). Hero of the
               page: You at the centre with your Projects and standalone
               Collections in orbit, each a real navigable node. Empty universe
@@ -133,19 +149,6 @@ export default async function MySpacePage({ params }: PageProps) {
               />
             )}
           </section>
-
-          <ProfileIdentity
-            displayName={user.displayName}
-            username={user.username}
-            avatarUrl={user.avatarUrl}
-            bio={user.bio}
-            location={user.location}
-            websiteUrl={user.websiteUrl}
-            joinedLabel={joinedLabel}
-            planBadge={plan.badge}
-            planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
-            topics={topics}
-          />
 
           {/* Your latest collections. */}
           <section className="flex flex-col gap-lg">
