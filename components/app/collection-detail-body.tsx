@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import Image from 'next/image'
 import { ExternalLink } from 'lucide-react'
 import { Avatar, Badge } from '@/components/ui'
+import { Link } from '@/lib/i18n/navigation'
 import { EmptyState } from '@/components/public/empty-state'
 import { TopicScene } from '@/components/brand/topic-scene'
 import { cn } from '@/lib/ui/cn'
@@ -212,7 +213,14 @@ export function CollectionDetailBody({
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-x-sm gap-y-xs">
-          <div className="flex items-center gap-sm">
+          {/* The owner is a real link to their public profile (recette P1-3): the
+              most public collection surface is the natural entry point to the
+              curator behind it — and, once there, to Follow / their other work.
+              A plain <Link> keeps the server-rendered ISR body cookie-free. */}
+          <Link
+            href={`/profile/${collection.owner.username}`}
+            className="flex items-center gap-sm rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+          >
             <Avatar
               src={collection.owner.avatar ?? undefined}
               name={collection.owner.name}
@@ -221,7 +229,7 @@ export function CollectionDetailBody({
             <span className="font-sans text-body-small text-foreground/70">
               {labels.by}
             </span>
-          </div>
+          </Link>
           <span className="text-foreground/25" aria-hidden>
             ·
           </span>
