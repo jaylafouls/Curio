@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Pencil } from 'lucide-react'
 import { buildMetadata } from '@/lib/seo/metadata'
 import { Avatar, Badge, ButtonLink, PageContainer } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
@@ -63,6 +63,7 @@ export default async function MySpacePage({ params }: PageProps) {
 
   const t = await getTranslations({ locale, namespace: 'MySpace' })
   const tPlan = await getTranslations({ locale, namespace: 'PlanBadge' })
+  const tProfile = await getTranslations({ locale, namespace: 'Profile' })
   const tUniverse = await getTranslations({ locale, namespace: 'MyUniverse' })
 
   const [topics, collections, curators, stats, plan, universe, insights] =
@@ -154,6 +155,16 @@ export default async function MySpacePage({ params }: PageProps) {
             planBadge={plan.badge}
             planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
             topics={topics}
+            actions={
+              <ButtonLink
+                href="/settings"
+                variant="secondary"
+                size="small"
+                iconLeft={<Pencil className="size-4" />}
+              >
+                {tProfile('editProfile')}
+              </ButtonLink>
+            }
           />
 
           {/* My Universe — the real interactive orbital view (§7.5). Hero of the

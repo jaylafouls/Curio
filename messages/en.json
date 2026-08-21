@@ -446,7 +446,12 @@
     "publicCollections": "Public collections",
     "collectionsEmptyTag": "Nothing public yet",
     "collectionsEmptyTitle": "No public collections",
-    "collectionsEmptyBody": "This curator hasn't made any collections public yet."
+    "collectionsEmptyBody": "This curator hasn't made any collections public yet.",
+    "follow": "Follow",
+    "followSignIn": "Sign in to follow",
+    "followError": "Couldn’t update — try again.",
+    "editProfile": "Edit profile",
+    "followingState": "Following"
   },
   "CollectionModal": {
     "createTitle": "New collection",
@@ -640,7 +645,6 @@
     "metaDescription": "Manage your Curio account, profile, language and privacy.",
     "title": "Settings",
     "subtitle": "Manage your account, profile and preferences.",
-
     "profileHeading": "Profile",
     "profileHint": "This information appears on your public profile.",
     "avatarLabel": "Profile photo",
@@ -661,26 +665,22 @@
     "profileSave": "Save changes",
     "profileSaving": "Saving…",
     "profileSaved": "Profile saved.",
-
     "languageHeading": "Language",
     "languageHint": "Choose the language for the Curio interface.",
     "languageEnglish": "English",
     "languageFrench": "Français",
     "languageSaving": "Switching…",
-
     "privacyHeading": "Privacy",
     "privacyHint": "Curio never sets non-essential cookies without your consent.",
     "privacyPreferenceCenter": "Cookie preferences",
     "privacyPreferenceCenterBody": "Review or change your cookie and analytics choices at any time.",
     "privacyOpenPreferences": "Manage preferences",
-
     "connectedHeading": "Connected apps",
     "connectedHint": "The sign-in methods linked to your account.",
     "connectedProviderEmail": "Email & password",
     "connectedProviderGoogle": "Google",
     "connectedSince": "Connected {date}",
     "connectedEmpty": "No connected sign-in methods.",
-
     "extensionHeading": "Chrome extension",
     "extensionHint": "Save links to Curio straight from your browser. Generate a token, then paste it into the Curio extension to connect it to your account.",
     "extensionLabelLabel": "Token name (optional)",
@@ -697,7 +697,6 @@
     "extensionLastUsed": "Last used {date}",
     "extensionNeverUsed": "Created {date} · not used yet",
     "extensionRevoke": "Revoke",
-
     "notificationsHeading": "Notifications",
     "billingHeading": "Billing & plan",
     "themeHeading": "Theme",
@@ -709,7 +708,6 @@
     "comingSoon": "Coming soon",
     "notificationsComingSoon": "Notification preferences will arrive in a future update.",
     "billingComingSoon": "Plans and billing will arrive in a future update.",
-
     "dangerHeading": "Delete account",
     "dangerHint": "Permanently delete your account and all your data. This cannot be undone.",
     "deleteCta": "Delete my account",
@@ -720,7 +718,6 @@
     "deleteConfirmCta": "Delete permanently",
     "deleteDeleting": "Deleting…",
     "deleteCancel": "Cancel",
-
     "errorInvalid": "Please check the highlighted fields.",
     "errorUsernameTaken": "That username is already taken.",
     "errorServer": "Something went wrong. Please try again.",

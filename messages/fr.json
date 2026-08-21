@@ -446,7 +446,12 @@
     "publicCollections": "Collections publiques",
     "collectionsEmptyTag": "Rien de public pour l'instant",
     "collectionsEmptyTitle": "Aucune collection publique",
-    "collectionsEmptyBody": "Ce curateur n'a encore rendu aucune collection publique."
+    "collectionsEmptyBody": "Ce curateur n'a encore rendu aucune collection publique.",
+    "follow": "Suivre",
+    "followSignIn": "Se connecter pour suivre",
+    "followError": "Échec — réessayez.",
+    "editProfile": "Modifier le profil",
+    "followingState": "Suivi"
   },
   "CollectionModal": {
     "createTitle": "Nouvelle collection",
@@ -640,7 +645,6 @@
     "metaDescription": "Gérez votre compte Curio, votre profil, la langue et la confidentialité.",
     "title": "Paramètres",
     "subtitle": "Gérez votre compte, votre profil et vos préférences.",
-
     "profileHeading": "Profil",
     "profileHint": "Ces informations apparaissent sur votre profil public.",
     "avatarLabel": "Photo de profil",
@@ -661,26 +665,22 @@
     "profileSave": "Enregistrer",
     "profileSaving": "Enregistrement…",
     "profileSaved": "Profil enregistré.",
-
     "languageHeading": "Langue",
     "languageHint": "Choisissez la langue de l’interface Curio.",
     "languageEnglish": "English",
     "languageFrench": "Français",
     "languageSaving": "Changement…",
-
     "privacyHeading": "Confidentialité",
     "privacyHint": "Curio ne dépose jamais de cookie non essentiel sans votre consentement.",
     "privacyPreferenceCenter": "Préférences de cookies",
     "privacyPreferenceCenterBody": "Consultez ou modifiez vos choix de cookies et de mesure d’audience à tout moment.",
     "privacyOpenPreferences": "Gérer mes préférences",
-
     "connectedHeading": "Applications connectées",
     "connectedHint": "Les méthodes de connexion liées à votre compte.",
     "connectedProviderEmail": "E-mail et mot de passe",
     "connectedProviderGoogle": "Google",
     "connectedSince": "Connecté le {date}",
     "connectedEmpty": "Aucune méthode de connexion liée.",
-
     "extensionHeading": "Extension Chrome",
     "extensionHint": "Enregistrez des liens dans Curio directement depuis votre navigateur. Générez un jeton, puis collez-le dans l'extension Curio pour la relier à votre compte.",
     "extensionLabelLabel": "Nom du jeton (facultatif)",
@@ -697,7 +697,6 @@
     "extensionLastUsed": "Dernière utilisation le {date}",
     "extensionNeverUsed": "Créé le {date} · pas encore utilisé",
     "extensionRevoke": "Révoquer",
-
     "notificationsHeading": "Notifications",
     "billingHeading": "Facturation et forfait",
     "themeHeading": "Thème",
@@ -709,7 +708,6 @@
     "comingSoon": "Bientôt disponible",
     "notificationsComingSoon": "Les préférences de notification arriveront dans une prochaine mise à jour.",
     "billingComingSoon": "Les forfaits et la facturation arriveront dans une prochaine mise à jour.",
-
     "dangerHeading": "Supprimer le compte",
     "dangerHint": "Supprime définitivement votre compte et toutes vos données. Cette action est irréversible.",
     "deleteCta": "Supprimer mon compte",
@@ -720,7 +718,6 @@
     "deleteConfirmCta": "Supprimer définitivement",
     "deleteDeleting": "Suppression…",
     "deleteCancel": "Annuler",
-
     "errorInvalid": "Veuillez vérifier les champs en surbrillance.",
     "errorUsernameTaken": "Ce nom d’utilisateur est déjà pris.",
     "errorServer": "Une erreur s’est produite. Veuillez réessayer.",

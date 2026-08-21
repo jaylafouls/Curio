@@ -7,6 +7,7 @@ import { PageContainer } from '@/components/ui'
 import { PublicShell } from '@/components/public/public-shell'
 import { PublicConnectedShell } from '@/components/app/public-connected-shell'
 import { ProfileIdentity } from '@/components/app/profile-identity'
+import { CuratorFollowButton } from '@/components/app/curator-follow-button'
 import { CollectionGrid } from '@/components/app/collection-grid'
 import { StatList } from '@/components/app/stat-list'
 import { EmptyState } from '@/components/public/empty-state'
@@ -101,6 +102,7 @@ export default async function ProfilePage({ params }: PageProps) {
           joinedLabel={joinedLabel}
           planBadge={plan.badge}
           planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
+          actions={<CuratorFollowButton curatorId={profile.id} />}
         />
         <StatList
           layout="inline"
