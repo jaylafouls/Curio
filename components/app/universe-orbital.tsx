@@ -93,70 +93,70 @@ export function UniverseOrbital({
         role="group"
         aria-label={t('figureLabel')}
       >
-      {/* Decorative orbit rings + spokes to each node. aria-hidden: the nodes
-          below carry the real, announced content. */}
-      <svg
-        aria-hidden
-        viewBox="0 0 100 100"
-        className="absolute inset-0 size-full"
-      >
-        <circle
-          cx="50"
-          cy="50"
-          r={RING_RADIUS_PCT}
-          fill="none"
-          className="stroke-border"
-          strokeWidth="0.3"
-        />
-        <circle
-          cx="50"
-          cy="50"
-          r={RING_RADIUS_PCT * 0.55}
-          fill="none"
-          className="stroke-violet/20"
-          strokeWidth="0.3"
-        />
+        {/* Decorative orbit rings + spokes to each node. aria-hidden: the nodes
+            below carry the real, announced content. */}
+        <svg
+          aria-hidden
+          viewBox="0 0 100 100"
+          className="absolute inset-0 size-full"
+        >
+          <circle
+            cx="50"
+            cy="50"
+            r={RING_RADIUS_PCT}
+            fill="none"
+            className="stroke-border"
+            strokeWidth="0.3"
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r={RING_RADIUS_PCT * 0.55}
+            fill="none"
+            className="stroke-violet/20"
+            strokeWidth="0.3"
+          />
+          {nodes.map((node, i) => {
+            const { x, y } = nodePosition(i, nodes.length)
+            return (
+              <line
+                key={node.id}
+                x1="50"
+                y1="50"
+                x2={x}
+                y2={y}
+                className="stroke-border/60"
+                strokeWidth="0.2"
+              />
+            )
+          })}
+        </svg>
+
+        {/* Centre — "You". Decorative label; the surrounding group is labelled. */}
+        <div className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
+          <span className="flex size-14 items-center justify-center rounded-full bg-violet font-serif text-h3 text-archive shadow-glow-violet sm:size-16">
+            {centerLabel}
+          </span>
+        </div>
+
+        {/* Orbiting nodes — each a real navigable link. */}
         {nodes.map((node, i) => {
           const { x, y } = nodePosition(i, nodes.length)
           return (
-            <line
+            <div
               key={node.id}
-              x1="50"
-              y1="50"
-              x2={x}
-              y2={y}
-              className="stroke-border/60"
-              strokeWidth="0.2"
-            />
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{
+                left: `${x}%`,
+                top: `${y}%`,
+                // Stagger the entrance so the constellation resolves outward.
+                animationDelay: `${i * 60}ms`,
+              }}
+            >
+              <UniverseNodeLink node={node} tooltip={t} />
+            </div>
           )
         })}
-      </svg>
-
-      {/* Centre — "You". Decorative label; the surrounding group is labelled. */}
-      <div className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-        <span className="flex size-14 items-center justify-center rounded-full bg-violet font-serif text-h3 text-archive shadow-glow-violet sm:size-16">
-          {centerLabel}
-        </span>
-      </div>
-
-      {/* Orbiting nodes — each a real navigable link. */}
-      {nodes.map((node, i) => {
-        const { x, y } = nodePosition(i, nodes.length)
-        return (
-          <div
-            key={node.id}
-            className="absolute -translate-x-1/2 -translate-y-1/2"
-            style={{
-              left: `${x}%`,
-              top: `${y}%`,
-              // Stagger the entrance so the constellation resolves outward.
-              animationDelay: `${i * 60}ms`,
-            }}
-          >
-            <UniverseNodeLink node={node} tooltip={t} />
-          </div>
-        )
-      })}
       </div>
 
       {/* Legend — decodes the figure (point 3): the two node KINDS with their

@@ -97,7 +97,7 @@ export async function createProject(
   return { ok: true, id: data.id }
 }
 
-/** Edit a project's name and/or colour (the only editable fields). */
+/** Edit a project's name, colour, and/or cover image. */
 export async function updateProject(
   id: string,
   patch: { name?: string; color?: string; coverUrl?: string | null },
