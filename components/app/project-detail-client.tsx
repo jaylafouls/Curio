@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { Pencil, Trash2, X } from 'lucide-react'
@@ -21,6 +22,30 @@ import {
 } from '@/lib/projects/colors'
 import type { ProjectDetail, AttachableCollection } from '@/lib/projects/data'
 import type { Locale } from '@/lib/i18n/routing'
+
+/**
+ * A localized "time ago" string (e.g. "3 days ago" / "il y a 3 jours") from an
+ * ISO timestamp, via Intl.RelativeTimeFormat — no dependency, locale-correct.
+ * Picks the largest sensible unit; "just now" for anything under a minute.
+ */
+function relativeTime(iso: string, locale: Locale): string {
+  const then = new Date(iso).getTime()
+  const diffSec = Math.round((then - Date.now()) / 1000) // negative = past
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+  const abs = Math.abs(diffSec)
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+    ['year', 31_536_000],
+    ['month', 2_592_000],
+    ['week', 604_800],
+    ['day', 86_400],
+    ['hour', 3_600],
+    ['minute', 60],
+  ]
+  for (const [unit, secs] of units) {
+    if (abs >= secs) return rtf.format(Math.round(diffSec / secs), unit)
+  }
+  return rtf.format(0, 'second') // "now" / "maintenant"
+}
 
 /**
  * ProjectDetailClient — the interactive owner view of /projects/[id]. The server
@@ -85,6 +110,19 @@ export function ProjectDetailClient({
         ← {t('back')}
       </Link>
 
+      {project.coverImageUrl ? (
+        <div className="relative mb-xl aspect-[3/1] w-full overflow-hidden rounded-lg bg-foreground/5">
+          <Image
+            src={project.coverImageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 100vw, 64rem"
+            priority
+            className="object-cover"
+          />
+        </div>
+      ) : null}
+
       <header className="mb-2xl flex flex-wrap items-start justify-between gap-md">
         <div className="flex items-start gap-md">
           <span
@@ -98,6 +136,10 @@ export function ProjectDetailClient({
               {t('collectionsCount', { count: project.collections.length })}
               {' · '}
               {t('linksCount', { count: project.totalLinks })}
+              {' · '}
+              {t('lastModified', {
+                when: relativeTime(project.updatedAt, locale),
+              })}
             </p>
             {project.description ? (
               <p className="mt-xs max-w-2xl font-sans text-body-small text-foreground/70">
@@ -190,11 +232,17 @@ export function ProjectDetailClient({
       <ProjectModal
         open={editOpen}
         onClose={() => setEditOpen(false)}
+        userId={userId}
         onSaved={() => {
           setEditOpen(false)
           refresh()
         }}
-        project={{ id: project.id, name: project.name, color: project.color }}
+        project={{
+          id: project.id,
+          name: project.name,
+          color: project.color,
+          cover: project.coverImageUrl,
+        }}
       />
     </div>
   )

@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import { buildMetadata } from '@/lib/seo/metadata'
-import { AccentText, Avatar, ButtonLink, PageContainer } from '@/components/ui'
+import { Avatar, Badge, ButtonLink, PageContainer } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { AppShell } from '@/components/app/app-shell'
@@ -12,6 +12,8 @@ import { ProfileIdentity } from '@/components/app/profile-identity'
 import { CollectionGrid } from '@/components/app/collection-grid'
 import { StatList } from '@/components/app/stat-list'
 import { UniverseOrbital } from '@/components/app/universe-orbital'
+import { UniverseList } from '@/components/app/universe-list'
+import { UniverseNudgeCard } from '@/components/app/universe-nudge'
 import { EmptyState } from '@/components/public/empty-state'
 import {
   getCurrentUser,
@@ -20,7 +22,7 @@ import {
   getFollowedCurators,
   getMySpaceStats,
 } from '@/lib/app/data'
-import { getMyUniverse } from '@/lib/universe/data'
+import { getMyUniverse, getUniverseInsights } from '@/lib/universe/data'
 import { getUserPlan } from '@/lib/plans/data'
 
 /**
@@ -63,7 +65,7 @@ export default async function MySpacePage({ params }: PageProps) {
   const tPlan = await getTranslations({ locale, namespace: 'PlanBadge' })
   const tUniverse = await getTranslations({ locale, namespace: 'MyUniverse' })
 
-  const [topics, collections, curators, stats, plan, universe] =
+  const [topics, collections, curators, stats, plan, universe, insights] =
     await Promise.all([
       getUserTopics(user.id, locale),
       getMyCollections(user.id, 6),
@@ -71,6 +73,7 @@ export default async function MySpacePage({ params }: PageProps) {
       getMySpaceStats(user.id),
       getUserPlan(user.id),
       getMyUniverse(),
+      getUniverseInsights(),
     ])
 
   const joinedLabel = t('joined', {
@@ -79,6 +82,46 @@ export default async function MySpacePage({ params }: PageProps) {
       { month: 'long', year: 'numeric' },
     ),
   })
+
+  // "Active since" year, from the oldest collection's creation (point 6). Falls
+  // back to the account's join year so the neutral nudge always has a year.
+  const activeSinceYear = new Date(
+    insights.stats.oldestCreatedAt ?? user.createdAt,
+  ).getFullYear()
+
+  // Resolve the most-used Topic's label from the user's active Topic set (which
+  // already carries locale-resolved labels). The top topic is drawn from the
+  // same onboarding set in practice; if it somehow isn't, fall back to the id.
+  const topTopicId = insights.stats.topTopic
+  const topTopicLabel = topTopicId
+    ? (topics.find((topic) => topic.id === topTopicId)?.label ?? topTopicId)
+    : null
+
+  // Resolve the single nudge card's copy + destination from its kind (point 5).
+  // Coverless-collection nudge intentionally omitted — no grouped cover-editing
+  // screen exists to resolve it, so it would have no honest CTA target.
+  const nudge = insights.nudge
+  const nudgeCard =
+    nudge.kind === 'first_project'
+      ? {
+          title: t('nudgeFirstProjectTitle'),
+          body: t('nudgeFirstProjectBody'),
+          ctaLabel: t('nudgeFirstProjectCta'),
+          href: '/projects',
+        }
+      : nudge.kind === 'unsorted_links'
+        ? {
+            title: t('nudgeUnsortedTitle', { count: nudge.count }),
+            body: t('nudgeUnsortedBody'),
+            ctaLabel: t('nudgeUnsortedCta'),
+            href: '/saved',
+          }
+        : {
+            title: t('nudgeNoneTitle'),
+            body: t('nudgeNoneBody', { year: activeSinceYear }),
+            ctaLabel: t('nudgeNoneCta'),
+            href: '/explore',
+          }
 
   return (
     <AppShell
@@ -97,6 +140,22 @@ export default async function MySpacePage({ params }: PageProps) {
       >
         {/* Main column. */}
         <div className="flex min-w-0 flex-col gap-xl">
+          {/* Profile identity — the real header of My Universe (point 1): avatar,
+              name, bio, location and active Topics sit at the very top of the
+              page, above the constellation, not buried beneath it. */}
+          <ProfileIdentity
+            displayName={user.displayName}
+            username={user.username}
+            avatarUrl={user.avatarUrl}
+            bio={user.bio}
+            location={user.location}
+            websiteUrl={user.websiteUrl}
+            joinedLabel={joinedLabel}
+            planBadge={plan.badge}
+            planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
+            topics={topics}
+          />
+
           {/* My Universe — the real interactive orbital view (§7.5). Hero of the
               page: You at the centre with your Projects and standalone
               Collections in orbit, each a real navigable node. Empty universe
@@ -111,12 +170,18 @@ export default async function MySpacePage({ params }: PageProps) {
               </p>
             </div>
             {universe.nodes.length > 0 ? (
-              <div className="rounded-lg border border-border bg-foreground/[0.02] px-lg py-xl">
-                <UniverseOrbital
-                  nodes={universe.nodes}
-                  centerLabel={tUniverse('you')}
-                />
-              </div>
+              <>
+                {/* Orbit = fixed decorative hero (top-8 most recent). It never
+                    has to scale; the companion list below is the real
+                    navigation to ALL projects and collections (points 4 & 7). */}
+                <div className="rounded-lg border border-border bg-foreground/[0.02] px-lg py-xl">
+                  <UniverseOrbital
+                    nodes={universe.hero}
+                    centerLabel={tUniverse('you')}
+                  />
+                </div>
+                <UniverseList nodes={universe.nodes} locale={locale} />
+              </>
             ) : (
               <EmptyState
                 tag={tUniverse('emptyTag')}
@@ -133,19 +198,6 @@ export default async function MySpacePage({ params }: PageProps) {
               />
             )}
           </section>
-
-          <ProfileIdentity
-            displayName={user.displayName}
-            username={user.username}
-            avatarUrl={user.avatarUrl}
-            bio={user.bio}
-            location={user.location}
-            websiteUrl={user.websiteUrl}
-            joinedLabel={joinedLabel}
-            planBadge={plan.badge}
-            planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
-            topics={topics}
-          />
 
           {/* Your latest collections. */}
           <section className="flex flex-col gap-lg">
@@ -221,6 +273,7 @@ export default async function MySpacePage({ params }: PageProps) {
             </h2>
             <StatList
               stats={[
+                { label: t('statProjects'), value: insights.stats.projects },
                 { label: t('statSavedLinks'), value: stats.savedLinks },
                 { label: t('statCollections'), value: stats.collections },
                 {
@@ -229,27 +282,45 @@ export default async function MySpacePage({ params }: PageProps) {
                 },
               ]}
             />
+
+            {/* Qualitative "at a glance" extras (point 6) — kept out of StatList
+                (which is number-only): the collections split sub-line, the
+                most-used Topic, and an "active since" line. Each renders only
+                when it has real data. */}
+            {insights.stats.collections > 0 ? (
+              <p className="mt-md font-sans text-meta text-foreground/50">
+                {t('statCollectionsSplit', {
+                  standalone: insights.stats.standaloneCollections,
+                  filed: insights.stats.filedCollections,
+                })}
+              </p>
+            ) : null}
+
+            {topTopicId && topTopicLabel ? (
+              <div className="mt-md flex items-center justify-between gap-sm">
+                <span className="font-sans text-body-small text-foreground/60">
+                  {t('statTopTopic')}
+                </span>
+                <Badge topic={topTopicId}>{topTopicLabel}</Badge>
+              </div>
+            ) : null}
+
+            {insights.stats.oldestCreatedAt ? (
+              <p className="mt-md font-sans text-meta text-foreground/50">
+                {t('statActiveSince', { year: activeSinceYear })}
+              </p>
+            ) : null}
           </section>
 
-          {/* "Your universe is unique" editorial banner (§7.5). */}
-          <section className="flex flex-col items-center gap-sm rounded-lg border border-border bg-violet-soft/10 p-lg text-center">
-            <AccentText
-              before={t('uniqueBefore')}
-              accent={t('uniqueAccent')}
-              size="h3"
-              as="h2"
-            />
-            <p className="font-sans text-body-small text-foreground/70">
-              {t('uniqueBody')}
-            </p>
-            <Link
-              href="/explore"
-              className="mt-xs inline-flex items-center gap-xs font-sans text-body-small text-violet transition-colors hover:opacity-80"
-            >
-              {t('uniqueCta')}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
-          </section>
+          {/* Next-action nudge (point 5) — replaces the old "your universe is
+              unique" banner with one actionable card drawn from tracked data,
+              or a neutral recap when nothing needs doing. */}
+          <UniverseNudgeCard
+            title={nudgeCard.title}
+            body={nudgeCard.body}
+            ctaLabel={nudgeCard.ctaLabel}
+            href={nudgeCard.href}
+          />
         </aside>
       </PageContainer>
     </AppShell>

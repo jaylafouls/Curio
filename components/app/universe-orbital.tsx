@@ -87,75 +87,110 @@ export function UniverseOrbital({
   const t = useTranslations('MyUniverse')
 
   return (
-    <div
-      className="relative mx-auto aspect-square w-full max-w-[22rem] sm:max-w-[30rem]"
-      role="group"
-      aria-label={t('figureLabel')}
-    >
-      {/* Decorative orbit rings + spokes to each node. aria-hidden: the nodes
-          below carry the real, announced content. */}
-      <svg
-        aria-hidden
-        viewBox="0 0 100 100"
-        className="absolute inset-0 size-full"
+    <div className="flex flex-col items-center gap-lg">
+      <div
+        className="relative mx-auto aspect-square w-full max-w-[22rem] sm:max-w-[30rem]"
+        role="group"
+        aria-label={t('figureLabel')}
       >
-        <circle
-          cx="50"
-          cy="50"
-          r={RING_RADIUS_PCT}
-          fill="none"
-          className="stroke-border"
-          strokeWidth="0.3"
-        />
-        <circle
-          cx="50"
-          cy="50"
-          r={RING_RADIUS_PCT * 0.55}
-          fill="none"
-          className="stroke-violet/20"
-          strokeWidth="0.3"
-        />
+        {/* Decorative orbit rings + spokes to each node. aria-hidden: the nodes
+            below carry the real, announced content. */}
+        <svg
+          aria-hidden
+          viewBox="0 0 100 100"
+          className="absolute inset-0 size-full"
+        >
+          <circle
+            cx="50"
+            cy="50"
+            r={RING_RADIUS_PCT}
+            fill="none"
+            className="stroke-border"
+            strokeWidth="0.3"
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r={RING_RADIUS_PCT * 0.55}
+            fill="none"
+            className="stroke-violet/20"
+            strokeWidth="0.3"
+          />
+          {nodes.map((node, i) => {
+            const { x, y } = nodePosition(i, nodes.length)
+            return (
+              <line
+                key={node.id}
+                x1="50"
+                y1="50"
+                x2={x}
+                y2={y}
+                className="stroke-border/60"
+                strokeWidth="0.2"
+              />
+            )
+          })}
+        </svg>
+
+        {/* Centre — "You". Decorative label; the surrounding group is labelled. */}
+        <div className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
+          <span className="flex size-14 items-center justify-center rounded-full bg-violet font-serif text-h3 text-archive shadow-glow-violet sm:size-16">
+            {centerLabel}
+          </span>
+        </div>
+
+        {/* Orbiting nodes — each a real navigable link. */}
         {nodes.map((node, i) => {
           const { x, y } = nodePosition(i, nodes.length)
           return (
-            <line
+            <div
               key={node.id}
-              x1="50"
-              y1="50"
-              x2={x}
-              y2={y}
-              className="stroke-border/60"
-              strokeWidth="0.2"
-            />
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{
+                left: `${x}%`,
+                top: `${y}%`,
+                // Stagger the entrance so the constellation resolves outward.
+                animationDelay: `${i * 60}ms`,
+              }}
+            >
+              <UniverseNodeLink node={node} tooltip={t} />
+            </div>
           )
         })}
-      </svg>
-
-      {/* Centre — "You". Decorative label; the surrounding group is labelled. */}
-      <div className="absolute left-1/2 top-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-        <span className="flex size-14 items-center justify-center rounded-full bg-violet font-serif text-h3 text-archive shadow-glow-violet sm:size-16">
-          {centerLabel}
-        </span>
       </div>
 
-      {/* Orbiting nodes — each a real navigable link. */}
-      {nodes.map((node, i) => {
-        const { x, y } = nodePosition(i, nodes.length)
-        return (
-          <div
-            key={node.id}
-            className="absolute -translate-x-1/2 -translate-y-1/2"
-            style={{
-              left: `${x}%`,
-              top: `${y}%`,
-              // Stagger the entrance so the constellation resolves outward.
-              animationDelay: `${i * 60}ms`,
-            }}
-          >
-            <UniverseNodeLink node={node} tooltip={t} />
-          </div>
-        )
-      })}
+      {/* Legend — decodes the figure (point 3): the two node KINDS with their
+          real shape/icon, what the count chip means for each, and a caption
+          stating position is decorative so nobody hunts for meaning in it. */}
+      <div className="flex flex-col items-center gap-sm">
+        <ul className="flex flex-wrap items-center justify-center gap-x-lg gap-y-xs">
+          <li className="flex items-center gap-xs font-sans text-meta text-foreground/70">
+            <span
+              className="flex size-5 items-center justify-center rounded-[0.3rem] bg-violet-soft text-foreground"
+              aria-hidden
+            >
+              <FolderOpen className="size-3" strokeWidth={2} />
+            </span>
+            <span>
+              {t('legendProject')} · {t('legendCountProject')}
+            </span>
+          </li>
+          <li className="flex items-center gap-xs font-sans text-meta text-foreground/70">
+            <span
+              className="flex size-5 items-center justify-center rounded-full bg-violet text-archive"
+              aria-hidden
+            >
+              <Sparkles className="size-3" strokeWidth={2} />
+            </span>
+            <span>
+              {t('legendCollection')} · {t('legendCountCollection')}
+            </span>
+          </li>
+        </ul>
+        <p className="text-center font-sans text-meta text-foreground/50">
+          {t('legendCaption')}
+        </p>
+      </div>
     </div>
   )
 }
@@ -203,7 +238,12 @@ function UniverseNodeLink({
     >
       <span
         className={cn(
-          'relative flex size-11 items-center justify-center rounded-full text-archive shadow-sm sm:size-12',
+          'relative flex size-11 items-center justify-center text-archive shadow-sm sm:size-12',
+          // Project vs Collection read as different KINDS at a glance, not just
+          // different icons (point 3): a project is a rounded-square container,
+          // a collection is a circle. Two same-named nodes ("Test 2" project +
+          // "Test 2" collection) are now distinguishable without the legend.
+          isProject ? 'rounded-lg' : 'rounded-full',
           // Cosmic: the near-black drop shadow is invisible on #0D0E15, so use
           // the documented violet glow (§5) instead — flat in Archive, glowing
           // in Cosmic, with a stronger glow on hover.

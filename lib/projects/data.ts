@@ -20,10 +20,14 @@ export type ProjectDetail = {
   name: string
   description: string | null
   color: string | null
+  /** Custom cover image URL (project-covers bucket), or null → colour pastille. */
+  coverImageUrl: string | null
   /** Collections inside this project (public + private — this is the owner view). */
   collections: AppCollection[]
   /** Total links across the project's collections (sum of links_count). */
   totalLinks: number
+  /** Last-modified timestamp (projects.updated_at, ISO string) for the "last modified" line. */
+  updatedAt: string
 }
 
 type CollectionRow = {
@@ -77,7 +81,7 @@ export async function getOwnerProjectById(
 
   const { data: project, error } = await supabase
     .from('projects')
-    .select('id, name, description, color')
+    .select('id, name, description, color, cover_image_url, updated_at')
     .eq('id', projectId)
     .eq('owner_id', user.id)
     .maybeSingle()
@@ -110,6 +114,9 @@ export async function getOwnerProjectById(
     name: project.name,
     description: project.description,
     color: project.color,
+    coverImageUrl: (project as { cover_image_url: string | null })
+      .cover_image_url,
+    updatedAt: (project as { updated_at: string }).updated_at,
     collections: mapped,
     totalLinks: mapped.reduce((sum, c) => sum + c.linksCount, 0),
   }

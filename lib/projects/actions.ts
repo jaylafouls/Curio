@@ -45,10 +45,28 @@ function cleanColor(input: unknown): ProjectColor | null {
     : null
 }
 
-/** Create a project (name + colour). Returns the new id for navigation. */
+/**
+ * Only allow a cover URL that points at our own public Storage bucket
+ * (project-covers), never an arbitrary external URL — an external URL would be
+ * an open image-embed vector and would not match next.config's remotePatterns.
+ * `undefined` = field absent (leave unchanged); `''`/`null` = clear the cover.
+ * Mirrors cleanCoverUrl in lib/collections/actions.ts (0010 pattern).
+ */
+function cleanCoverUrl(input: unknown): string | null | undefined {
+  if (input === undefined) return undefined
+  if (input === null || input === '') return null
+  if (typeof input !== 'string') return undefined
+  if (!input.includes('/storage/v1/object/public/project-covers/')) {
+    return undefined
+  }
+  return input
+}
+
+/** Create a project (name + colour, optional cover). Returns the new id. */
 export async function createProject(
   name: string,
   color: string,
+  coverUrl?: string | null,
 ): Promise<Result<{ id: string }>> {
   const userId = await getUserId()
   if (!userId) return { ok: false, error: 'unauthenticated' }
@@ -56,11 +74,17 @@ export async function createProject(
   const cleanedName = cleanName(name)
   const cleanedColor = cleanColor(color)
   if (!cleanedName || !cleanedColor) return { ok: false, error: 'invalid' }
+  const cleanedCover = cleanCoverUrl(coverUrl) ?? null
 
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('projects')
-    .insert({ owner_id: userId, name: cleanedName, color: cleanedColor })
+    .insert({
+      owner_id: userId,
+      name: cleanedName,
+      color: cleanedColor,
+      cover_image_url: cleanedCover,
+    })
     .select('id')
     .single()
 
@@ -73,10 +97,10 @@ export async function createProject(
   return { ok: true, id: data.id }
 }
 
-/** Edit a project's name and/or colour (the only editable fields). */
+/** Edit a project's name, colour, and/or cover image. */
 export async function updateProject(
   id: string,
-  patch: { name?: string; color?: string },
+  patch: { name?: string; color?: string; coverUrl?: string | null },
 ): Promise<Result> {
   const userId = await getUserId()
   if (!userId) return { ok: false, error: 'unauthenticated' }
@@ -92,6 +116,11 @@ export async function updateProject(
     const c = cleanColor(patch.color)
     if (!c) return { ok: false, error: 'invalid' }
     update.color = c
+  }
+  if (patch.coverUrl !== undefined) {
+    // cleanCoverUrl returns undefined for a rejected non-bucket URL; treat that
+    // as "clear" rather than silently ignoring, so a bad value can't persist.
+    update.cover_image_url = cleanCoverUrl(patch.coverUrl) ?? null
   }
   if (Object.keys(update).length === 0) return { ok: true }
 

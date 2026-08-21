@@ -15,8 +15,11 @@ import { ProjectModal } from './project-modal'
  * while the header uses a compact secondary button.
  */
 export function NewProjectButton({
+  userId,
   variant = 'secondary',
 }: {
+  /** The signed-in user's id — the Storage path prefix for cover uploads. */
+  userId: string
   variant?: 'primary' | 'secondary'
 }) {
   const t = useTranslations('ProjectDetail')
@@ -36,6 +39,7 @@ export function NewProjectButton({
       <ProjectModal
         open={open}
         onClose={() => setOpen(false)}
+        userId={userId}
         onSaved={(id) => {
           setOpen(false)
           router.push(`/projects/${id}`)
