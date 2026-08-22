@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: '%s · Curio',
   },
   description:
-    'Curio is a curation social network. Save, organise and share the links worth keeping.',
+    'Curio is a curation social network. Save, organize and share the links worth keeping.',
 }
 
 /**

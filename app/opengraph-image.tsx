@@ -20,6 +20,6 @@ export const contentType = OG_CONTENT_TYPE
 export default function OpengraphImage() {
   return renderOgImage({
     title: 'The internet worth keeping',
-    subtitle: 'Save, organise and share the links worth keeping.',
+    subtitle: 'Save, organize and share the links worth keeping.',
   })
 }
