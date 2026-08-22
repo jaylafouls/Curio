@@ -259,38 +259,10 @@ export async function getMyCollections(
   )
 }
 
-/**
- * A visited profile's PUBLIC collections only (§8.10 — private collections and
- * projects are never exposed). RLS enforces this too, but the explicit
- * is_public filter documents intent and keeps the query correct even when the
- * viewer is the owner (who would otherwise see private rows).
- */
-export async function getPublicCollectionsByOwner(
-  ownerId: string,
-  limit = 24,
-): Promise<AppCollection[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('collections')
-    .select(COLLECTION_SELECT)
-    .eq('owner_id', ownerId)
-    .eq('is_public', true)
-    .order('updated_at', { ascending: false })
-    .limit(limit)
-
-  if (error) {
-    console.error('app: failed to load profile collections', {
-      message: error.message,
-    })
-    return []
-  }
-
-  return withMosaics(
-    ((data ?? []) as unknown as CollectionRow[])
-      .filter((row) => isBadgeTopic(row.topic_id))
-      .map(mapCollection),
-  )
-}
+// A visited profile's PUBLIC collections are read cookie-free via the anon
+// client — see getPublicProfileCollections (lib/public/data.ts). Reading them
+// here through the authenticated client would turn the ISR /profile/[username]
+// page dynamic per session (the recette regression). Kept out on purpose.
 
 // ── Projects (/projects index) ──────────────────────────────────────────────
 
@@ -779,93 +751,8 @@ export type PublicProfileStats = {
   following: number
 }
 
-/**
- * A public profile by username (§8.10) — resolved through the anon-readable
- * users policy, so it works for logged-out visitors and crawlers alike. Returns
- * null when no such username exists (the page then 404s). Only public profile
- * fields are selected (no email — that lives in auth.users).
- */
-export async function getProfileByUsername(
-  username: string,
-): Promise<PublicProfile | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('users')
-    .select(
-      'id, username, display_name, avatar_url, bio, location, website_url, ' +
-        'is_founding_curator, created_at',
-    )
-    .eq('username', username)
-    .maybeSingle()
-
-  if (error) {
-    console.error('app: failed to load profile', { message: error.message })
-    return null
-  }
-  if (!data) return null
-
-  // Runtime-concatenated select string defeats row-shape inference — name it.
-  const row = data as unknown as {
-    id: string
-    username: string
-    display_name: string
-    avatar_url: string | null
-    bio: string | null
-    location: string | null
-    website_url: string | null
-    is_founding_curator: boolean
-    created_at: string
-  }
-
-  return {
-    id: row.id,
-    username: row.username,
-    displayName: row.display_name,
-    avatarUrl: row.avatar_url,
-    bio: row.bio,
-    location: row.location,
-    websiteUrl: row.website_url,
-    isFoundingCurator: row.is_founding_curator,
-    createdAt: row.created_at,
-  }
-}
-
-/**
- * Public profile counters (§8.10): public collections, followers, following.
- * followers/following read the public follows graph; collections counts only
- * is_public rows (private collections are never surfaced on a public profile).
- */
-export async function getProfileStats(
-  userId: string,
-): Promise<PublicProfileStats> {
-  const supabase = await createClient()
-  const [collections, followers, following] = await Promise.all([
-    supabase
-      .from('collections')
-      .select('id', { count: 'exact', head: true })
-      .eq('owner_id', userId)
-      .eq('is_public', true),
-    supabase
-      .from('follows')
-      .select('id', { count: 'exact', head: true })
-      .eq('followed_id', userId),
-    supabase
-      .from('follows')
-      .select('id', { count: 'exact', head: true })
-      .eq('follower_id', userId),
-  ])
-
-  for (const r of [collections, followers, following]) {
-    if (r.error) {
-      console.error('app: failed to load profile stats', {
-        message: r.error.message,
-      })
-    }
-  }
-
-  return {
-    collections: collections.count ?? 0,
-    followers: followers.count ?? 0,
-    following: following.count ?? 0,
-  }
-}
+// The /profile/[username] reads (profile, stats, public collections) live in
+// lib/public/data.ts and go through the ANON client, so that ISR page stays
+// cookie-free and cacheable — see getPublicProfileByUsername /
+// getPublicProfileStats / getPublicProfileCollections there. The PublicProfile /
+// PublicProfileStats types above are the shared shapes those functions return.

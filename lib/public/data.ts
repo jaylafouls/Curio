@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { BADGE_TOPICS, type BadgeTopic } from '@/components/ui'
 import { requireSupabaseEnv } from '@/lib/supabase/env'
 import { getPublicCollectionMosaics } from '@/lib/collections/data'
+import type { AppCollection, PublicProfile, PublicProfileStats } from '@/lib/app/data'
 import type { Locale } from '@/lib/i18n/routing'
 
 /**
@@ -293,4 +294,175 @@ export async function getGlobalStats(): Promise<GlobalStats> {
     collections: collections.count ?? 0,
     links: links.count ?? 0,
   }
+}
+
+// ── Public profile (/profile/[username]) ────────────────────────────────────
+
+/**
+ * The read side of /profile/[username], through the ANON client.
+ *
+ * These mirror getProfileByUsername / getProfileStats / getPublicCollectionsByOwner
+ * (lib/app/data.ts) but read cookie-free, exactly like getPublicCollectionBySlug
+ * does for the collection page. That is the whole point: /profile/[username] is a
+ * `revalidate`-cached public page whose connected chrome is layered client-side
+ * (PublicConnectedShell). If its server reads touched cookies() the route would
+ * turn dynamic per session and the client shell swap would desync — the recette
+ * regression where a signed-in visitor saw the anon header on ANOTHER curator's
+ * profile. Reading through the anon client keeps the server render byte-identical
+ * for everyone (crawlers, anon, signed-in), so the cache holds and the shell swap
+ * runs on a clean frame.
+ *
+ * RLS already scopes the anon client to exactly the public slice — users
+ * (users_select_public = true), is_public collections
+ * (collections_select_public_or_owner), and the world-readable follows graph — so
+ * the data is identical to the authenticated read for a PUBLIC profile, minus the
+ * private rows a viewer must never see here anyway.
+ */
+export async function getPublicProfileByUsername(
+  username: string,
+): Promise<PublicProfile | null> {
+  const supabase = anonClient()
+  const { data, error } = await supabase
+    .from('users')
+    .select(
+      'id, username, display_name, avatar_url, bio, location, website_url, ' +
+        'is_founding_curator, created_at',
+    )
+    .eq('username', username)
+    .maybeSingle()
+
+  if (error) {
+    console.error('public: failed to load profile', { message: error.message })
+    return null
+  }
+  if (!data) return null
+
+  const row = data as unknown as {
+    id: string
+    username: string
+    display_name: string
+    avatar_url: string | null
+    bio: string | null
+    location: string | null
+    website_url: string | null
+    is_founding_curator: boolean
+    created_at: string
+  }
+
+  return {
+    id: row.id,
+    username: row.username,
+    displayName: row.display_name,
+    avatarUrl: row.avatar_url,
+    bio: row.bio,
+    location: row.location,
+    websiteUrl: row.website_url,
+    isFoundingCurator: row.is_founding_curator,
+    createdAt: row.created_at,
+  }
+}
+
+/** Public profile counters (§8.10) — anon client, public rows only. */
+export async function getPublicProfileStats(
+  userId: string,
+): Promise<PublicProfileStats> {
+  const supabase = anonClient()
+  const [collections, followers, following] = await Promise.all([
+    supabase
+      .from('collections')
+      .select('id', { count: 'exact', head: true })
+      .eq('owner_id', userId)
+      .eq('is_public', true),
+    supabase
+      .from('follows')
+      .select('id', { count: 'exact', head: true })
+      .eq('followed_id', userId),
+    supabase
+      .from('follows')
+      .select('id', { count: 'exact', head: true })
+      .eq('follower_id', userId),
+  ])
+
+  for (const r of [collections, followers, following]) {
+    if (r.error) {
+      console.error('public: failed to load profile stats', {
+        message: r.error.message,
+      })
+    }
+  }
+
+  return {
+    collections: collections.count ?? 0,
+    followers: followers.count ?? 0,
+    following: following.count ?? 0,
+  }
+}
+
+/**
+ * A visited profile's PUBLIC collections (§8.10), anon client. is_public is
+ * filtered explicitly and enforced by RLS — private collections are never
+ * exposed on a public profile. Coverless cards get the same 2×2 mosaic tier as
+ * the rest of the app, batched over the anon client.
+ */
+export async function getPublicProfileCollections(
+  ownerId: string,
+  limit = 24,
+): Promise<AppCollection[]> {
+  const supabase = anonClient()
+  const { data, error } = await supabase
+    .from('collections')
+    .select(
+      'id, slug, name, cover_image_url, topic_id, is_public, links_count, ' +
+        'owner:users!collections_owner_id_fkey (display_name, avatar_url, username)',
+    )
+    .eq('owner_id', ownerId)
+    .eq('is_public', true)
+    .order('updated_at', { ascending: false })
+    .limit(limit)
+
+  if (error) {
+    console.error('public: failed to load profile collections', {
+      message: error.message,
+    })
+    return []
+  }
+
+  type Row = {
+    id: string
+    slug: string
+    name: string
+    cover_image_url: string | null
+    topic_id: string
+    is_public: boolean
+    links_count: number
+    owner:
+      | { display_name: string; avatar_url: string | null; username: string }
+      | { display_name: string; avatar_url: string | null; username: string }[]
+      | null
+  }
+
+  const collections: AppCollection[] = ((data ?? []) as unknown as Row[])
+    .filter((row) => isBadgeTopic(row.topic_id))
+    .map((row) => {
+      const owner = Array.isArray(row.owner) ? row.owner[0] : row.owner
+      return {
+        id: row.id,
+        slug: row.slug,
+        title: row.name,
+        topic: row.topic_id as BadgeTopic,
+        cover: row.cover_image_url,
+        isPublic: row.is_public,
+        linksCount: row.links_count ?? 0,
+        owner: {
+          name: owner?.display_name ?? '',
+          avatar: owner?.avatar_url ?? null,
+          username: owner?.username ?? '',
+        },
+      }
+    })
+
+  const coverlessIds = collections.filter((c) => !c.cover).map((c) => c.id)
+  if (coverlessIds.length === 0) return collections
+  const mosaics = await getPublicCollectionMosaics(coverlessIds)
+  return collections.map((c) => (c.cover ? c : { ...c, mosaic: mosaics[c.id] }))
 }
