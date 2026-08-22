@@ -13,12 +13,12 @@ import type { AppNotification } from '@/lib/notifications/data'
 /**
  * NotificationsClient — the /notifications feed with tabs (spec §8.13).
  *
- * Tabs: All · Comments · Follows · Likes · Mentions. Only All and Follows are
- * FUNCTIONAL and fed — Comments/Likes/Mentions are disabled "Coming soon"
- * affordances, because no comment/like/mention feature exists in the app to
- * source them (acted decision). They are rendered greyed and non-interactive
- * rather than as active tabs with a fake empty state, which would imply the
- * feature exists. All rows shipped this chantier are follow notifications.
+ * Tabs: All · Follows. These are the only two that are FUNCTIONAL and fed — the
+ * sole social action that emits a notification today is a follow (user follow →
+ * notify followed; collection follow → notify the collection owner). The
+ * Comments/Likes/Mentions placeholder tabs (recette P2-7) were removed rather
+ * than shipped as dead "Coming soon" affordances, since no comment/like/mention
+ * feature exists to source them. They return when those features are scoped.
  *
  * On mount, every unread notification is marked read (server action) so the bell
  * badge clears once the recipient has seen the list. The read state already
@@ -26,16 +26,9 @@ import type { AppNotification } from '@/lib/notifications/data'
  * is_read value at load, which is honest: they were unread when the page opened.
  */
 
-type TabValue = 'all' | 'comments' | 'follows' | 'likes' | 'mentions'
+type TabValue = 'all' | 'follows'
 
-const ENABLED_TABS: readonly TabValue[] = ['all', 'follows']
-const ALL_TABS: readonly TabValue[] = [
-  'all',
-  'comments',
-  'follows',
-  'likes',
-  'mentions',
-]
+const TABS: readonly TabValue[] = ['all', 'follows']
 
 export function NotificationsClient({
   notifications,
@@ -52,26 +45,21 @@ export function NotificationsClient({
     void markAllNotificationsRead()
   }, [])
 
-  const visible = useMemo(() => {
-    if (tab === 'follows' || tab === 'all') {
-      // Only 'follow' rows exist; both All and Follows show them.
-      return notifications.filter((n) => n.type === 'follow')
-    }
-    return []
-  }, [tab, notifications])
-
-  const isComingSoon = !ENABLED_TABS.includes(tab)
+  const visible = useMemo(
+    // Only 'follow' rows exist; both All and Follows show them.
+    () => notifications.filter((n) => n.type === 'follow'),
+    [notifications],
+  )
 
   return (
     <div className="flex flex-col gap-xl">
-      {/* Tab strip — enabled tabs are buttons; coming-soon tabs are disabled. */}
+      {/* Tab strip — All · Follows, both functional. */}
       <div
         role="tablist"
         aria-label={t('tablistLabel')}
         className="flex items-center gap-lg overflow-x-auto border-b border-border"
       >
-        {ALL_TABS.map((value) => {
-          const enabled = ENABLED_TABS.includes(value)
+        {TABS.map((value) => {
           const active = value === tab
           return (
             <button
@@ -79,37 +67,21 @@ export function NotificationsClient({
               role="tab"
               type="button"
               aria-selected={active}
-              aria-disabled={!enabled}
-              disabled={!enabled}
-              title={enabled ? undefined : t('comingSoon')}
-              onClick={() => enabled && setTab(value)}
+              onClick={() => setTab(value)}
               className={cn(
                 '-mb-px flex shrink-0 items-center gap-xs border-b-2 pb-sm font-sans text-body-small transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet',
-                !enabled
-                  ? 'cursor-not-allowed border-transparent text-foreground/30'
-                  : active
-                    ? 'border-violet text-foreground'
-                    : 'border-transparent text-foreground/60 hover:text-foreground',
+                active
+                  ? 'border-violet text-foreground'
+                  : 'border-transparent text-foreground/60 hover:text-foreground',
               )}
             >
               {t(`tab.${value}`)}
-              {!enabled ? (
-                <span className="rounded-full bg-foreground/[0.06] px-xs py-[1px] font-sans text-meta text-foreground/40">
-                  {t('comingSoon')}
-                </span>
-              ) : null}
             </button>
           )
         })}
       </div>
 
-      {isComingSoon ? (
-        <EmptyState
-          tag={t('comingSoonTag')}
-          title={t('comingSoonTitle')}
-          body={t('comingSoonBody')}
-        />
-      ) : visible.length > 0 ? (
+      {visible.length > 0 ? (
         <ul className="flex flex-col gap-2xs">
           {visible.map((n) => (
             <NotificationRow

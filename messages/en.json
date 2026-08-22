@@ -749,15 +749,8 @@
     "tablistLabel": "Filter notifications",
     "tab": {
       "all": "All",
-      "comments": "Comments",
-      "follows": "Follows",
-      "likes": "Likes",
-      "mentions": "Mentions"
+      "follows": "Follows"
     },
-    "comingSoon": "Coming soon",
-    "comingSoonTag": "Coming soon",
-    "comingSoonTitle": "Not available yet",
-    "comingSoonBody": "This kind of activity will appear here once the feature ships.",
     "followedYou": "started following you",
     "followedCollection": "started following your collection",
     "someone": "Someone",

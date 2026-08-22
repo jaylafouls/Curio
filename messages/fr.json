@@ -749,15 +749,8 @@
     "tablistLabel": "Filtrer les notifications",
     "tab": {
       "all": "Tout",
-      "comments": "Commentaires",
-      "follows": "Abonnements",
-      "likes": "J’aime",
-      "mentions": "Mentions"
+      "follows": "Abonnements"
     },
-    "comingSoon": "Bientôt",
-    "comingSoonTag": "Bientôt",
-    "comingSoonTitle": "Pas encore disponible",
-    "comingSoonBody": "Ce type d’activité apparaîtra ici dès que la fonctionnalité sera lancée.",
     "followedYou": "a commencé à vous suivre",
     "followedCollection": "a commencé à suivre votre collection",
     "someone": "Quelqu’un",
