@@ -26,67 +26,75 @@
     "eyebrow": "Un univers de curiosité humaine",
     "titleBefore": "L'internet qui vaut ",
     "titleAccent": "d'être gardé.",
-    "subtitle": "Sauvegardez n'importe quoi, organisez-le avec soin, et découvrez le web à travers les personnes en qui vous avez confiance.",
+    "subtitle": "Collectez des liens, idées et lieux qui vous inspirent. Découvrez les univers d'esprits curieux.",
     "invalidToken": "Ce lien d'invitation a expiré — vous pouvez toujours rejoindre en tant que Découvreur.",
     "ctaBuild": "Créez votre univers",
     "ctaExplore": "Explorer",
-    "socialProof": "Rejoignez les 1 000 premiers curateurs.",
+    "socialProof": "Rejoignez les 1 000 premiers curateurs",
+    "socialProofSub": "Qui construisent l'avenir de Curio.",
     "universesBefore": "Explorez des collections ",
     "universesAccent": "inspirantes.",
-    "universesSubtitle": "Des collections créées par des esprits curieux, sur ce qui vaut la peine d'être gardé.",
-    "universesCta": "Explorer toutes les collections",
+    "universesSubtitle": "Plongez dans les collections de personnes de goût, de vision et de perspective.",
+    "universesCta": "Explorer tous les curateurs",
     "universesEmptyTag": "Bientôt",
     "universesEmptyTitle": "Les premières collections arrivent",
     "universesEmptyBody": "Curio ouvre tout juste ses portes. Soyez parmi les premiers à créer une collection publique qui compte.",
     "values": {
       "collect": {
         "title": "Collectez tout",
-        "body": "Liens, lieux, produits, idées — sauvegardez ce qui compte, où que vous soyez."
+        "body": "Liens, lieux, produits, articles et bien plus."
       },
       "organize": {
         "title": "Organisez avec soin",
-        "body": "Façonnez vos sauvegardes en collections et univers qui vous ressemblent vraiment."
+        "body": "Créez des collections qui reflètent votre univers."
       },
       "discover": {
         "title": "Découvrez par les gens",
-        "body": "Suivez des esprits curieux et explorez le web à travers ceux en qui vous avez confiance."
+        "body": "Explorez les univers d'esprits curieux."
       },
       "keep": {
         "title": "Gardez l'essentiel",
-        "body": "Pas de flux qui s'efface. Ce que vous sauvegardez reste — une bibliothèque qui prend de la valeur avec le temps."
+        "body": "Un foyer pour votre inspiration, pour toujours."
       }
     }
   },
   "About": {
     "metaTitle": "À propos",
-    "metaDescription": "La mission de Curio est de cartographier la curiosité humaine — un internet curé par des humains, fondé sur les personnes, pas les algorithmes.",
-    "eyebrow": "Notre mission",
-    "missionBefore": "Cartographier la curiosité ",
-    "missionAccent": "humaine.",
-    "intro": "Curio est un foyer pour l'internet qui vaut la peine d'être gardé — un endroit pour collecter les liens, idées et lieux qui vous inspirent, et découvrir les univers d'autres esprits curieux. Les personnes avant les algorithmes, la qualité avant la quantité.",
-    "valuesTitle": "Ce en quoi nous croyons",
-    "values": {
+    "metaDescription": "Pourquoi Curio existe — un foyer pour l'internet qui vaut la peine d'être gardé, fondé sur la curation humaine, pas les algorithmes.",
+    "eyebrow": "Pourquoi Curio",
+    "missionBefore": "L'internet qui vaut ",
+    "missionAccent": "d'être gardé.",
+    "intro": "L'internet produit plus que quiconque ne peut consommer. Les algorithmes décident ce que vous voyez — optimisant l'engagement, pas le sens. Curio existe parce que nous croyons que le meilleur filtre est un esprit curieux. Un endroit pour sauvegarder ce qui compte, partager ce qui inspire, et découvrir à travers les personnes en qui vous avez confiance.",
+    "manifestoTitle": "Pourquoi nous avons construit cela",
+    "manifestoP1": "Chaque jour, vous tombez sur des choses qui méritent d'être retenues — un article qui change votre perspective, un lieu à visiter, un produit qui résout un vrai problème. Mais il n'y a nulle part de bon pour les garder. Les favoris disparaissent. Les flux sociaux noient le signal dans le bruit. Rien n'est fait pour durer.",
+    "manifestoP2": "Curio est un foyer pour ce que vous voulez garder. Pas un flux qui oublie, pas un cimetière de favoris — une bibliothèque vivante façonnée par votre curiosité, organisée comme votre esprit fonctionne.",
+    "manifestoP3": "Et parce que les découvertes les plus intéressantes viennent des personnes, pas des algorithmes, Curio vous permet d'explorer les univers d'autres esprits curieux. Suivez des gens de goût et de perspective. Voyez ce qu'ils gardent. Construisez quelque chose qui vaut la peine d'être partagé.",
+    "principlesTitle": "Ce qui nous guide",
+    "principles": {
       "human": {
-        "title": "L'humain d'abord",
-        "body": "Les personnes avant les algorithmes. La curation est un acte humain, et nous construisons pour celles et ceux qui la pratiquent."
+        "title": "Les personnes avant les algorithmes",
+        "body": "Les meilleures recommandations viennent des humains. Nous construisons pour les curateurs — des personnes qui collectent, organisent et partagent avec intention."
       },
       "curiosity": {
-        "title": "Guidés par la curiosité",
-        "body": "Explorer, apprendre, rester ouvert. Nous valorisons le vagabondage et la profondeur plutôt que le défilement sans fin."
+        "title": "La curiosité comme boussole",
+        "body": "Nous récompensons la profondeur, le vagabondage et l'intérêt sincère. Pas les métriques d'engagement, pas les boucles virales."
       },
       "curated": {
-        "title": "Curé avec soin",
-        "body": "La qualité avant la quantité. Ce qui vaut la peine d'être gardé mérite du soin, pas du bruit."
+        "title": "La qualité avant la quantité",
+        "body": "Une collection de dix liens parfaits vaut mieux que mille favoris oubliés. Nous concevons pour le soin, pas le volume."
       },
       "lasting": {
         "title": "Fait pour durer",
-        "body": "Une plateforme qui grandit avec vous — une bibliothèque qui prend de la valeur avec le temps, pas un flux qui oublie."
+        "body": "Ce que vous sauvegardez reste. Votre bibliothèque prend de la valeur avec le temps — pas moins."
+      },
+      "openness": {
+        "title": "Découverte ouverte",
+        "body": "Naviguez librement. Suivez qui vous voulez. Pas de contenu verrouillé, pas de filtrage algorithmique."
+      },
+      "craft": {
+        "title": "Le soin du détail",
+        "body": "De beaux outils font un meilleur travail. Chaque écran, chaque interaction, chaque pixel est pensé."
       }
-    },
-    "stats": {
-      "curators": "Curateurs",
-      "collections": "Collections publiques",
-      "links": "Liens gardés"
     },
     "ctaBefore": "Créez votre ",
     "ctaAccent": "univers.",

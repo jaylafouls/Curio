@@ -2,7 +2,7 @@
   "Meta": {
     "siteName": "Curio",
     "defaultTitle": "Curio — The internet worth keeping",
-    "defaultDescription": "Curio is a curation social network. Save, organise and share the links worth keeping."
+    "defaultDescription": "Curio is a curation social network. Save, organize and share the links worth keeping."
   },
   "Nav": {
     "home": "Curio — home",
@@ -17,76 +17,84 @@
     "closeMenu": "Close menu"
   },
   "Footer": {
-    "tagline": "The internet worth keeping — save, organise and share what matters.",
+    "tagline": "The internet worth keeping — save, organize and share what matters.",
     "copyright": "© {year} Curio. All rights reserved."
   },
   "Landing": {
     "metaTitle": "Curio — The internet worth keeping",
-    "metaDescription": "Curio is a curation social network. Save, organise and share the links worth keeping — and discover inspiring collections built by curious minds.",
+    "metaDescription": "Curio is a curation social network. Save, organize and share the links worth keeping — and discover inspiring collections built by curious minds.",
     "eyebrow": "A universe of human curiosity",
     "titleBefore": "The internet worth ",
     "titleAccent": "keeping.",
-    "subtitle": "Save anything, organise it beautifully, and discover the web through the people you trust.",
+    "subtitle": "Collect links, ideas and places that inspire you. Discover the universes of curious minds.",
     "invalidToken": "That invitation link has expired — you can still join as a Discoverer.",
     "ctaBuild": "Build your universe",
     "ctaExplore": "Explore",
-    "socialProof": "Join the first 1,000 curators.",
+    "socialProof": "Join the first 1,000 curators",
+    "socialProofSub": "Who are building the future of Curio.",
     "universesBefore": "Explore inspiring ",
     "universesAccent": "collections.",
-    "universesSubtitle": "Collections built by curious people, on the things worth keeping.",
-    "universesCta": "Explore all collections",
+    "universesSubtitle": "Dive into the collections of people with taste, insight and perspective.",
+    "universesCta": "Explore all curators",
     "universesEmptyTag": "Coming soon",
     "universesEmptyTitle": "The first collections are on their way",
     "universesEmptyBody": "Curio is just opening its doors. Be one of the first to build a public collection worth keeping.",
     "values": {
       "collect": {
         "title": "Collect anything",
-        "body": "Links, places, products, ideas — save whatever is worth keeping, from anywhere."
+        "body": "Save links, places, products, articles and more."
       },
       "organize": {
-        "title": "Organise beautifully",
-        "body": "Shape your saves into collections and universes that actually feel like yours."
+        "title": "Organize beautifully",
+        "body": "Build collections that reflect your world."
       },
       "discover": {
         "title": "Discover through people",
-        "body": "Follow curious minds and explore the web through the people you trust."
+        "body": "Explore the universes of curious minds."
       },
       "keep": {
         "title": "Keep what matters",
-        "body": "No feed churn. What you save stays — a library that grows more valuable over time."
+        "body": "A home for your inspiration, forever."
       }
     }
   },
   "About": {
     "metaTitle": "About",
-    "metaDescription": "Curio's mission is to map human curiosity — a human-curated internet built on people, not algorithms.",
-    "eyebrow": "Our mission",
-    "missionBefore": "To map human ",
-    "missionAccent": "curiosity.",
-    "intro": "Curio is a home for the internet worth keeping — a place to collect links, ideas and places that inspire you, and to discover the universes of other curious minds. People before algorithms, quality over quantity.",
-    "valuesTitle": "What we believe",
-    "values": {
+    "metaDescription": "Why Curio exists — a home for the internet worth keeping, built on human curation, not algorithms.",
+    "eyebrow": "Why Curio",
+    "missionBefore": "The internet worth ",
+    "missionAccent": "keeping.",
+    "intro": "The internet produces more than anyone can consume. Algorithms decide what you see — optimizing for engagement, not meaning. Curio exists because we believe the best filter is a curious mind. A place to save what matters, share what inspires, and discover through the people you trust.",
+    "manifestoTitle": "Why we built this",
+    "manifestoP1": "Every day, you come across things worth remembering — an article that shifts your perspective, a place you want to visit, a product that solves a real problem. But there's nowhere good to put them. Bookmarks disappear. Social feeds bury the signal in noise. Nothing is built to last.",
+    "manifestoP2": "Curio is a home for the things you want to keep. Not a feed that forgets, not a bookmark graveyard — a living library shaped by your curiosity, organized the way your mind works.",
+    "manifestoP3": "And because the most interesting discoveries come from people, not algorithms, Curio lets you explore the universes of other curious minds. Follow people with taste and perspective. See what they keep. Build something worth sharing yourself.",
+    "principlesTitle": "What guides us",
+    "principles": {
       "human": {
-        "title": "Human first",
-        "body": "People before algorithms. Curation is a human act, and we build for the people doing it."
+        "title": "People over algorithms",
+        "body": "The best recommendations come from humans. We build for curators — people who collect, organize and share with intention."
       },
       "curiosity": {
-        "title": "Curiosity driven",
-        "body": "Explore, learn, stay open. We reward wandering and depth over the endless scroll."
+        "title": "Curiosity as a compass",
+        "body": "We reward depth, wandering and genuine interest. Not engagement metrics, not viral loops."
       },
       "curated": {
-        "title": "Thoughtfully curated",
-        "body": "Quality over quantity. The things worth keeping deserve care, not noise."
+        "title": "Quality over quantity",
+        "body": "A collection of ten perfect links beats a thousand forgotten bookmarks. We design for care, not volume."
       },
       "lasting": {
         "title": "Built to last",
-        "body": "A platform that grows with you — a library that gains value over time, not a feed that forgets."
+        "body": "What you save stays. Your library grows more valuable over time — not less."
+      },
+      "openness": {
+        "title": "Open discovery",
+        "body": "Browse freely. Follow who you want. No gated content, no algorithmic gatekeeping."
+      },
+      "craft": {
+        "title": "Craft in every detail",
+        "body": "Beautiful tools make better work. Every screen, every interaction, every pixel is considered."
       }
-    },
-    "stats": {
-      "curators": "Curators",
-      "collections": "Public collections",
-      "links": "Links kept"
     },
     "ctaBefore": "Start your ",
     "ctaAccent": "universe.",
