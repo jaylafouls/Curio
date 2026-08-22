@@ -123,13 +123,13 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             >
               {t('ctaBuild')}
             </ButtonLink>
-            <Link
+            <ButtonLink
               href="/explore"
-              className="inline-flex h-11 items-center gap-sm rounded-full border border-border px-lg font-sans text-body-small text-foreground/80 transition-colors duration-base hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+              variant="secondary"
+              iconRight={<ArrowRight className="size-4" />}
             >
               {t('ctaExplore')}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
+            </ButtonLink>
           </div>
         </div>
 
