@@ -9,27 +9,20 @@ import { cn } from '@/lib/ui/cn'
 import { BrandLockup } from './brand-lockup'
 
 /**
- * PublicHeader — the non-authenticated horizontal header (spec §7.1):
+ * PublicHeader — the non-authenticated horizontal header:
  *
- *   [C · curio]   Explore · Curators   [Log in] [Sign up →]
+ *   [C · curio]   Explore · Founding Curators · About   [Log in] [Sign up →]
  *
- * "Editorial" is temporarily delinked (its content was never written — Decisions
- * Log §11.5, still open); the /editorial route stays live and re-adding the link
- * is a one-liner. "About" moved to the footer to keep the primary nav minimal.
- *
- * No "Home" link — the landing IS the home, reached via the brand lockup. The
- * centre nav collapses into a slide-down menu below the `md` breakpoint so the
- * bar stays legible at 440px. Active link is derived from the locale-stripped
- * pathname (usePathname already drops the /en|/fr prefix).
- *
- * Both auth CTAs point at /signup: the auth screen (écran 02) is a single
- * combined sign-up / log-in surface with an inline toggle, so there is no
- * separate /login route to link to. Light Archive surface by default.
+ * Three nav links per the landing mockup. "Editorial" is delinked (content never
+ * written — Decisions Log §11.5); the /editorial route stays live. No "Home"
+ * link — the landing IS the home, reached via the brand lockup. The centre nav
+ * collapses into a slide-down menu below the `md` breakpoint.
  */
 
 const NAV = [
   { href: '/explore', key: 'explore' },
   { href: '/curators', key: 'curators' },
+  { href: '/about', key: 'about' },
 ] as const
 
 export function PublicHeader() {
