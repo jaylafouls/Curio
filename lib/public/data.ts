@@ -199,6 +199,8 @@ export type PublicCurator = {
   avatarUrl: string | null
   bio: string | null
   location: string | null
+  /** Real follower head-count (recette P1-4) — no longer hardcoded to 0. */
+  followersCount: number
 }
 
 /**
@@ -223,13 +225,30 @@ export async function getPublicCurators(limit = 24): Promise<PublicCurator[]> {
     return []
   }
 
-  return (data ?? []).map((row) => ({
+  const rows = data ?? []
+
+  // Real follower head-count per curator (recette P1-4). The users table carries
+  // no denormalized followers_count, so we head-count follows.followed_id per
+  // curator in parallel — cheap on the fixed, small curator set and world-
+  // readable under RLS. A count error degrades to 0 rather than failing the grid.
+  const followerCounts = await Promise.all(
+    rows.map(async (row) => {
+      const { count } = await supabase
+        .from('follows')
+        .select('id', { count: 'exact', head: true })
+        .eq('followed_id', row.id)
+      return count ?? 0
+    }),
+  )
+
+  return rows.map((row, i) => ({
     id: row.id,
     displayName: row.display_name,
     username: row.username,
     avatarUrl: row.avatar_url,
     bio: row.bio,
     location: row.location,
+    followersCount: followerCounts[i],
   }))
 }
 
