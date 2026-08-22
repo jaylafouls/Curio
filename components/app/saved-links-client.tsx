@@ -70,6 +70,16 @@ export function SavedLinksClient({
     topic: ALL,
   })
 
+  // Autofocus the search box when arriving from the header search entry
+  // (/saved?focus=search, recette P2-6). Client-only, read once after mount so we
+  // don't pull in useSearchParams/Suspense; the param is a pure UI hint.
+  const searchRef = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('focus') === 'search') {
+      searchRef.current?.focus()
+    }
+  }, [])
+
   // Debounced search term: `q` is what the input shows; `debouncedQ` is what we
   // actually query on, so typing doesn't fire a request per keystroke.
   const [debouncedQ, setDebouncedQ] = useState('')
@@ -229,6 +239,7 @@ export function SavedLinksClient({
           aria-hidden
         />
         <input
+          ref={searchRef}
           type="search"
           value={filters.q}
           onChange={(e) => setFilters((f) => ({ ...f, q: e.target.value }))}

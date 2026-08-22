@@ -336,7 +336,8 @@
     "morning": "Good morning, {name}",
     "afternoon": "Good afternoon, {name}",
     "evening": "Good evening, {name}",
-    "tagline": "Discover something inspiring today."
+    "tagline": "Discover something inspiring today.",
+    "search": "Search your saved links"
   },
   "MySpace": {
     "metaTitle": "My Universe",

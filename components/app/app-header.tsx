@@ -12,9 +12,10 @@ import { Sparkle } from 'lucide-react'
  * with their own in-flow section header. The tagline is hidden on the narrowest
  * viewports so the greeting and bell share one row without wrapping.
  *
- * The spec's search bar routes to /search, which does not exist yet, so it is
- * omitted rather than shipped as a dead affordance (same discipline as the
- * public footer's un-linked legal pages).
+ * The spec's header search bar has no dedicated /search page yet, so the top-bar
+ * search entry (in AppShellFrame) routes to /saved — where the full-text engine
+ * already lives (migration 0017) — and autofocuses its input, rather than
+ * shipping a dead affordance or a fake route (recette P2-6).
  */
 function greetingKey(hour: number): 'morning' | 'afternoon' | 'evening' {
   if (hour < 12) return 'morning'
