@@ -49,10 +49,12 @@ export default async function CuratorsPage({ params }: PageProps) {
     getPublicTopics(locale),
   ])
 
-  // The page content, rendered once. It's handed to PublicConnectedShell twice:
-  // bare (for the connected AppShellFrame path) and wrapped in <PublicShell> (the
-  // server-rendered anon frame). The wrapper picks one at runtime by session.
-  const content = (
+  // The page content. Built for each shell path (see PublicConnectedShell): the
+  // anon frame (wrapped in <PublicShell>) and the connected AppShellFrame frame.
+  // The two differ ONLY in the empty-state action — the "Join Curio" → /signup
+  // CTA is right for an anonymous visitor but a faux-pas for a signed-in member
+  // (recette P2-5), so the connected variant drops it and just informs.
+  const renderContent = (connected: boolean) => (
     <section className="mx-auto w-full max-w-6xl px-lg py-2xl">
       <header className="mb-xl flex flex-col gap-sm">
         <AccentText
@@ -89,12 +91,14 @@ export default async function CuratorsPage({ params }: PageProps) {
           title={t('emptyTitle')}
           body={t('emptyBody')}
           action={
-            <ButtonLink
-              href="/signup"
-              iconRight={<ArrowRight className="size-4" />}
-            >
-              {t('joinCta')}
-            </ButtonLink>
+            connected ? undefined : (
+              <ButtonLink
+                href="/signup"
+                iconRight={<ArrowRight className="size-4" />}
+              >
+                {t('joinCta')}
+              </ButtonLink>
+            )
           }
         />
       )}
@@ -104,9 +108,9 @@ export default async function CuratorsPage({ params }: PageProps) {
   return (
     <PublicConnectedShell
       locale={locale}
-      anon={<PublicShell>{content}</PublicShell>}
+      anon={<PublicShell>{renderContent(false)}</PublicShell>}
     >
-      {content}
+      {renderContent(true)}
     </PublicConnectedShell>
   )
 }
