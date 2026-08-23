@@ -141,7 +141,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
 
           {/* Centre: "You" + Topic vignettes orbit */}
           <div className="relative hidden lg:block">
-            {/* Network lines — decorative SVG */}
+            {/* Network lines + constellation dots — decorative SVG */}
             <svg
               className="absolute inset-0 h-full w-full"
               viewBox="0 0 400 400"
@@ -150,6 +150,29 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             >
               <ellipse cx="200" cy="190" rx="140" ry="110" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.6" />
               <ellipse cx="200" cy="190" rx="90" ry="70" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.4" />
+              {/* Constellation lines */}
+              <line x1="310" y1="60" x2="340" y2="90" stroke="#D9D8DE" strokeWidth="0.6" opacity="0.5" />
+              <line x1="340" y1="90" x2="370" y2="75" stroke="#D9D8DE" strokeWidth="0.6" opacity="0.5" />
+              <line x1="370" y1="75" x2="385" y2="110" stroke="#D9D8DE" strokeWidth="0.6" opacity="0.5" />
+              <line x1="340" y1="90" x2="355" y2="130" stroke="#D9D8DE" strokeWidth="0.6" opacity="0.4" />
+              <line x1="355" y1="130" x2="380" y2="155" stroke="#D9D8DE" strokeWidth="0.6" opacity="0.4" />
+              <line x1="320" y1="170" x2="355" y2="130" stroke="#D9D8DE" strokeWidth="0.6" opacity="0.3" />
+              {/* Constellation dots — scattered */}
+              <circle cx="310" cy="60" r="2.5" fill="#785CFF" opacity="0.7" />
+              <circle cx="340" cy="90" r="2" fill="#D9C6A6" opacity="0.8" />
+              <circle cx="370" cy="75" r="1.5" fill="#D9D8DE" opacity="0.6" />
+              <circle cx="385" cy="110" r="2" fill="#785CFF" opacity="0.5" />
+              <circle cx="355" cy="130" r="1.5" fill="#C1694F" opacity="0.5" />
+              <circle cx="380" cy="155" r="2" fill="#D9D8DE" opacity="0.4" />
+              <circle cx="320" cy="170" r="1.5" fill="#D9C6A6" opacity="0.5" />
+              {/* Extra scattered dots */}
+              <circle cx="15" cy="45" r="2" fill="#785CFF" opacity="0.5" />
+              <circle cx="55" cy="340" r="1.5" fill="#D9C6A6" opacity="0.5" />
+              <circle cx="280" cy="210" r="1.5" fill="#C1694F" opacity="0.4" />
+              <circle cx="120" cy="350" r="2" fill="#785CFF" opacity="0.3" />
+              <circle cx="250" cy="340" r="1.5" fill="#D9D8DE" opacity="0.4" />
+              <circle cx="350" cy="250" r="2" fill="#D9C6A6" opacity="0.4" />
+              <circle cx="390" cy="200" r="1.5" fill="#785CFF" opacity="0.3" />
             </svg>
 
             {/* "You" centre node */}
