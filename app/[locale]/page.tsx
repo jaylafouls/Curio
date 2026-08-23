@@ -177,7 +177,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
 
             {/* "You" centre node */}
             <div className="absolute left-1/2 top-[46%] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-              <span className="flex size-[72px] items-center justify-center rounded-full bg-white font-sans text-[13px] font-medium text-foreground shadow-md ring-1 ring-violet/10">
+              <span className="flex size-[72px] items-center justify-center rounded-full bg-white font-sans text-[13px] font-medium text-foreground ring-1 ring-violet/10" style={{ boxShadow: '0 2px 12px rgba(120,92,255,0.12), 0 4px 16px rgba(0,0,0,0.06)' }}>
                 You
               </span>
             </div>
@@ -195,12 +195,12 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
                   className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-[2px]"
                   style={{ left: `${cx}%`, top: `${cy}%` }}
                 >
-                  <div className="relative size-[54px] overflow-hidden rounded-full border border-border/60 shadow-sm">
+                  <div className="relative size-[54px] overflow-hidden rounded-full border border-border/60" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
                     <Image
                       src={topic.src}
                       alt={topic.label}
                       fill
-                      className="object-cover"
+                      className="object-cover object-center"
                       sizes="54px"
                     />
                   </div>
