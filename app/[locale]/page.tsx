@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import { buildMetadata } from '@/lib/seo/metadata'
 import { checkInvitationToken } from '@/lib/auth/invitation'
-import { AccentText, Avatar, ButtonLink } from '@/components/ui'
+import { AccentText, ButtonLink } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicConnectedShell } from '@/components/app/public-connected-shell'
@@ -114,9 +114,18 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
 
             {/* Founding Curators social proof */}
             <div className="mt-sm flex items-center gap-sm">
-              <div className="flex -space-x-2">
-                {['A', 'B', 'C', 'D', 'E'].map((seed) => (
-                  <Avatar key={seed} name={seed} size="sm" />
+              <div className="flex -space-x-2" aria-hidden>
+                {[
+                  'from-[#D9C6A6] to-[#C98A4B]',
+                  'from-[#CFC3FF] to-[#785CFF]',
+                  'from-[#93AFA8] to-[#6A7B7A]',
+                  'from-[#D9AFAE] to-[#C1694F]',
+                  'from-[#E0DBB8] to-[#8B6F47]',
+                ].map((gradient, i) => (
+                  <span
+                    key={i}
+                    className={`inline-block size-8 rounded-full bg-gradient-to-br ring-2 ring-white ${gradient}`}
+                  />
                 ))}
               </div>
               <div className="flex flex-col">
