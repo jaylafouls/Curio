@@ -68,7 +68,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
     <>
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <section className="relative w-full overflow-hidden">
-        <div className="mx-auto grid min-h-[398px] max-w-[1280px] grid-cols-1 lg:grid-cols-[34%_36%_30%]">
+        <div className="mx-auto grid min-h-[398px] max-w-[1280px] grid-cols-1 lg:grid-cols-[34%_36%_1fr]">
           {/* Left: copy + CTAs */}
           <div className="flex flex-col gap-sm px-lg pt-md pb-md sm:pt-lg">
             <span className="font-sans text-[11px] font-medium uppercase tracking-[0.1em] text-violet">
@@ -212,14 +212,14 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             })}
           </div>
 
-          {/* Right: hero photo */}
-          <div className="relative hidden min-h-[398px] overflow-hidden lg:block">
+          {/* Right: hero photo — bleeds to viewport edge */}
+          <div className="relative hidden min-h-[398px] overflow-hidden lg:block" style={{ marginRight: 'calc(-50vw + 50%)' }}>
             <Image
               src="/landing/hero-photo.jpg"
               alt=""
               fill
               className="object-cover object-center"
-              sizes="384px"
+              sizes="50vw"
               priority
             />
             {/* Left fade into background */}
