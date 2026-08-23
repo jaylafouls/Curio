@@ -9,6 +9,7 @@ import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicConnectedShell } from '@/components/app/public-connected-shell'
 import { PublicShell } from '@/components/public/public-shell'
+import { getPublicCollections } from '@/lib/public/data'
 
 type PageProps = {
   params: Promise<{ locale: Locale }>
@@ -39,14 +40,6 @@ const TOPIC_VIGNETTES = [
   { src: '/landing/food.jpg', label: 'Food' },
 ] as const
 
-const SHOWCASE_CARDS = [
-  { src: '/landing/tokyo.jpg', title: 'Tokyo by Locals' },
-  { src: '/landing/escapes.jpg', title: 'Hidden Escapes' },
-  { src: '/landing/books-card.jpg', title: 'Books That Stay' },
-  { src: '/landing/food-card.jpg', title: 'Culinary Notes' },
-  { src: '/landing/style-card.jpg', title: 'Timeless Style' },
-] as const
-
 const FEATURES = [
   { key: 'collect', color: 'bg-violet/10 text-violet', symbol: '♡' },
   { key: 'organize', color: 'bg-[#EEF2E7] text-[#728A53]', symbol: '♧' },
@@ -63,6 +56,8 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
   const tokenState = await checkInvitationToken(token)
   const signupHref =
     tokenState === 'valid' ? `/signup?token=${token}` : '/signup'
+
+  const collections = await getPublicCollections(5)
 
   const content = (
     <>
@@ -255,28 +250,46 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             </Link>
           </div>
 
-          {/* Right: showcase cards row */}
-          <div className="grid flex-1 grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-5">
-            {SHOWCASE_CARDS.map((card) => (
-              <div
-                key={card.title}
-                className="relative h-[180px] overflow-hidden rounded-[10px] shadow-md"
-              >
-                <Image
-                  src={card.src}
-                  alt={card.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 170px"
-                />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-sm pb-sm pt-lg">
-                  <span className="font-serif text-[14px] leading-tight text-white">
-                    {card.title}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Right: real public collections (empty today → empty state) */}
+          {collections.length > 0 ? (
+            <div className="grid flex-1 grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-5">
+              {collections.map((col) => (
+                <Link
+                  key={col.id}
+                  href={`/collections/${col.slug}`}
+                  className="group relative h-[180px] overflow-hidden rounded-[10px] shadow-md"
+                >
+                  {col.cover ? (
+                    <Image
+                      src={col.cover}
+                      alt={col.title}
+                      fill
+                      className="object-cover transition-transform duration-base group-hover:scale-[1.03]"
+                      sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 170px"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-muted">
+                      <span className="font-sans text-[11px] text-foreground/40">{col.title}</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-sm pb-sm pt-lg">
+                    <span className="font-serif text-[14px] leading-tight text-white">
+                      {col.title}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center gap-xs py-lg text-center">
+              <span className="font-sans text-[10px] font-medium uppercase tracking-wide text-violet/60">
+                {t('universesEmptyTag')}
+              </span>
+              <p className="font-sans text-[13px] text-foreground/60">
+                {t('universesEmptyTitle')}
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
