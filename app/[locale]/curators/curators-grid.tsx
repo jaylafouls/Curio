@@ -47,10 +47,13 @@ export function CuratorsGrid({
           <CuratorCard
             key={c.id}
             name={c.displayName}
+            // Neutral brand tint for the "Curator" role badge — curators carry
+            // no primary Topic yet, so this is a role colour, not a category
+            // claim (recette P2-3).
             topic="ideas"
             role={t('role')}
             bio={c.bio ?? ''}
-            followers={0}
+            followers={c.followersCount}
             avatar={c.avatarUrl ?? undefined}
             action={
               <Link href={`/profile/${c.username}`}>

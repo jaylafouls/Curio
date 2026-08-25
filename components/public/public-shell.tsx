@@ -11,10 +11,19 @@ import { PublicFooter } from './public-footer'
  * inside `children`; the shell itself stays neutral so the header/footer read
  * consistently across all five pages.
  */
-export function PublicShell({ children }: { children: ReactNode }) {
+export function PublicShell({
+  children,
+  transparentHeader = false,
+}: {
+  children: ReactNode
+  /** Header renders with no border/fill, absolutely positioned over the page's
+   *  own top section — used on the landing hero, where header and hero share
+   *  one continuous background with no seam (mockup-exact). */
+  transparentHeader?: boolean
+}) {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <PublicHeader />
+      <PublicHeader transparent={transparentHeader} />
       <main className="flex-1">{children}</main>
       <PublicFooter />
     </div>

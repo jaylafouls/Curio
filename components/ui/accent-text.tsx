@@ -16,13 +16,19 @@ export type AccentTextTag = 'h1' | 'h2' | 'h3' | 'p' | 'span'
 export interface AccentTextProps {
   /** Text before the accented segment. Include trailing space if needed. */
   before?: ReactNode
-  /** The emphasized segment — rendered italic violet. */
+  /** The emphasized segment — always italic; violet by default. */
   accent: ReactNode
   /** Text after the accented segment. Include leading space if needed. */
   after?: ReactNode
   size?: AccentTextSize
   as?: AccentTextTag
   className?: string
+  /** 'violet' (default, e.g. "Explore inspiring *universes*") or 'inherit'
+   *  to keep the accent in the same ink as the rest of the line — italic
+   *  only, no color shift (e.g. the hero's "worth *keeping*.", confirmed
+   *  against the reference: measured pixel color is the same dark ink as
+   *  the rest of that headline, not violet). */
+  accentColor?: 'violet' | 'inherit'
 }
 
 const sizeClasses: Record<AccentTextSize, string> = {
@@ -39,6 +45,7 @@ export function AccentText({
   size = 'display',
   as = 'h1',
   className,
+  accentColor = 'violet',
 }: AccentTextProps) {
   return createElement(
     as,
@@ -50,7 +57,9 @@ export function AccentText({
       ),
     },
     before,
-    <em className="italic text-violet">{accent}</em>,
+    <em className={cn('italic', accentColor === 'violet' && 'text-violet')}>
+      {accent}
+    </em>,
     after,
   )
 }

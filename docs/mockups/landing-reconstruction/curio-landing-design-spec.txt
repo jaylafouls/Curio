@@ -1,0 +1,32 @@
+CURIO LANDING — VISUAL RECONSTRUCTION
+Source: supplied JPEG reference
+Canvas: 1280 x 853 px
+
+CORE TOKENS
+Background: #F8F7F3
+Dark ink: #111827
+Muted text: #666666
+Purple accent: #6C5CE7
+Warm accent: #E6A06A
+Warm strip: #F2F0EB
+Card radius: ~10 px
+Pill radius: 20–21 px
+
+TYPOGRAPHY
+Display / editorial serif: Georgia / Times New Roman fallback.
+Sans UI: Arial / system sans fallback.
+Approximate hero display size: 52 px.
+Approximate section display size: 30 px.
+Navigation: ~11 px.
+
+LAYOUT
+Header: ~86 px
+Hero: y=86 to 484 (~398 px)
+Press strip: y=484 to 548 (64 px)
+Collections: y=548 to 746 (198 px)
+Feature bar: y=746 to 853 (107 px)
+
+IMPORTANT
+This is a visual reconstruction from a flattened JPEG, not the original Figma file.
+Photography has been cropped from the source image and referenced as separate assets.
+Vector geometry and text are editable in the SVG.

@@ -7,15 +7,16 @@ import { PageContainer } from '@/components/ui'
 import { PublicShell } from '@/components/public/public-shell'
 import { PublicConnectedShell } from '@/components/app/public-connected-shell'
 import { ProfileIdentity } from '@/components/app/profile-identity'
+import { CuratorFollowButton } from '@/components/app/curator-follow-button'
 import { CollectionGrid } from '@/components/app/collection-grid'
 import { StatList } from '@/components/app/stat-list'
 import { EmptyState } from '@/components/public/empty-state'
 import {
-  getProfileByUsername,
-  getProfileStats,
-  getPublicCollectionsByOwner,
-} from '@/lib/app/data'
-import { getUserPlan } from '@/lib/plans/data'
+  getPublicProfileByUsername,
+  getPublicProfileStats,
+  getPublicProfileCollections,
+} from '@/lib/public/data'
+import { resolvePlanBadge } from '@/lib/plans/data'
 
 // ISR for this high-traffic public page (chantier SEO part 6). Revalidates on
 // this window rather than rendering per request. Next requires a static literal;
@@ -43,7 +44,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { locale, username } = await params
   const meta = await getTranslations({ locale, namespace: 'Meta' })
-  const profile = await getProfileByUsername(username)
+  const profile = await getPublicProfileByUsername(username)
 
   if (!profile) {
     return buildMetadata({
@@ -69,16 +70,23 @@ export default async function ProfilePage({ params }: PageProps) {
   const { locale, username } = await params
   setRequestLocale(locale)
 
-  const profile = await getProfileByUsername(username)
+  const profile = await getPublicProfileByUsername(username)
   if (!profile) notFound()
 
   const t = await getTranslations({ locale, namespace: 'Profile' })
   const tPlan = await getTranslations({ locale, namespace: 'PlanBadge' })
-  const [stats, collections, plan] = await Promise.all([
-    getProfileStats(profile.id),
-    getPublicCollectionsByOwner(profile.id),
-    getUserPlan(profile.id),
+  const [stats, collections] = await Promise.all([
+    getPublicProfileStats(profile.id),
+    getPublicProfileCollections(profile.id),
   ])
+
+  // Badge is derived from the world-readable founding flag only. The Pro badge is
+  // gated behind the plans table, which is owner-only under RLS (plans_select_self)
+  // — a visited public profile can never expose another user's plan regardless of
+  // client, so reading plans here would only re-introduce a cookie() call (turning
+  // this ISR page dynamic per session) with no reachable Pro outcome. Pro is also
+  // unassigned during the beta. Founding wins anyway per resolvePlanBadge (§15).
+  const badge = resolvePlanBadge(profile.isFoundingCurator, 'free')
 
   const joinedLabel = new Date(profile.createdAt).toLocaleDateString(
     locale === 'fr' ? 'fr-FR' : 'en-US',
@@ -99,8 +107,9 @@ export default async function ProfilePage({ params }: PageProps) {
           location={profile.location}
           websiteUrl={profile.websiteUrl}
           joinedLabel={joinedLabel}
-          planBadge={plan.badge}
-          planBadgeLabel={plan.badge === 'pro' ? tPlan('pro') : tPlan('founding')}
+          planBadge={badge}
+          planBadgeLabel={badge === 'pro' ? tPlan('pro') : tPlan('founding')}
+          actions={<CuratorFollowButton curatorId={profile.id} />}
         />
         <StatList
           layout="inline"

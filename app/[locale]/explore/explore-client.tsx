@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Tabs, CollectionCard, CuratorCard, Button } from '@/components/ui'
+import { Tabs, CollectionCard, CuratorCard } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import { EmptyState } from '@/components/public/empty-state'
 import type { PublicTopic, PublicCollection, PublicCurator } from '@/lib/public/data'
@@ -52,45 +52,11 @@ export function ExploreClient({
         <Tabs items={tabs} value={topic} onValueChange={setTopic} variant="pill" />
       </div>
 
-      {/* New & noteworthy */}
-      <section className="flex flex-col gap-lg">
-        <h2 className="font-serif text-h2 text-foreground">{t('newTitle')}</h2>
-        {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.slice(0, 6).map((c) => (
-              <Link
-                key={c.id}
-                href={`/collections/${c.slug}`}
-                className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
-              >
-                <CollectionCard
-                  title={c.title}
-                  topic={c.topic}
-                  cover={c.cover ?? undefined}
-                  mosaic={c.mosaic}
-                  owner={{ name: c.owner.name, avatar: c.owner.avatar ?? undefined }}
-                  linksCount={c.linksCount}
-                />
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            tag={t('emptyTag')}
-            title={t('newEmptyTitle')}
-            body={t('newEmptyBody')}
-            action={
-              <Link href="/signup">
-                <Button variant="primary" size="small">
-                  {t('emptyCta')}
-                </Button>
-              </Link>
-            }
-          />
-        )}
-      </section>
-
-      {/* Explore by collections */}
+      {/* Collections. Previously split into "New & noteworthy" (a slice of the
+          same list) + "Explore by collections" (the full list) — two sections
+          fed by the same `filtered` source showed the same cards twice. Merged
+          into one section until a distinct "new" signal (created_at/popularity)
+          exists to justify a separate feed (recette P2-2). */}
       <section className="flex flex-col gap-lg">
         <h2 className="font-serif text-h2 text-foreground">
           {t('collectionsTitle')}
@@ -138,10 +104,13 @@ export function ExploreClient({
               >
                 <CuratorCard
                   name={c.displayName}
+                  // Neutral brand tint for the "Curator" role badge — curators
+                  // carry no primary Topic yet, so this is a role colour, not a
+                  // category claim (recette P2-3).
                   topic="ideas"
                   role={t('curatorRole')}
                   bio={c.bio ?? ''}
-                  followers={0}
+                  followers={c.followersCount}
                   avatar={c.avatarUrl ?? undefined}
                 />
               </Link>

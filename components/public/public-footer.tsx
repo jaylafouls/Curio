@@ -30,11 +30,13 @@ export async function PublicFooter() {
 
   return (
     <footer className="border-t border-border bg-background">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-lg px-lg py-2xl">
-        <div className="flex flex-col gap-md sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex max-w-xs flex-col gap-sm">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-sm px-lg py-md lg:px-3xl">
+        <div className="flex flex-col gap-md sm:flex-row sm:items-center sm:justify-between">
+          {/* Logo + tagline sit side by side (not stacked) — a stacked block
+              was the main thing making the footer feel oversized. */}
+          <div className="flex items-center gap-sm">
             <BrandLockup className="text-foreground" />
-            <p className="font-sans text-body-small text-foreground/60">
+            <p className="max-w-[220px] font-sans text-body-small text-foreground/60 sm:border-l sm:border-border sm:pl-sm">
               {f('tagline')}
             </p>
           </div>

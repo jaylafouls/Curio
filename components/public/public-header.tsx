@@ -9,30 +9,28 @@ import { cn } from '@/lib/ui/cn'
 import { BrandLockup } from './brand-lockup'
 
 /**
- * PublicHeader — the non-authenticated horizontal header (spec §7.1):
+ * PublicHeader — the non-authenticated horizontal header:
  *
- *   [C · curio]   Explore · Curators   [Log in] [Sign up →]
+ *   [C · curio]   Explore · Founding Curators · Editorial · About   [Log in] [Sign up →]
  *
- * "Editorial" is temporarily delinked (its content was never written — Decisions
- * Log §11.5, still open); the /editorial route stays live and re-adding the link
- * is a one-liner. "About" moved to the footer to keep the primary nav minimal.
- *
- * No "Home" link — the landing IS the home, reached via the brand lockup. The
- * centre nav collapses into a slide-down menu below the `md` breakpoint so the
- * bar stays legible at 440px. Active link is derived from the locale-stripped
- * pathname (usePathname already drops the /en|/fr prefix).
- *
- * Both auth CTAs point at /signup: the auth screen (écran 02) is a single
- * combined sign-up / log-in surface with an inline toggle, so there is no
- * separate /login route to link to. Light Archive surface by default.
+ * Four nav links per the 01-curio-reference-4x.png pixel-perfect reference
+ * (2026-08-23 landing rebuild). "Editorial" was previously delinked because
+ * no content had been written (Decisions Log §11.5) — the route has always
+ * stayed live, and the new reference restores its nav position, so it's
+ * relinked here. Flag to Jay: if there's still no Editorial content, this
+ * exposes an empty page again — worth a quick check before shipping.
+ * No "Home" link — the landing IS the home, reached via the brand lockup.
+ * The centre nav collapses into a slide-down menu below the `md` breakpoint.
  */
 
 const NAV = [
   { href: '/explore', key: 'explore' },
   { href: '/curators', key: 'curators' },
+  { href: '/editorial', key: 'editorial' },
+  { href: '/about', key: 'about' },
 ] as const
 
-export function PublicHeader() {
+export function PublicHeader({ transparent = false }: { transparent?: boolean } = {}) {
   const t = useTranslations('Nav')
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
@@ -42,8 +40,19 @@ export function PublicHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-lg">
+    <header
+      className={cn(
+        'top-0 z-40 w-full',
+        transparent
+          ? 'absolute border-b border-transparent bg-transparent'
+          : 'sticky border-b border-border bg-background/80 backdrop-blur-md',
+      )}
+    >
+      {/* Same horizontal rhythm as PageContainer (24px → 64px at lg) so the
+          header lines up with every other section on the page — no more
+          bespoke percentage padding drifting out of sync with the rest. */}
+      <div className="mx-auto h-[86px] w-full max-w-[1280px]">
+        <div className="flex h-full items-center justify-between px-lg lg:px-3xl">
         {/* Brand → landing. */}
         <Link
           href="/"
@@ -108,6 +117,7 @@ export function PublicHeader() {
             <Menu className="size-5" aria-hidden />
           )}
         </button>
+        </div>
       </div>
 
       {/* Mobile slide-down nav. */}

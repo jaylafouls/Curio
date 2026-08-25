@@ -2,7 +2,7 @@
   "Meta": {
     "siteName": "Curio",
     "defaultTitle": "Curio — The internet worth keeping",
-    "defaultDescription": "Curio is a curation social network. Save, organise and share the links worth keeping."
+    "defaultDescription": "Curio is a curation social network. Save, organize and share the links worth keeping."
   },
   "Nav": {
     "home": "Curio — home",
@@ -17,76 +17,84 @@
     "closeMenu": "Close menu"
   },
   "Footer": {
-    "tagline": "The internet worth keeping — save, organise and share what matters.",
+    "tagline": "The internet worth keeping — save, organize and share what matters.",
     "copyright": "© {year} Curio. All rights reserved."
   },
   "Landing": {
     "metaTitle": "Curio — The internet worth keeping",
-    "metaDescription": "Curio is a curation social network. Save, organise and share the links worth keeping — and discover inspiring collections built by curious minds.",
+    "metaDescription": "Curio is a curation social network. Save, organize and share the links worth keeping — and discover inspiring collections built by curious minds.",
     "eyebrow": "A universe of human curiosity",
     "titleBefore": "The internet worth ",
     "titleAccent": "keeping.",
-    "subtitle": "Save anything, organise it beautifully, and discover the web through the people you trust.",
+    "subtitle": "Collect links, ideas and places that inspire you. Discover the universes of curious minds.",
     "invalidToken": "That invitation link has expired — you can still join as a Discoverer.",
     "ctaBuild": "Build your universe",
     "ctaExplore": "Explore",
-    "socialProof": "Join the first 1,000 curators.",
+    "socialProof": "Join the first 1,000 curators",
+    "socialProofSub": "Who are building the future of Curio.",
     "universesBefore": "Explore inspiring ",
-    "universesAccent": "collections.",
-    "universesSubtitle": "Collections built by curious people, on the things worth keeping.",
-    "universesCta": "Explore all collections",
+    "universesAccent": "universes.",
+    "universesSubtitle": "Dive into the collections of people with taste, insight and perspective.",
+    "universesCta": "Explore all curators",
     "universesEmptyTag": "Coming soon",
     "universesEmptyTitle": "The first collections are on their way",
     "universesEmptyBody": "Curio is just opening its doors. Be one of the first to build a public collection worth keeping.",
     "values": {
       "collect": {
         "title": "Collect anything",
-        "body": "Links, places, products, ideas — save whatever is worth keeping, from anywhere."
+        "body": "Save links, places, products, articles and more."
       },
       "organize": {
-        "title": "Organise beautifully",
-        "body": "Shape your saves into collections and universes that actually feel like yours."
+        "title": "Organize beautifully",
+        "body": "Build collections that reflect your world."
       },
       "discover": {
         "title": "Discover through people",
-        "body": "Follow curious minds and explore the web through the people you trust."
+        "body": "Explore the universes of curious minds."
       },
       "keep": {
         "title": "Keep what matters",
-        "body": "No feed churn. What you save stays — a library that grows more valuable over time."
+        "body": "A home for your inspiration, forever."
       }
     }
   },
   "About": {
     "metaTitle": "About",
-    "metaDescription": "Curio's mission is to map human curiosity — a human-curated internet built on people, not algorithms.",
-    "eyebrow": "Our mission",
-    "missionBefore": "To map human ",
-    "missionAccent": "curiosity.",
-    "intro": "Curio is a home for the internet worth keeping — a place to collect links, ideas and places that inspire you, and to discover the universes of other curious minds. People before algorithms, quality over quantity.",
-    "valuesTitle": "What we believe",
-    "values": {
+    "metaDescription": "Why Curio exists — a home for the internet worth keeping, built on human curation, not algorithms.",
+    "eyebrow": "Why Curio",
+    "missionBefore": "The internet worth ",
+    "missionAccent": "keeping.",
+    "intro": "The internet produces more than anyone can consume. Algorithms decide what you see — optimizing for engagement, not meaning. Curio exists because we believe the best filter is a curious mind. A place to save what matters, share what inspires, and discover through the people you trust.",
+    "manifestoTitle": "Why we built this",
+    "manifestoP1": "Every day, you come across things worth remembering — an article that shifts your perspective, a place you want to visit, a product that solves a real problem. But there's nowhere good to put them. Bookmarks disappear. Social feeds bury the signal in noise. Nothing is built to last.",
+    "manifestoP2": "Curio is a home for the things you want to keep. Not a feed that forgets, not a bookmark graveyard — a living library shaped by your curiosity, organized the way your mind works.",
+    "manifestoP3": "And because the most interesting discoveries come from people, not algorithms, Curio lets you explore the universes of other curious minds. Follow people with taste and perspective. See what they keep. Build something worth sharing yourself.",
+    "principlesTitle": "What guides us",
+    "principles": {
       "human": {
-        "title": "Human first",
-        "body": "People before algorithms. Curation is a human act, and we build for the people doing it."
+        "title": "People over algorithms",
+        "body": "The best recommendations come from humans. We build for curators — people who collect, organize and share with intention."
       },
       "curiosity": {
-        "title": "Curiosity driven",
-        "body": "Explore, learn, stay open. We reward wandering and depth over the endless scroll."
+        "title": "Curiosity as a compass",
+        "body": "We reward depth, wandering and genuine interest. Not engagement metrics, not viral loops."
       },
       "curated": {
-        "title": "Thoughtfully curated",
-        "body": "Quality over quantity. The things worth keeping deserve care, not noise."
+        "title": "Quality over quantity",
+        "body": "A collection of ten perfect links beats a thousand forgotten bookmarks. We design for care, not volume."
       },
       "lasting": {
         "title": "Built to last",
-        "body": "A platform that grows with you — a library that gains value over time, not a feed that forgets."
+        "body": "What you save stays. Your library grows more valuable over time — not less."
+      },
+      "openness": {
+        "title": "Open discovery",
+        "body": "Browse freely. Follow who you want. No gated content, no algorithmic gatekeeping."
+      },
+      "craft": {
+        "title": "Craft in every detail",
+        "body": "Beautiful tools make better work. Every screen, every interaction, every pixel is considered."
       }
-    },
-    "stats": {
-      "curators": "Curators",
-      "collections": "Public collections",
-      "links": "Links kept"
     },
     "ctaBefore": "Start your ",
     "ctaAccent": "universe.",
@@ -131,11 +139,7 @@
     "subtitle": "Browse by topic and discover collections built by curious minds.",
     "tabAll": "All",
     "emptyTag": "Coming soon",
-    "emptyCta": "Build your universe",
     "curatorRole": "Curator",
-    "newTitle": "New & noteworthy",
-    "newEmptyTitle": "Fresh collections are coming",
-    "newEmptyBody": "As curators publish their collections, the newest and most noteworthy will surface here.",
     "collectionsTitle": "Explore by collections",
     "collectionsEmptyTitle": "No public collections yet",
     "collectionsEmptyBody": "Public collections will appear here as people start sharing what they keep.",
@@ -340,7 +344,8 @@
     "morning": "Good morning, {name}",
     "afternoon": "Good afternoon, {name}",
     "evening": "Good evening, {name}",
-    "tagline": "Discover something inspiring today."
+    "tagline": "Discover something inspiring today.",
+    "search": "Search your saved links"
   },
   "MySpace": {
     "metaTitle": "My Universe",
@@ -400,7 +405,7 @@
     "title": "Saved",
     "subtitle": "Everything you've kept, newest first.",
     "tabAll": "All links",
-    "tabInbox": "Inbox",
+    "tabInbox": "Unsorted",
     "tabUnsorted": "Unsorted",
     "countLinks": "{count, plural, =0 {No links} one {# link} other {# links}}",
     "unsortedBadge": "Unsorted",
@@ -416,7 +421,7 @@
     "moveLabel": "Move to a collection",
     "moveTitle": "Move to a collection",
     "moveEmpty": "You don't have any collections yet. Create one first, then move links into it.",
-    "moveToInbox": "Move back to Inbox",
+    "moveToInbox": "Move to Unsorted",
     "moveError": "Couldn't move this link. Please try again.",
     "emptyAllTag": "Nothing yet",
     "emptyAllTitle": "Your saved links will appear here",
@@ -446,7 +451,12 @@
     "publicCollections": "Public collections",
     "collectionsEmptyTag": "Nothing public yet",
     "collectionsEmptyTitle": "No public collections",
-    "collectionsEmptyBody": "This curator hasn't made any collections public yet."
+    "collectionsEmptyBody": "This curator hasn't made any collections public yet.",
+    "follow": "Follow",
+    "followSignIn": "Sign in to follow",
+    "followError": "Couldn’t update — try again.",
+    "editProfile": "Edit profile",
+    "followingState": "Following"
   },
   "CollectionModal": {
     "createTitle": "New collection",
@@ -640,7 +650,6 @@
     "metaDescription": "Manage your Curio account, profile, language and privacy.",
     "title": "Settings",
     "subtitle": "Manage your account, profile and preferences.",
-
     "profileHeading": "Profile",
     "profileHint": "This information appears on your public profile.",
     "avatarLabel": "Profile photo",
@@ -661,26 +670,22 @@
     "profileSave": "Save changes",
     "profileSaving": "Saving…",
     "profileSaved": "Profile saved.",
-
     "languageHeading": "Language",
     "languageHint": "Choose the language for the Curio interface.",
     "languageEnglish": "English",
     "languageFrench": "Français",
     "languageSaving": "Switching…",
-
     "privacyHeading": "Privacy",
     "privacyHint": "Curio never sets non-essential cookies without your consent.",
     "privacyPreferenceCenter": "Cookie preferences",
     "privacyPreferenceCenterBody": "Review or change your cookie and analytics choices at any time.",
     "privacyOpenPreferences": "Manage preferences",
-
     "connectedHeading": "Connected apps",
     "connectedHint": "The sign-in methods linked to your account.",
     "connectedProviderEmail": "Email & password",
     "connectedProviderGoogle": "Google",
     "connectedSince": "Connected {date}",
     "connectedEmpty": "No connected sign-in methods.",
-
     "extensionHeading": "Chrome extension",
     "extensionHint": "Save links to Curio straight from your browser. Generate a token, then paste it into the Curio extension to connect it to your account.",
     "extensionLabelLabel": "Token name (optional)",
@@ -697,7 +702,6 @@
     "extensionLastUsed": "Last used {date}",
     "extensionNeverUsed": "Created {date} · not used yet",
     "extensionRevoke": "Revoke",
-
     "notificationsHeading": "Notifications",
     "billingHeading": "Billing & plan",
     "themeHeading": "Theme",
@@ -709,7 +713,6 @@
     "comingSoon": "Coming soon",
     "notificationsComingSoon": "Notification preferences will arrive in a future update.",
     "billingComingSoon": "Plans and billing will arrive in a future update.",
-
     "dangerHeading": "Delete account",
     "dangerHint": "Permanently delete your account and all your data. This cannot be undone.",
     "deleteCta": "Delete my account",
@@ -720,7 +723,6 @@
     "deleteConfirmCta": "Delete permanently",
     "deleteDeleting": "Deleting…",
     "deleteCancel": "Cancel",
-
     "errorInvalid": "Please check the highlighted fields.",
     "errorUsernameTaken": "That username is already taken.",
     "errorServer": "Something went wrong. Please try again.",
@@ -755,15 +757,8 @@
     "tablistLabel": "Filter notifications",
     "tab": {
       "all": "All",
-      "comments": "Comments",
-      "follows": "Follows",
-      "likes": "Likes",
-      "mentions": "Mentions"
+      "follows": "Follows"
     },
-    "comingSoon": "Coming soon",
-    "comingSoonTag": "Coming soon",
-    "comingSoonTitle": "Not available yet",
-    "comingSoonBody": "This kind of activity will appear here once the feature ships.",
     "followedYou": "started following you",
     "followedCollection": "started following your collection",
     "someone": "Someone",

@@ -1,41 +1,21 @@
 import type { Metadata } from 'next'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import { ArrowRight, Bookmark, FolderTree, Users, Sparkles } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 import { buildMetadata } from '@/lib/seo/metadata'
-import { JsonLd, buildCollectionPage } from '@/lib/seo/json-ld'
-import { SITE_URL } from '@/lib/seo/config'
 import { checkInvitationToken } from '@/lib/auth/invitation'
-import {
-  AccentText,
-  Avatar,
-  Badge,
-  ButtonLink,
-  CollectionCard,
-} from '@/components/ui'
+import { AccentText, ButtonLink } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicConnectedShell } from '@/components/app/public-connected-shell'
 import { PublicShell } from '@/components/public/public-shell'
-import { OrbitalViz } from '@/components/public/orbital-viz'
-import { getPublicTopics, getPublicCollections } from '@/lib/public/data'
+import { getPublicCollections, getPublicCurators } from '@/lib/public/data'
 
 type PageProps = {
   params: Promise<{ locale: Locale }>
   searchParams: Promise<{ token?: string }>
 }
 
-/**
- * Landing / — the public marketing home (spec §8.1). Replaces the earlier
- * minimal Welcome screen while PRESERVING its invitation-token behaviour: a
- * valid `?token=` still forwards to /signup?token= for redemption; an invalid
- * one is dropped (visitor proceeds as a normal Découvreur).
- *
- * Light Archive surface (the authoritative high-res landing mockup is light,
- * not Cosmic) — see D on the spec-text-vs-mockup conflict. Wrapped in
- * PublicConnectedShell so a signed-in visitor gets the connected app chrome
- * while the cookie-free anon/crawler render stays the shared PublicShell (header
- * + footer), byte-identical to before. generateMetadata per brief rule 1.
- */
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -51,12 +31,36 @@ export async function generateMetadata({
   })
 }
 
-// Press wordmarks were removed (recette item 7, option a): displaying
-// Monocle/Kinfolk/NYT/Vogue under a social-proof banner implied those brands
-// use or endorse Curio, which is false. GTM §1 frames "the first 1,000
-// curators" as the Founding Curators recruitment CTA (kept), but never claims
-// any press relationship. A reframed "in the spirit of…" inspiration strip is
-// a launch-time option (Decisions Log §19), deliberately deferred, not shipped.
+const FEATURES = [
+  { key: 'collect', color: 'bg-violet/10 text-violet', symbol: '♡' },
+  { key: 'organize', color: 'bg-[#EEF2E7] text-[#728A53]', symbol: '♧' },
+  { key: 'discover', color: 'bg-[#FBF1DD] text-[#D6A24E]', symbol: '◎' },
+  { key: 'keep', color: 'bg-[#FBEAEA] text-[#D27B7B]', symbol: '♡' },
+] as const
+
+// Hero orbit — simplified, viewport-proof geometry (see comment at the call
+// site). Fixed pixel radius, 6 topics evenly spaced at 60° starting from the
+// top, computed once with plain trig instead of reference-measured percentages.
+const ORBIT_RADIUS = 112
+const ORBIT_BOX = ORBIT_RADIUS * 2 + 140 // room for the 60px node + its two-line label
+
+const ORBIT_TOPIC_DEFS = [
+  { src: '/landing/travel.jpg', label: 'Travel', count: 128, angle: 0 },
+  { src: '/landing/books.jpg', label: 'Books', count: 86, angle: 60 },
+  { src: '/landing/ideas.jpg', label: 'Ideas', count: 64, angle: 120 },
+  { src: '/landing/food.jpg', label: 'Food', count: 93, angle: 180 },
+  { src: '/landing/culture.jpg', label: 'Culture', count: 72, angle: 240 },
+  { src: '/landing/style.jpg', label: 'Style', count: 110, angle: 300 },
+] as const
+
+const ORBIT_TOPICS = ORBIT_TOPIC_DEFS.map((topic) => {
+  const radians = (topic.angle * Math.PI) / 180
+  return {
+    ...topic,
+    x: Math.round(ORBIT_RADIUS * Math.sin(radians)),
+    y: Math.round(-ORBIT_RADIUS * Math.cos(radians)),
+  }
+})
 
 export default async function LandingPage({ params, searchParams }: PageProps) {
   const { locale } = await params
@@ -64,194 +68,380 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
   const { token } = await searchParams
   const t = await getTranslations('Landing')
 
-  // Invitation token (preserved from the old Welcome): valid → forward to
-  // signup with the token; invalid → dropped. Absent → nothing.
   const tokenState = await checkInvitationToken(token)
   const signupHref =
     tokenState === 'valid' ? `/signup?token=${token}` : '/signup'
 
-  const [topics, collections] = await Promise.all([
-    getPublicTopics(locale),
-    getPublicCollections(5),
-  ])
+  const collections = await getPublicCollections(5)
+  const socialProofCurators = await getPublicCurators(4)
 
-  const values = [
-    { icon: Bookmark, key: 'collect' },
-    { icon: FolderTree, key: 'organize' },
-    { icon: Users, key: 'discover' },
-    { icon: Sparkles, key: 'keep' },
-  ] as const
-
-  // Built once, handed to PublicConnectedShell twice: wrapped in <PublicShell>
-  // for the server-rendered anon frame, and bare for the connected AppShellFrame
-  // path. The wrapper picks one at runtime by session (same idiom as /explore).
-  // The landing reads only cookie-free clients (checkInvitationToken via
-  // createAdminClient, getPublicTopics/getPublicCollections via the anon client),
-  // so the anon path stays byte-identical to the previous server render.
   const content = (
     <>
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="mx-auto w-full max-w-6xl px-lg pt-2xl pb-xl sm:pt-3xl">
-        <div className="flex flex-col items-center gap-lg text-center">
-          <span className="font-sans text-meta font-medium uppercase tracking-widest text-foreground/50">
-            {t('eyebrow')}
-          </span>
-          <AccentText
-            before={t('titleBefore')}
-            accent={t('titleAccent')}
-            size="display"
-            as="h1"
-            className="max-w-3xl text-balance"
-          />
-          <p className="max-w-xl font-sans text-body text-foreground/70">
-            {t('subtitle')}
-          </p>
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      <section className="relative w-full overflow-hidden" style={{ paddingTop: 86 }}>
+        {/* Full-bleed constellation layer — spans the header band too (bleeds
+            upward by the header's 86px height) so header and hero read as one
+            continuous field, mockup-exact (no seam at the nav line). */}
+        <svg
+          className="pointer-events-none absolute inset-x-0 z-0 w-full"
+          style={{ top: -86, height: 'calc(100% + 86px)' }}
+          viewBox="0 0 1280 484"
+          preserveAspectRatio="none"
+          fill="none"
+          aria-hidden
+        >
+          {/* Constellation lines — scattered across the full width, header
+              through hero, left edge (under the logo) to right edge (under
+              Sign up). */}
+          <line x1="60" y1="30" x2="95" y2="55" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.5" />
+          <line x1="95" y1="55" x2="80" y2="90" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.4" />
+          <line x1="150" y1="20" x2="185" y2="45" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.35" />
+          <line x1="230" y1="60" x2="260" y2="35" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.3" />
+          <line x1="950" y1="25" x2="985" y2="50" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.4" />
+          <line x1="985" y1="50" x2="1020" y2="30" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.4" />
+          <line x1="1020" y1="30" x2="1050" y2="60" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.35" />
+          <line x1="1100" y1="15" x2="1130" y2="40" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.35" />
+          <line x1="1180" y1="55" x2="1210" y2="30" stroke="#D9D8DE" strokeWidth="0.8" opacity="0.3" />
+          <line x1="440" y1="100" x2="470" y2="130" stroke="#D9D8DE" strokeWidth="0.6" opacity="0.35" />
+          <line x1="780" y1="105" x2="810" y2="135" stroke="#D9D8DE" strokeWidth="0.6" opacity="0.35" />
+          {/* Constellation dots — full width, denser than a scoped orbit motif. */}
+          <circle cx="60" cy="30" r="2" fill="#6C5CE7" opacity="0.55" />
+          <circle cx="95" cy="55" r="1.6" fill="#E6A06A" opacity="0.5" />
+          <circle cx="80" cy="90" r="1.6" fill="#D9D8DE" opacity="0.45" />
+          <circle cx="150" cy="20" r="1.6" fill="#6C5CE7" opacity="0.4" />
+          <circle cx="185" cy="45" r="1.4" fill="#E6A06A" opacity="0.35" />
+          <circle cx="230" cy="60" r="1.6" fill="#D9D8DE" opacity="0.35" />
+          <circle cx="260" cy="35" r="1.4" fill="#6C5CE7" opacity="0.3" />
+          <circle cx="330" cy="15" r="1.6" fill="#E6A06A" opacity="0.3" />
+          <circle cx="380" cy="50" r="1.4" fill="#D9D8DE" opacity="0.3" />
+          <circle cx="440" cy="100" r="1.6" fill="#6C5CE7" opacity="0.3" />
+          <circle cx="470" cy="130" r="1.4" fill="#E6A06A" opacity="0.25" />
+          <circle cx="780" cy="105" r="1.6" fill="#E6A06A" opacity="0.3" />
+          <circle cx="810" cy="135" r="1.4" fill="#6C5CE7" opacity="0.25" />
+          <circle cx="950" cy="25" r="1.8" fill="#6C5CE7" opacity="0.45" />
+          <circle cx="985" cy="50" r="1.6" fill="#E6A06A" opacity="0.4" />
+          <circle cx="1020" cy="30" r="1.6" fill="#D9D8DE" opacity="0.4" />
+          <circle cx="1050" cy="60" r="1.4" fill="#6C5CE7" opacity="0.35" />
+          <circle cx="1100" cy="15" r="1.6" fill="#E6A06A" opacity="0.35" />
+          <circle cx="1130" cy="40" r="1.4" fill="#D9D8DE" opacity="0.3" />
+          <circle cx="1180" cy="55" r="1.6" fill="#6C5CE7" opacity="0.3" />
+          <circle cx="1210" cy="30" r="1.4" fill="#E6A06A" opacity="0.35" />
+          <circle cx="1245" cy="70" r="1.6" fill="#D9D8DE" opacity="0.3" />
+          <circle cx="30" cy="150" r="1.6" fill="#E6A06A" opacity="0.3" />
+          <circle cx="70" cy="260" r="1.8" fill="#6C5CE7" opacity="0.3" />
+          <circle cx="120" cy="340" r="1.4" fill="#D9D8DE" opacity="0.3" />
+          <circle cx="1180" cy="220" r="1.6" fill="#6C5CE7" opacity="0.3" />
+          <circle cx="1220" cy="300" r="1.4" fill="#E6A06A" opacity="0.3" />
+          <circle cx="1160" cy="380" r="1.6" fill="#D9D8DE" opacity="0.3" />
+        </svg>
 
-          {tokenState === 'invalid' ? (
-            <p
-              role="status"
-              className="max-w-sm font-sans text-body-small text-foreground/60"
-            >
-              {t('invalidToken')}
-            </p>
-          ) : null}
+        {/* Single relative 1280-wide canvas — copy, orbit and photo are all
+            positioned against these SAME coordinates (measured directly off
+            01-curio-reference-4x.png, 1280×853), not split into separate grid
+            columns with their own coordinate systems (that's what silently
+            distorted the orbit earlier). */}
+        <div className="relative z-10 mx-auto min-h-[398px] max-w-[1280px]">
+          {/* Copy + CTAs — normal flow, capped width, left offset matches the
+              same px-lg → lg:px-3xl rhythm as the header/collections/feature
+              bar below, so the whole page shares one consistent left edge. */}
+          <div className="absolute inset-y-0 left-0 z-10 flex max-w-[460px] flex-col justify-center gap-sm py-md pl-lg sm:py-lg lg:pl-3xl">
+            <span className="font-sans text-[11px] font-medium uppercase tracking-[0.1em] text-violet">
+              {t('eyebrow')}
+            </span>
 
-          <div className="mt-sm flex flex-col items-center gap-sm sm:flex-row">
-            <ButtonLink
-              href={signupHref}
-              iconRight={<ArrowRight className="size-4" />}
-            >
-              {t('ctaBuild')}
-            </ButtonLink>
-            <Link
-              href="/explore"
-              className="inline-flex h-11 items-center gap-sm rounded-full border border-border px-lg font-sans text-body-small text-foreground/80 transition-colors duration-base hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
-            >
-              {t('ctaExplore')}
-              <ArrowRight className="size-4" aria-hidden />
-            </Link>
-          </div>
-        </div>
-
-        {/* Orbital visualisation — You + Core Topics. */}
-        <div className="mt-2xl sm:mt-3xl">
-          <OrbitalViz topics={topics} />
-        </div>
-      </section>
-
-      {/* ── Social proof (Founding Curators recruitment CTA, GTM §1) ──────── */}
-      <section className="mx-auto w-full max-w-6xl px-lg py-xl">
-        <div className="flex flex-col items-center gap-md">
-          <div className="flex items-center gap-md">
-            <div className="flex -space-x-2">
-              {['A', 'B', 'C', 'D', 'E'].map((seed) => (
-                <Avatar key={seed} name={seed} size="sm" />
-              ))}
-            </div>
-            <p className="font-sans text-body-small text-foreground/70">
-              {t('socialProof')}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Explore inspiring universes ──────────────────────────────────── */}
-      <section className="mx-auto w-full max-w-6xl px-lg py-2xl">
-        <div className="flex flex-col gap-lg">
-          <div className="flex flex-col gap-sm">
             <AccentText
-              before={t('universesBefore')}
-              accent={t('universesAccent')}
-              size="h1"
-              as="h2"
+              before={t('titleBefore')}
+              accent={t('titleAccent')}
+              accentColor="inherit"
+              size="display"
+              as="h1"
+              className="max-w-[330px] text-[clamp(2rem,4.2vw,3.25rem)] leading-[1.08]"
             />
-            <p className="max-w-xl font-sans text-body text-foreground/70">
-              {t('universesSubtitle')}
-            </p>
-          </div>
 
-          {collections.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3">
-                {collections.map((c) => (
-                  <div key={c.id}>
-                    <JsonLd
-                      data={buildCollectionPage({
-                        name: c.title,
-                        url: `${SITE_URL}/${locale}/collections/${c.slug}`,
-                        description: c.description ?? undefined,
-                        image: c.cover ?? undefined,
-                        author: {
-                          name: c.owner.name,
-                          url: `${SITE_URL}/${locale}/profile/${c.owner.username}`,
-                        },
-                      })}
-                    />
-                    <Link
-                      href={`/collections/${c.slug}`}
-                      className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
-                    >
-                      <CollectionCard
-                        title={c.title}
-                        topic={c.topic}
-                        cover={c.cover ?? undefined}
-                        mosaic={c.mosaic}
-                        owner={{
-                          name: c.owner.name,
-                          avatar: c.owner.avatar ?? undefined,
-                        }}
-                        linksCount={c.linksCount}
-                      />
-                    </Link>
-                  </div>
-                ))}
-              </div>
-              <div>
-                <Link
-                  href="/explore"
-                  className="inline-flex items-center gap-xs font-sans text-body-small font-medium text-violet transition-colors hover:opacity-80"
-                >
-                  {t('universesCta')}
-                  <ArrowRight className="size-4" aria-hidden />
-                </Link>
-              </div>
-            </>
-          ) : (
-            // Empty state — 0 public collections in prod. Graceful, no fake seeding.
-            <div className="flex flex-col items-center gap-md rounded-lg border border-border bg-foreground/[0.02] px-lg py-3xl text-center">
-              <Badge topic="ideas">{t('universesEmptyTag')}</Badge>
-              <h3 className="font-serif text-h3 text-foreground">
-                {t('universesEmptyTitle')}
-              </h3>
-              <p className="max-w-md font-sans text-body-small text-foreground/70">
-                {t('universesEmptyBody')}
+            <p className="max-w-sm font-sans text-[13px] leading-relaxed text-[#444]">
+              {t('subtitle')}
+            </p>
+
+            {tokenState === 'invalid' ? (
+              <p
+                role="status"
+                className="max-w-sm font-sans text-body-small text-foreground/60"
+              >
+                {t('invalidToken')}
               </p>
+            ) : null}
+
+            <div className="mt-xs flex flex-nowrap items-center gap-sm">
               <ButtonLink
                 href={signupHref}
-                className="mt-xs"
+                size="small"
+                className="whitespace-nowrap"
                 iconRight={<ArrowRight className="size-4" />}
               >
                 {t('ctaBuild')}
               </ButtonLink>
+              <ButtonLink
+                href="/explore"
+                variant="secondary"
+                size="small"
+                className="whitespace-nowrap"
+                iconRight={<ArrowRight className="size-4" />}
+              >
+                {t('ctaExplore')}
+              </ButtonLink>
             </div>
-          )}
+
+            {/* Founding Curators social proof — real curator avatars (not
+                fake gradient placeholders), same "use the real data" call as
+                the collection covers below. Falls back to a gradient chip
+                for any curator without an avatar_url yet. */}
+            <div className="mt-sm flex items-center gap-sm">
+              <div className="flex -space-x-2" aria-hidden>
+                {(socialProofCurators.length > 0
+                  ? socialProofCurators
+                  : [null, null, null, null]
+                ).map((curator, i) => {
+                  const fallbackGradients = [
+                    'from-[#D9C6A6] to-[#C98A4B]',
+                    'from-[#CFC3FF] to-[#785CFF]',
+                    'from-[#93AFA8] to-[#6A7B7A]',
+                    'from-[#D9AFAE] to-[#C1694F]',
+                  ]
+                  return curator?.avatarUrl ? (
+                    <span
+                      key={curator.id}
+                      className="relative inline-block size-8 overflow-hidden rounded-full ring-2 ring-white"
+                    >
+                      <Image
+                        src={curator.avatarUrl}
+                        alt={curator.displayName}
+                        fill
+                        className="object-cover"
+                        sizes="32px"
+                      />
+                    </span>
+                  ) : (
+                    <span
+                      key={curator?.id ?? i}
+                      className={`inline-block size-8 rounded-full bg-gradient-to-br ring-2 ring-white ${fallbackGradients[i % fallbackGradients.length]}`}
+                    />
+                  )
+                })}
+              </div>
+              <div className="flex flex-col">
+                <span className="font-sans text-[12px] font-medium text-foreground/80">
+                  {t('socialProof')}
+                </span>
+                <span className="font-sans text-[10px] text-foreground/50">
+                  {t('socialProofSub')}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Centre: "You" + Topic orbit — simplified rebuild (2026-08-24).
+              The mockup-exact version kept breaking (positions/sizes off)
+              because it depended on percentages resolving correctly against
+              a container whose own aspect ratio shifts with viewport width —
+              fragile by construction. This version drops that dependency
+              entirely: one fixed-size square (ORBIT_BOX), 6 topics at even
+              60° angles around a fixed pixel radius, computed with plain
+              trig. Not a copy of the reference's exact (slightly irregular)
+              geometry — the brief here is "You in the centre, your topics
+              around you," reproduced cleanly and predictably at any
+              viewport, not chased pixel-for-pixel. */}
+          <div
+            className="pointer-events-none absolute left-[53%] top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
+            style={{ width: ORBIT_BOX, height: ORBIT_BOX }}
+          >
+            {/* Single orbit ring, sized to the same radius the nodes sit on. */}
+            <span
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/50"
+              style={{ width: ORBIT_RADIUS * 2, height: ORBIT_RADIUS * 2 }}
+            />
+
+            {/* "You" centre node */}
+            <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
+              <span
+                className="flex size-[76px] items-center justify-center rounded-full bg-white font-sans text-[13px] font-medium text-foreground ring-1 ring-border/30"
+                style={{
+                  boxShadow:
+                    '0 0 0 14px rgba(120,92,255,0.06), 0 0 0 28px rgba(120,92,255,0.03), 0 4px 12px rgba(0,0,0,0.08)',
+                }}
+              >
+                You
+              </span>
+            </div>
+
+            {/* Topic nodes — evenly spaced at 60° around ORBIT_RADIUS, offset
+                computed once in ORBIT_TOPICS below (plain sin/cos, no
+                percentage math). */}
+            {ORBIT_TOPICS.map((topic) => (
+              <div
+                key={topic.label}
+                className="absolute left-1/2 top-1/2 flex flex-col items-center gap-[2px]"
+                style={{ transform: `translate(calc(-50% + ${topic.x}px), calc(-50% + ${topic.y}px))` }}
+              >
+                <div className="relative size-[60px] overflow-hidden rounded-full border border-border/60" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
+                  <Image
+                    src={topic.src}
+                    alt={topic.label}
+                    fill
+                    className="object-cover object-center"
+                    sizes="60px"
+                  />
+                </div>
+                <span className="whitespace-nowrap font-sans text-[11px] font-medium text-foreground/80">
+                  {topic.label}
+                </span>
+                <span className="whitespace-nowrap font-sans text-[9px] text-foreground/45">
+                  {topic.count} collections
+                </span>
+              </div>
+            ))}
+          </div>
+
+        </div>
+
+        {/* Right: hero photo — a sibling of the 1280-capped block above, not
+            a child of it, so it can bleed to the TRUE viewport edge on wide
+            screens instead of stopping at a gutter once the viewport exceeds
+            1280px. Left edge = min(70.31%, 50%+260px): below 1280px viewport
+            that's a plain 70.31% (== the reference's 900/1280 bbox, no
+            centering offset yet); above 1280px the 1280-block is centered, so
+            "50% of viewport + 260px" is the fixed distance from that block's
+            center to its own x=900 mark — using whichever is smaller keeps
+            the photo's left edge locked to the content block while its right
+            edge always reaches true right:0 (full bleed, no white band). */}
+        <div
+          className="absolute inset-y-0 right-0 hidden overflow-hidden lg:block"
+          style={{ left: 'min(70.31%, calc(50% + 260px))' }}
+        >
+          <Image
+            src="/landing/hero-photo.jpg"
+            alt=""
+            fill
+            className="object-cover"
+            style={{ objectPosition: 'center' }}
+            sizes="30vw"
+            priority
+          />
+          {/* Left fade into background */}
+          <div
+            className="absolute inset-y-0 left-0 w-28"
+            style={{
+              background:
+                'linear-gradient(to right, rgb(var(--background)), transparent)',
+            }}
+          />
         </div>
       </section>
 
-      {/* ── Values ───────────────────────────────────────────────────────── */}
-      <section className="mx-auto w-full max-w-6xl px-lg py-2xl">
-        <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-4">
-          {values.map(({ icon: Icon, key }) => (
-            <div key={key} className="flex flex-col gap-sm">
-              <span className="flex size-11 items-center justify-center rounded-full bg-violet/10 text-violet">
-                <Icon className="size-5" strokeWidth={2} aria-hidden />
+      {/* ── Collections showcase ───────────────────────────────────── */}
+      <section className="bg-[#FAF9F5]">
+        {/* Same px-lg → lg:px-3xl rhythm as the header/hero copy/feature bar,
+            nested inside the width-capped block so it lines up with them. */}
+        <div className="mx-auto w-full max-w-[1280px]">
+        <div className="flex w-full flex-col gap-md px-lg py-md sm:flex-row sm:items-start sm:gap-lg lg:px-3xl">
+          {/* Left: text */}
+          <div className="flex w-full shrink-0 flex-col gap-xs sm:w-[220px] sm:pt-sm">
+            <h2 className="font-serif text-[28px] leading-[1.15] text-foreground">
+              {t('universesBefore')}
+              <em className="italic text-violet">{t('universesAccent')}</em>
+            </h2>
+            <p className="font-sans text-[11px] leading-relaxed text-[#666]">
+              {t('universesSubtitle')}
+            </p>
+            <Link
+              href="/explore"
+              className="mt-xs inline-flex items-center gap-xs font-sans text-[11px] font-medium text-violet transition-colors hover:opacity-80"
+            >
+              {t('universesCta')}
+              <ArrowRight className="size-3" aria-hidden />
+            </Link>
+          </div>
+
+          {/* Right: real public collections (empty today → empty state) */}
+          {collections.length > 0 ? (
+            <div className="relative flex-1">
+              <div className="grid grid-cols-2 gap-[12px] sm:grid-cols-3 lg:grid-cols-5">
+                {collections.map((col) => (
+                  <Link
+                    key={col.id}
+                    href={`/collections/${col.slug}`}
+                    className="group relative h-[180px] overflow-hidden rounded-[10px] shadow-md"
+                  >
+                    {col.cover ? (
+                      <Image
+                        src={col.cover}
+                        alt={col.title}
+                        fill
+                        className="object-cover transition-transform duration-base group-hover:scale-[1.03]"
+                        style={
+                          // tokyo.jpg has a "FEATURED" pill baked into its
+                          // top-left corner (from the reference extraction);
+                          // center-cropping this card's aspect clips it, so
+                          // anchor left/top here instead of cropping evenly.
+                          col.cover.includes('tokyo.jpg')
+                            ? { objectPosition: 'left top' }
+                            : undefined
+                        }
+                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 170px"
+                      />
+                    ) : (
+                      <div className="h-full bg-muted" />
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-sm pb-sm pt-lg">
+                      <span className="font-serif text-[14px] leading-tight text-white">
+                        {col.title}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              {/* Carousel affordance from the reference — decorative for now
+                  (only 5 demo collections exist, nothing to page through
+                  yet); wire up real paging once the collection count grows
+                  past one row. */}
+              <span
+                aria-hidden
+                className="absolute right-0 top-1/2 hidden size-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full bg-white text-foreground shadow-md lg:flex"
+              >
+                <ArrowRight className="size-4" />
               </span>
-              <h3 className="font-serif text-h3 text-foreground">
-                {t(`values.${key}.title`)}
-              </h3>
-              <p className="font-sans text-body-small text-foreground/70">
-                {t(`values.${key}.body`)}
+            </div>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center gap-xs py-lg text-center">
+              <span className="font-sans text-[10px] font-medium uppercase tracking-wide text-violet/60">
+                {t('universesEmptyTag')}
+              </span>
+              <p className="font-sans text-[13px] text-foreground/60">
+                {t('universesEmptyTitle')}
               </p>
+            </div>
+          )}
+        </div>
+        </div>
+      </section>
+
+      {/* ── Feature bar ────────────────────────────────────────────── */}
+      <section className="mx-auto w-full max-w-[1280px] px-lg py-lg lg:px-3xl">
+        <div className="grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map(({ key, color, symbol }) => (
+            <div key={key} className="flex items-start gap-sm">
+              <span
+                className={`flex size-[42px] shrink-0 items-center justify-center rounded-full text-[19px] ${color}`}
+              >
+                {symbol}
+              </span>
+              <div className="flex flex-col gap-[2px]">
+                <span className="font-sans text-[12px] font-medium text-foreground">
+                  {t(`values.${key}.title`)}
+                </span>
+                <span className="font-sans text-[10px] leading-snug text-[#666]">
+                  {t(`values.${key}.body`)}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -262,7 +452,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
   return (
     <PublicConnectedShell
       locale={locale}
-      anon={<PublicShell>{content}</PublicShell>}
+      anon={<PublicShell transparentHeader>{content}</PublicShell>}
     >
       {content}
     </PublicConnectedShell>

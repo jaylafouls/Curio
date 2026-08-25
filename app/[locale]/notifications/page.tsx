@@ -17,9 +17,10 @@ import type { Locale } from '@/lib/i18n/routing'
  *
  * Feed content is real follow notifications only — the sole social action that
  * emits today (user follow → notify followed; collection follow → notify the
- * collection owner). Comments/Likes/Mentions tabs exist per the spec but are
- * disabled "Coming soon" (no source feature), so no fake rows are ever shown.
- * A fresh account reads [] and the client renders its designed empty state.
+ * collection owner). The tab strip is All · Follows; the placeholder
+ * Comments/Likes/Mentions tabs were removed (recette P2-7) rather than shipped
+ * as dead "Coming soon" affordances, so no fake rows are ever shown. A fresh
+ * account reads [] and the client renders its designed empty state.
  *
  * noindex: a private authenticated page must never be crawled or indexed.
  */

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1280" height="853" viewBox="0 0 1280 853">
+  <title>Curio — Landing Page reconstructed from reference</title>
+  <desc>Editable SVG reconstruction of the supplied Curio landing page. Text, buttons,
+  cards, circles and decorative network are represented as vector elements; photography
+  is provided as cropped image assets.</desc>
+
+  <defs>
+    <linearGradient id="heroFade" x1="0" x2="1">
+      <stop offset="0" stop-color="#F8F7F3" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#F8F7F3" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.12"/>
+    </filter>
+    <clipPath id="heroClip"><rect x="900" y="86" width="380" height="398"/></clipPath>
+    <clipPath id="card1"><rect x="305" y="556" width="183" height="180" rx="10"/></clipPath>
+    <clipPath id="card2"><rect x="501" y="556" width="170" height="180" rx="10"/></clipPath>
+    <clipPath id="card3"><rect x="683" y="556" width="170" height="180" rx="10"/></clipPath>
+    <clipPath id="card4"><rect x="866" y="556" width="171" height="180" rx="10"/></clipPath>
+    <clipPath id="card5"><rect x="1047" y="556" width="166" height="180" rx="10"/></clipPath>
+  </defs>
+
+  <!-- PAGE -->
+  <rect width="1280" height="853" fill="#F8F7F3"/>
+
+  <!-- HEADER -->
+  <g id="header">
+    <g id="logo">
+      <circle cx="61" cy="53" r="26" fill="none" stroke="#6C5CE7" stroke-width="1.2"/>
+      <circle cx="61" cy="27" r="2.2" fill="#6C5CE7"/>
+      <circle cx="86" cy="53" r="2.2" fill="#D9A06B"/>
+      <circle cx="61" cy="79" r="2.2" fill="#D9A06B"/>
+      <text x="61" y="63" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#111827">C</text>
+      <text x="102" y="59" font-family="Georgia, serif" font-size="29" fill="#111827">curio</text>
+    </g>
+    <g font-family="Arial, sans-serif" font-size="11" fill="#111827">
+      <text x="477" y="42">Explore</text>
+      <text x="564" y="42">Curators</text>
+      <text x="646" y="42">Editorial</text>
+      <text x="725" y="42">About</text>
+      <text x="1091" y="42">Log in</text>
+    </g>
+    <rect x="1152" y="19" width="84" height="38" rx="20" fill="#111827"/>
+    <text x="1194" y="43" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#fff">Sign up</text>
+  </g>
+
+  <!-- HERO -->
+  <g id="hero">
+    <rect x="0" y="86" width="1280" height="398" fill="#F8F7F3"/>
+    <g id="network" fill="none" stroke="#D9D8DE" stroke-width="0.8" opacity="0.8">
+      <ellipse cx="650" cy="280" rx="160" ry="120"/>
+      <ellipse cx="650" cy="280" rx="105" ry="80"/>
+      <path d="M360 75 L460 210 L420 370 L560 450"/>
+      <path d="M840 80 L760 210 L900 360 L1010 420"/>
+      <path d="M300 390 L440 330 L560 430"/>
+    </g>
+    <g id="networkDots">
+      <circle cx="359" cy="75" r="2.5" fill="#7565E8"/><circle cx="445" cy="92" r="2.5" fill="#E6A06A"/>
+      <circle cx="358" cy="235" r="2.5" fill="#7565E8"/><circle cx="404" cy="335" r="2.5" fill="#E6A06A"/>
+      <circle cx="839" cy="67" r="2.5" fill="#7565E8"/><circle cx="899" cy="113" r="2.5" fill="#E6A06A"/>
+      <circle cx="773" cy="267" r="2.5" fill="#8C3030"/><circle cx="901" cy="94" r="2.5" fill="#BFC0C9"/>
+      <circle cx="1015" cy="52" r="2.5" fill="#7565E8"/><circle cx="876" cy="205" r="2.5" fill="#7565E8"/>
+      <circle cx="773" cy="390" r="2.5" fill="#E6A06A"/><circle cx="445" cy="453" r="2.5" fill="#7565E8"/>
+    </g>
+
+    <text x="83" y="132" font-family="Arial, sans-serif" font-size="11" letter-spacing="1.1" fill="#6C5CE7">A UNIVERSE OF HUMAN CURIOSITY</text>
+    <text x="82" y="201" font-family="Georgia, 'Times New Roman', serif" font-size="52" fill="#111827">The internet</text>
+    <text x="82" y="260" font-family="Georgia, 'Times New Roman', serif" font-size="52" fill="#111827">worth keeping.</text>
+    <text x="83" y="302" font-family="Arial, sans-serif" font-size="13" fill="#444">Collect links, ideas and places that inspire you.</text>
+    <text x="83" y="321" font-family="Arial, sans-serif" font-size="13" fill="#444">Discover the universes of curious minds.</text>
+
+    <rect x="82" y="349" width="156" height="39" rx="21" fill="#111827"/>
+    <text x="105" y="373" font-family="Arial, sans-serif" font-size="12" fill="#fff">Build your universe</text>
+    <text x="215" y="373" font-family="Arial, sans-serif" font-size="18" fill="#fff">→</text>
+
+    <rect x="249" y="349" width="101" height="39" rx="21" fill="#F8F7F3" stroke="#E1E0DC"/>
+    <text x="272" y="373" font-family="Arial, sans-serif" font-size="12" fill="#222">Explore</text>
+    <text x="320" y="373" font-family="Arial, sans-serif" font-size="18" fill="#999">→</text>
+
+    <g id="avatars">
+      <circle cx="96" cy="433" r="15" fill="#C9B49D"/><circle cx="112" cy="431" r="15" fill="#A78E7A"/>
+      <circle cx="128" cy="434" r="15" fill="#7C8A8C"/><circle cx="144" cy="431" r="15" fill="#BBAAA0"/>
+      <circle cx="160" cy="434" r="15" fill="#6F6A63"/>
+      <text x="190" y="428" font-family="Arial, sans-serif" font-size="12" fill="#333">Join the first 1,000 curators</text>
+      <text x="190" y="447" font-family="Arial, sans-serif" font-size="10" fill="#666">Who are building the future of Curio.</text>
+    </g>
+
+    <!-- YOU + UNIVERSE -->
+    <circle cx="650" cy="260" r="42" fill="#fff" stroke="#E8E5F7" filter="url(#softShadow)"/>
+    <text x="650" y="265" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#222">You</text>
+
+    <g font-family="Arial, sans-serif" fill="#222">
+      <g><image x="610" y="79" width="60" height="60" xlink:href="curio-landing-assets/travel.jpg" clip-path="circle(30px at 30px 30px)"/>
+        <text x="675" y="106" font-size="12">Travel</text><text x="675" y="121" font-size="9" fill="#666">128 collections</text></g>
+      <g><image x="774" y="146" width="63" height="61" xlink:href="curio-landing-assets/books.jpg"/>
+        <text x="842" y="178" font-size="12">Books</text><text x="842" y="193" font-size="9" fill="#666">86 collections</text></g>
+      <g><image x="482" y="145" width="63" height="62" xlink:href="curio-landing-assets/style.jpg"/>
+        <text x="505" y="222" font-size="12">Style</text><text x="505" y="237" font-size="9" fill="#666">110 collections</text></g>
+      <g><image x="483" y="308" width="63" height="62" xlink:href="curio-landing-assets/culture.jpg"/>
+        <text x="505" y="385" font-size="12">Culture</text><text x="505" y="400" font-size="9" fill="#666">72 collections</text></g>
+      <g><image x="774" y="307" width="63" height="63" xlink:href="curio-landing-assets/ideas.jpg"/>
+        <text x="842" y="344" font-size="12">Ideas</text><text x="842" y="359" font-size="9" fill="#666">64 collections</text></g>
+      <g><image x="611" y="390" width="62" height="61" xlink:href="curio-landing-assets/food.jpg"/>
+        <text x="641" y="463" font-size="12">Food</text><text x="641" y="478" font-size="9" fill="#666">93 collections</text></g>
+    </g>
+
+    <!-- HERO PHOTO -->
+    <image x="900" y="86" width="380" height="398" preserveAspectRatio="xMidYMid slice"
+           xlink:href="curio-landing-assets/hero-photo.jpg" clip-path="url(#heroClip)"/>
+    <rect x="860" y="86" width="120" height="398" fill="url(#heroFade)"/>
+  </g>
+
+  <!-- PRESS STRIP -->
+  <g id="press">
+    <rect x="0" y="484" width="1280" height="64" fill="#F2F0EB"/>
+    <text x="83" y="519" font-family="Arial, sans-serif" font-size="10" fill="#666">Curated by people featured in</text>
+    <text x="304" y="519" font-family="Georgia, serif" font-size="15" fill="#555">MONOCLE</text>
+    <text x="460" y="519" font-family="Georgia, serif" font-size="13" letter-spacing="2" fill="#555">K I N F O L K</text>
+    <text x="618" y="519" font-family="Georgia, serif" font-size="14" fill="#555">Sight</text>
+    <text x="628" y="535" font-family="Arial, sans-serif" font-size="9" fill="#555">Unseen</text>
+    <text x="746" y="519" font-family="Georgia, serif" font-size="14" fill="#333">The New York Times</text>
+    <text x="927" y="519" font-family="Georgia, serif" font-size="14" fill="#555">apartamento</text>
+    <text x="1085" y="519" font-family="Georgia, serif" font-size="14" fill="#555">VOGUE</text>
+  </g>
+
+  <!-- COLLECTIONS -->
+  <g id="collections">
+    <rect x="0" y="548" width="1280" height="198" fill="#FAF9F5"/>
+    <text x="83" y="606" font-family="Georgia, serif" font-size="30" fill="#111827">Explore inspiring</text>
+    <text x="83" y="637" font-family="Georgia, serif" font-size="30" font-style="italic" fill="#6C5CE7">universes.</text>
+    <text x="83" y="669" font-family="Arial, sans-serif" font-size="11" fill="#666">Dive into the collections of people with taste,</text>
+    <text x="83" y="686" font-family="Arial, sans-serif" font-size="11" fill="#666">insight and perspective.</text>
+    <text x="83" y="716" font-family="Arial, sans-serif" font-size="11" fill="#6C5CE7">Explore all curators →</text>
+
+    <g id="cards" filter="url(#softShadow)">
+      <image x="305" y="556" width="183" height="180" preserveAspectRatio="xMidYMid slice" xlink:href="curio-landing-assets/tokyo.jpg" clip-path="url(#card1)"/>
+      <image x="501" y="556" width="170" height="180" preserveAspectRatio="xMidYMid slice" xlink:href="curio-landing-assets/escapes.jpg" clip-path="url(#card2)"/>
+      <image x="683" y="556" width="170" height="180" preserveAspectRatio="xMidYMid slice" xlink:href="curio-landing-assets/books-card.jpg" clip-path="url(#card3)"/>
+      <image x="866" y="556" width="171" height="180" preserveAspectRatio="xMidYMid slice" xlink:href="curio-landing-assets/food-card.jpg" clip-path="url(#card4)"/>
+      <image x="1047" y="556" width="166" height="180" preserveAspectRatio="xMidYMid slice" xlink:href="curio-landing-assets/style-card.jpg" clip-path="url(#card5)"/>
+    </g>
+    <g font-family="Georgia, serif" fill="#fff">
+      <text x="321" y="691" font-size="15">Tokyo by Locals</text>
+      <text x="518" y="691" font-size="15">Hidden Escapes</text>
+      <text x="700" y="691" font-size="15">Books That Stay</text>
+      <text x="883" y="691" font-size="15">Culinary Notes</text>
+      <text x="1064" y="691" font-size="15">Timeless Style</text>
+    </g>
+    <g font-family="Arial, sans-serif" font-size="8" fill="#fff">
+      <text x="337" y="715">By Jake Reynolds</text><text x="534" y="715">By Clara Martin</text>
+      <text x="716" y="715">By Anna L.</text><text x="899" y="715">By Luca Moretti</text>
+      <text x="1080" y="715">By Thomas Eriksen</text>
+    </g>
+    <rect x="1201" y="628" width="36" height="36" rx="18" fill="#fff" stroke="#DDD"/>
+    <text x="1219" y="651" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#777">→</text>
+  </g>
+
+  <!-- FEATURE BAR -->
+  <g id="feature-bar" font-family="Arial, sans-serif">
+    <rect x="0" y="746" width="1280" height="107" fill="#F8F7F3"/>
+    <g>
+      <circle cx="106" cy="796" r="21" fill="#F0EAFB"/><text x="106" y="802" text-anchor="middle" font-size="19" fill="#6C5CE7">♡</text>
+      <text x="144" y="784" font-size="12" fill="#222">Collect anything</text><text x="144" y="801" font-size="10" fill="#666">Save links, places, products,</text><text x="144" y="816" font-size="10" fill="#666">articles and more.</text>
+    </g>
+    <g>
+      <circle cx="408" cy="796" r="21" fill="#EEF2E7"/><text x="408" y="802" text-anchor="middle" font-size="18" fill="#728A53">♧</text>
+      <text x="446" y="784" font-size="12" fill="#222">Organize beautifully</text><text x="446" y="801" font-size="10" fill="#666">Build collections that</text><text x="446" y="816" font-size="10" fill="#666">reflect your world.</text>
+    </g>
+    <g>
+      <circle cx="715" cy="796" r="21" fill="#FBF1DD"/><text x="715" y="802" text-anchor="middle" font-size="18" fill="#D6A24E">◎</text>
+      <text x="753" y="784" font-size="12" fill="#222">Discover through people</text><text x="753" y="801" font-size="10" fill="#666">Explore the universes of</text><text x="753" y="816" font-size="10" fill="#666">curious minds.</text>
+    </g>
+    <g>
+      <circle cx="1007" cy="796" r="21" fill="#FBEAEA"/><text x="1007" y="802" text-anchor="middle" font-size="18" fill="#D27B7B">♡</text>
+      <text x="1045" y="784" font-size="12" fill="#222">Keep what matters</text><text x="1045" y="801" font-size="10" fill="#666">A home for your inspiration,</text><text x="1045" y="816" font-size="10" fill="#666">forever.</text>
+    </g>
+  </g>
+</svg>

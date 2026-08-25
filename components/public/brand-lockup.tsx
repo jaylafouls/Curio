@@ -22,8 +22,8 @@ export function BrandLockup({
     <span className={cn('inline-flex items-center gap-sm', className)}>
       <svg
         viewBox="0 0 100 100"
-        width={32}
-        height={32}
+        width={56}
+        height={56}
         fill="none"
         aria-hidden
         className="shrink-0"
@@ -36,19 +36,26 @@ export function BrandLockup({
             stroke="rgb(var(--brand-violet) / 0.5)"
             strokeWidth="2"
           />
+          {/* 8 dots at 45° intervals — 0°, 45°, 90°, … 315° */}
           <circle cx="50" cy="8" r="4" fill="rgb(var(--brand-violet))" />
-          <circle cx="88" cy="60" r="2.4" fill="currentColor" opacity="0.35" />
+          <circle cx="79.7" cy="20.3" r="3" fill="rgb(var(--brand-archive))" />
+          <circle cx="92" cy="50" r="3.6" fill="rgb(var(--brand-violet))" />
+          <circle cx="79.7" cy="79.7" r="2.6" fill="rgb(var(--brand-archive))" />
+          <circle cx="50" cy="92" r="3.2" fill="rgb(var(--brand-violet))" />
+          <circle cx="20.3" cy="79.7" r="3" fill="rgb(var(--brand-archive))" />
+          <circle cx="8" cy="50" r="3.6" fill="rgb(var(--brand-violet))" />
+          <circle cx="20.3" cy="20.3" r="2.6" fill="rgb(var(--brand-archive))" />
         </g>
         <text
           x="50"
-          y="52"
+          y="51"
           dominantBaseline="central"
           textAnchor="middle"
           className="font-serif"
-          fontSize="46"
+          fontSize="42"
           fill="currentColor"
         >
-          c
+          C
         </text>
       </svg>
       {wordmark ? (

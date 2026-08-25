@@ -143,6 +143,54 @@ export async function unfollowCurator(followedId: string): Promise<ActionResult>
 }
 
 /**
+ * Viewer's follow relationship to a curator, for the Follow button on a public
+ * profile (recette P1-1). Mirrors getCollectionFollowState: the public profile
+ * is ISR-cached and cookie-free, so viewer identity is resolved AFTER hydration
+ * by this action, never during the cached render.
+ *
+ *   - logged out           -> { loggedIn: false }, the button routes to sign-in.
+ *   - viewing own profile   -> { isSelf: true }, no follow affordance.
+ *   - logged-in other       -> isFollowing reflects the follows row.
+ */
+export type CuratorFollowState = {
+  loggedIn: boolean
+  isSelf: boolean
+  isFollowing: boolean
+}
+
+export async function getCuratorFollowState(
+  curatorId: string,
+): Promise<CuratorFollowState> {
+  const loggedOut: CuratorFollowState = {
+    loggedIn: false,
+    isSelf: false,
+    isFollowing: false,
+  }
+  if (!curatorId) return loggedOut
+
+  const userId = await getUserId()
+  if (!userId) return loggedOut
+
+  if (userId === curatorId) {
+    return { loggedIn: true, isSelf: true, isFollowing: false }
+  }
+
+  const supabase = await createClient()
+  // The caller can read their own follow edge; head+count avoids pulling the row.
+  const { count } = await supabase
+    .from('follows')
+    .select('id', { count: 'exact', head: true })
+    .eq('follower_id', userId)
+    .eq('followed_id', curatorId)
+
+  return {
+    loggedIn: true,
+    isSelf: false,
+    isFollowing: (count ?? 0) > 0,
+  }
+}
+
+/**
  * Screen 05 — create the universe: update users.universe_name / universe_color.
  * name: 1-20 chars (trimmed); color: one of the 5-value enum (violet default).
  * Does NOT flip onboarding_completed — that happens at screen 07 ("Let's go"),

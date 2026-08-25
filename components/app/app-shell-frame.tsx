@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
+import { Search } from 'lucide-react'
 import { AppSidebar } from './app-sidebar'
 import { AppBottomNav } from './app-bottom-nav'
 import { NotificationBell } from './notification-bell'
@@ -60,6 +61,7 @@ export function AppShellFrame({
   // sidebar's "home" nav label). Client-side counterpart to the server
   // getTranslations('AppNav') the pre-extraction shell used.
   const nav = useTranslations('AppNav')
+  const headerT = useTranslations('AppHeader')
 
   return (
     <div
@@ -87,6 +89,18 @@ export function AppShellFrame({
             <BrandLockup wordmark={false} />
           </Link>
           {header ? <div className="min-w-0 flex-1">{header}</div> : <div className="flex-1" />}
+          {/* Search entry (recette P2-6). The full-text search engine already
+              lives on /saved (migration 0017); the mockup's header search was
+              omitted because /search doesn't exist. This routes to that real
+              engine and autofocuses its input, instead of shipping a dead field
+              or a fake /search route. */}
+          <Link
+            href="/saved?focus=search"
+            aria-label={headerT('search')}
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-foreground transition-colors hover:bg-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet"
+          >
+            <Search className="size-5" strokeWidth={2} aria-hidden />
+          </Link>
           <NotificationBell unreadCount={unreadCount} />
         </div>
         <main className="flex-1">{children}</main>
