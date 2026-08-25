@@ -48,11 +48,12 @@ export function PublicHeader({ transparent = false }: { transparent?: boolean } 
           : 'sticky border-b border-border bg-background/80 backdrop-blur-md',
       )}
     >
-      {/* Same horizontal rhythm as PageContainer (24px → 64px at lg) so the
-          header lines up with every other section on the page — no more
-          bespoke percentage padding drifting out of sync with the rest. */}
+      {/* Flat 24px inset at every breakpoint (2026-08-25: dropped the lg:px-3xl
+          bump — Jay wants the whole top block shifted further left, closer to
+          the true edge, not just harmonized at 64px). Same token as hero
+          copy/collections/feature bar/footer below, so they all move together. */}
       <div className="mx-auto h-[86px] w-full max-w-[1280px]">
-        <div className="flex h-full items-center justify-between px-lg lg:px-3xl">
+        <div className="flex h-full items-center justify-between px-lg">
         {/* Brand → landing. */}
         <Link
           href="/"

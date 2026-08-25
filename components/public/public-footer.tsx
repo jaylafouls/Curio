@@ -30,13 +30,17 @@ export async function PublicFooter() {
 
   return (
     <footer className="border-t border-border bg-background">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-sm px-lg py-md lg:px-3xl">
+      <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-sm px-lg py-md">
         <div className="flex flex-col gap-md sm:flex-row sm:items-center sm:justify-between">
           {/* Logo + tagline sit side by side (not stacked) — a stacked block
-              was the main thing making the footer feel oversized. */}
+              was the main thing making the footer feel oversized. Tagline
+              widened to ~2 lines instead of ~4 (2026-08-25) — max-w-[220px]
+              was wrapping this sentence far more than necessary. Container
+              matches the header's max-w-[1280px] (was max-w-6xl/1152px) so
+              the logo sits at the exact same left position as the header's. */}
           <div className="flex items-center gap-sm">
             <BrandLockup className="text-foreground" />
-            <p className="max-w-[220px] font-sans text-body-small text-foreground/60 sm:border-l sm:border-border sm:pl-sm">
+            <p className="max-w-[380px] font-sans text-body-small text-foreground/60 sm:border-l sm:border-border sm:pl-sm">
               {f('tagline')}
             </p>
           </div>

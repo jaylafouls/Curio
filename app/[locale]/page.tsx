@@ -141,10 +141,11 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             columns with their own coordinate systems (that's what silently
             distorted the orbit earlier). */}
         <div className="relative z-10 mx-auto min-h-[398px] max-w-[1280px]">
-          {/* Copy + CTAs — normal flow, capped width, left offset matches the
-              same px-lg → lg:px-3xl rhythm as the header/collections/feature
-              bar below, so the whole page shares one consistent left edge. */}
-          <div className="absolute inset-y-0 left-0 z-10 flex max-w-[460px] flex-col justify-center gap-sm py-md pl-lg sm:py-lg lg:pl-3xl">
+          {/* Copy + CTAs — normal flow, capped width, flat 24px left offset
+              (2026-08-25: dropped the lg:pl-3xl bump, shifted further left
+              per Jay's annotated screenshot), same token as the
+              header/collections/feature bar below. */}
+          <div className="absolute inset-y-0 left-0 z-10 flex max-w-[460px] flex-col justify-center gap-sm py-md pl-lg sm:py-lg">
             <span className="font-sans text-[11px] font-medium uppercase tracking-[0.1em] text-violet">
               {t('eyebrow')}
             </span>
@@ -339,10 +340,10 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
 
       {/* ── Collections showcase ───────────────────────────────────── */}
       <section className="bg-[#FAF9F5]">
-        {/* Same px-lg → lg:px-3xl rhythm as the header/hero copy/feature bar,
-            nested inside the width-capped block so it lines up with them. */}
+        {/* Same flat px-lg as the header/hero copy/feature bar, nested inside
+            the width-capped block so it lines up with them. */}
         <div className="mx-auto w-full max-w-[1280px]">
-        <div className="flex w-full flex-col gap-md px-lg py-md sm:flex-row sm:items-start sm:gap-lg lg:px-3xl">
+        <div className="flex w-full flex-col gap-md px-lg py-md sm:flex-row sm:items-start sm:gap-lg">
           {/* Left: text */}
           <div className="flex w-full shrink-0 flex-col gap-xs sm:w-[220px] sm:pt-sm">
             <h2 className="font-serif text-[28px] leading-[1.15] text-foreground">
@@ -425,7 +426,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
       </section>
 
       {/* ── Feature bar ────────────────────────────────────────────── */}
-      <section className="mx-auto w-full max-w-[1280px] px-lg py-lg lg:px-3xl">
+      <section className="mx-auto w-full max-w-[1280px] px-lg py-lg">
         <div className="grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map(({ key, color, symbol }) => (
             <div key={key} className="flex items-start gap-sm">
