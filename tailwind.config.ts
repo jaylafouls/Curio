@@ -89,9 +89,10 @@ const config: Config = {
       },
       fontFamily: {
         // Wired to next/font CSS variables (app/[locale]/layout.tsx).
-        // font-serif = Instrument Serif, weight 400 ONLY + italic. Never rely
-        // on font-weight for hierarchy on this token — size only (§2.1).
-        serif: ['var(--font-instrument-serif)', 'ui-serif', 'serif'],
+        // font-serif = DM Serif Display (2026-08 typography update, replaces
+        // Instrument Serif), weight 400 ONLY + italic. Never rely on
+        // font-weight for hierarchy on this token — size only (§2.1).
+        serif: ['var(--font-dm-serif-display)', 'ui-serif', 'serif'],
         sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       fontSize: {

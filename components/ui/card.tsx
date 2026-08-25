@@ -192,7 +192,7 @@ export function CollectionCard({
         </div>
       </div>
       <div className="flex flex-col gap-xs p-sm">
-        {/* Instrument Serif, size-only hierarchy (§2.1). Mode-aware text. */}
+        {/* DM Serif Display, size-only hierarchy (§2.1). Mode-aware text. */}
         <h3 className="font-serif text-h3 leading-tight text-foreground">
           {title}
         </h3>

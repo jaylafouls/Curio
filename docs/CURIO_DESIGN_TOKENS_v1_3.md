@@ -72,14 +72,16 @@ Ce ne sont pas la même famille de teinte — `#6A7B7A` est un gris-vert froid p
 
 ### 2.1 Familles — TRANCHÉ (CEO/PO, remplace les points ouverts 3 et 4)
 
+**[MAJ 2026-08]** DM Serif Display remplace Instrument Serif (même contrat technique : graisse unique 400, hiérarchie par la taille). Décidé sous le régime assoupli du §21 du Decisions Log — recherche d'un rendu plus éditorial/premium, pas de nouvel arbitrage nécessaire pour ce type de changement.
+
 | Token | Valeur | Source |
 |---|---|---|
-| `font.serif` (titres) | **Instrument Serif** | Google Fonts, SIL OFL (libre, usage commercial OK) |
+| `font.serif` (titres) | **DM Serif Display** | Google Fonts, SIL OFL (libre, usage commercial OK) |
 | `font.sans` (UI, corps) | **Inter** | Google Fonts, SIL OFL (libre, usage commercial OK) |
 
 Les deux s'intègrent nativement via `next/font/google` — zéro fichier à héberger, zéro souci de licence, chargement optimisé (`font-display: swap`) out of the box. Ça débloque totalement le point bloquant identifié précédemment (police serif payante = self-hosting + coût de licence).
 
-**⚠️ Contrainte technique importante à respecter en dev — Instrument Serif est un display font à graisse unique** :
+**⚠️ Contrainte technique importante à respecter en dev — DM Serif Display est un display font à graisse unique** :
 - Une seule graisse disponible : **400 (Regular)**, + italique. Pas de 600/700/Bold dans la famille.
 - → La hiérarchie H1/H2/H3 doit se faire **uniquement par la taille**, jamais en s'appuyant sur un `font-weight` différent pour ce token. Si un besoin de titre "gras" apparaît, il faudra soit jouer sur la taille/couleur, soit re-basculer temporairement sur `font.sans` en gras pour ce cas précis — pas forcer un poids inexistant.
 - Conçue pour du display à partir de ~24px : à ne jamais utiliser en dessous (les traits fins deviennent illisibles à petite taille) — cohérent avec son usage prévu ici (`text.display`, `text.h1`, `text.h2` uniquement, jamais `text.body`/`text.meta`).
@@ -87,10 +89,10 @@ Les deux s'intègrent nativement via `next/font/google` — zéro fichier à hé
 
 Intégration `next/font` :
 ```ts
-import { Instrument_Serif } from 'next/font/google'
+import { DM_Serif_Display } from 'next/font/google'
 import { Inter } from 'next/font/google'
 
-const instrumentSerif = Instrument_Serif({ subsets: ['latin'], weight: '400', style: ['normal','italic'] })
+const dmSerifDisplay = DM_Serif_Display({ subsets: ['latin'], weight: '400', style: ['normal','italic'] })
 const inter = Inter({ subsets: ['latin'] }) // variable, tous poids disponibles
 ```
 
@@ -217,7 +219,7 @@ Les ombres `shadow.sm`/`shadow.md` sont calibrées `rgba(17,17,17,…)` (noir su
 
 1. ~~Couleurs exactes des 10 badges Topic~~ — **TRANCHÉ provisoirement (CEO/PO, v1.2, voir §1.5)** : palette complète des 10 badges assignée, dev débloqué. 3 valeurs fiables (Travel/Design/Food), 7 provisoires en attente de confirmation designer (correction mineure possible, pas bloquante).
 2. ~~Vert olive~~ — **TRANCHÉ (CEO/PO, v1.2, voir §1.3)** : `#6A7B7A` retenu comme valeur canonique.
-3. ~~Police Editorial Serif exacte~~ — **TRANCHÉ** : Instrument Serif (voir §2.1). Point clos.
+3. ~~Police Editorial Serif exacte~~ — **TRANCHÉ** : DM Serif Display (voir §2.1, remplace Instrument Serif depuis 2026-08). Point clos.
 4. ~~Police Sans Serif exacte~~ — **TRANCHÉ** : Inter (voir §2.1). Point clos.
 5. **Ombres et radius fins** — estimés, à valider par comparaison screenshot systématique en dev.
 6. **Breakpoint tablette** — aucune maquette fournie à ce jour.

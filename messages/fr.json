@@ -169,7 +169,7 @@
     "title": "Le setup Curio est en ligne",
     "accent": "à garder",
     "titleSuffix": "L'internet",
-    "body": "Ce placeholder valide les tokens du design system : Instrument Serif en display, Inter pour l'UI, fond Archive par défaut.",
+    "body": "Ce placeholder valide les tokens du design system : DM Serif Display en display, Inter pour l'UI, fond Archive par défaut.",
     "tokensHeading": "Tokens du design system",
     "supabaseOk": "Supabase (EU Frankfurt) joignable",
     "supabaseWaiting": "Supabase non configuré — renseigner les variables d'env",

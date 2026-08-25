@@ -6,7 +6,7 @@ import { cn } from '@/lib/ui/cn'
  * a serif title with one word/segment set in italic violet
  * ("The internet worth *keeping*", "Explore inspiring *universes*").
  *
- * Instrument Serif has a single weight (400) so hierarchy is size-only (§2.1);
+ * DM Serif Display has a single weight (400) so hierarchy is size-only (§2.1);
  * the `size` prop maps to the display/h1/h2/h3 tokens. Renders as an <h1> by
  * default; override with `as` for the right document outline.
  */

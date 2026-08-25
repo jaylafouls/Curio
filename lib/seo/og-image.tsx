@@ -10,7 +10,7 @@ import { ImageResponse } from 'next/og'
  * On-token: Cosmic background (#0D0E15), violet accent (#785CFF), off-white
  * foreground (#FAFBF2), matching tailwind.config.ts and the Welcome mockup.
  * Fonts are kept to a system serif/sans stack so the image renders on the edge
- * runtime with no font fetch; swap in Instrument Serif here if brand fidelity of
+ * runtime with no font fetch; swap in DM Serif Display here if brand fidelity of
  * the OG card later warrants the extra font load.
  */
 

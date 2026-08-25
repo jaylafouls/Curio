@@ -169,7 +169,7 @@
     "title": "Curio setup is live",
     "accent": "worth keeping",
     "titleSuffix": "The internet",
-    "body": "This placeholder validates the design tokens: Instrument Serif for display, Inter for UI, Archive background by default.",
+    "body": "This placeholder validates the design tokens: DM Serif Display for display, Inter for UI, Archive background by default.",
     "tokensHeading": "Design tokens",
     "supabaseOk": "Supabase (EU Frankfurt) reachable",
     "supabaseWaiting": "Supabase not configured yet — set the env vars",

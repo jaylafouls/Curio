@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { notFound } from 'next/navigation'
 import { NextIntlClientProvider } from 'next-intl'
 import { setRequestLocale, getMessages } from 'next-intl/server'
-import { instrumentSerif, inter } from '../fonts'
+import { dmSerifDisplay, inter } from '../fonts'
 import { routing, isSupportedLocale } from '@/lib/i18n/routing'
 import { ConsentProvider } from '@/components/consent/consent-provider'
 
@@ -36,7 +36,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${instrumentSerif.variable}`}
+      className={`${inter.variable} ${dmSerifDisplay.variable}`}
     >
       <body>
         <NextIntlClientProvider messages={messages}>
