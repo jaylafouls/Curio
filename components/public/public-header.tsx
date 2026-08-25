@@ -11,21 +11,26 @@ import { BrandLockup } from './brand-lockup'
 /**
  * PublicHeader — the non-authenticated horizontal header:
  *
- *   [C · curio]   Explore · Founding Curators · About   [Log in] [Sign up →]
+ *   [C · curio]   Explore · Founding Curators · Editorial · About   [Log in] [Sign up →]
  *
- * Three nav links per the landing mockup. "Editorial" is delinked (content never
- * written — Decisions Log §11.5); the /editorial route stays live. No "Home"
- * link — the landing IS the home, reached via the brand lockup. The centre nav
- * collapses into a slide-down menu below the `md` breakpoint.
+ * Four nav links per the 01-curio-reference-4x.png pixel-perfect reference
+ * (2026-08-23 landing rebuild). "Editorial" was previously delinked because
+ * no content had been written (Decisions Log §11.5) — the route has always
+ * stayed live, and the new reference restores its nav position, so it's
+ * relinked here. Flag to Jay: if there's still no Editorial content, this
+ * exposes an empty page again — worth a quick check before shipping.
+ * No "Home" link — the landing IS the home, reached via the brand lockup.
+ * The centre nav collapses into a slide-down menu below the `md` breakpoint.
  */
 
 const NAV = [
   { href: '/explore', key: 'explore' },
   { href: '/curators', key: 'curators' },
+  { href: '/editorial', key: 'editorial' },
   { href: '/about', key: 'about' },
 ] as const
 
-export function PublicHeader() {
+export function PublicHeader({ transparent = false }: { transparent?: boolean } = {}) {
   const t = useTranslations('Nav')
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
@@ -35,8 +40,19 @@ export function PublicHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-lg">
+    <header
+      className={cn(
+        'top-0 z-40 w-full',
+        transparent
+          ? 'absolute border-b border-transparent bg-transparent'
+          : 'sticky border-b border-border bg-background/80 backdrop-blur-md',
+      )}
+    >
+      {/* Same horizontal rhythm as PageContainer (24px → 64px at lg) so the
+          header lines up with every other section on the page — no more
+          bespoke percentage padding drifting out of sync with the rest. */}
+      <div className="mx-auto h-[86px] w-full max-w-[1280px]">
+        <div className="flex h-full items-center justify-between px-lg lg:px-3xl">
         {/* Brand → landing. */}
         <Link
           href="/"
@@ -101,6 +117,7 @@ export function PublicHeader() {
             <Menu className="size-5" aria-hidden />
           )}
         </button>
+        </div>
       </div>
 
       {/* Mobile slide-down nav. */}

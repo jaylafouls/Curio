@@ -27,6 +27,7 @@ lpt[1-9].*
 *~
 .idea/
 .vscode/
+.claude/settings.local.json
 *.code-workspace
 .env
 .env.*

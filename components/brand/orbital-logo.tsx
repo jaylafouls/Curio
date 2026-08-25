@@ -32,7 +32,7 @@ export function OrbitalLogo({ label, size = 96, className }: OrbitalLogoProps) {
         fill="none"
         aria-hidden
       >
-        {/* Orbit ring + travelling dots, rotating as one group. */}
+        {/* Orbit ring + 8 dots at 45° intervals, rotating as one group. */}
         <g className="origin-center animate-orbital motion-reduce:animate-none">
           <circle
             cx="50"
@@ -41,9 +41,22 @@ export function OrbitalLogo({ label, size = 96, className }: OrbitalLogoProps) {
             stroke="rgb(var(--brand-violet) / 0.35)"
             strokeWidth="1"
           />
+          {/* 0° (top) */}
           <circle cx="50" cy="8" r="2.4" fill="rgb(var(--brand-violet))" />
-          <circle cx="88" cy="60" r="1.6" fill="rgb(var(--brand-archive) / 0.7)" />
-          <circle cx="16" cy="66" r="1.4" fill="rgb(var(--brand-archive) / 0.5)" />
+          {/* 45° */}
+          <circle cx="79.7" cy="20.3" r="1.8" fill="rgb(var(--brand-archive))" />
+          {/* 90° (right) */}
+          <circle cx="92" cy="50" r="2.2" fill="rgb(var(--brand-violet))" />
+          {/* 135° */}
+          <circle cx="79.7" cy="79.7" r="1.6" fill="rgb(var(--brand-archive))" />
+          {/* 180° (bottom) */}
+          <circle cx="50" cy="92" r="2.0" fill="rgb(var(--brand-violet))" />
+          {/* 225° */}
+          <circle cx="20.3" cy="79.7" r="1.8" fill="rgb(var(--brand-archive))" />
+          {/* 270° (left) */}
+          <circle cx="8" cy="50" r="2.2" fill="rgb(var(--brand-violet))" />
+          {/* 315° */}
+          <circle cx="20.3" cy="20.3" r="1.6" fill="rgb(var(--brand-archive))" />
         </g>
         {/* The serif C sits still at the centre. Archive/light ink — this logo
             renders on the Cosmic onboarding/signup surface (no .dark), so a fixed
