@@ -412,7 +412,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               the landing having its own stripped-down look (2026-08-27). */}
           {collections.length > 0 ? (
             <div className="relative flex-1">
-              <div className="grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-5">
                 {collections.map((col) => (
                   <Link
                     key={col.id}
