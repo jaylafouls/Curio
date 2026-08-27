@@ -421,6 +421,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
                   >
                     <CollectionCard
                       variant="overlay"
+                      compact
                       title={col.title}
                       topic={col.topic}
                       cover={col.cover ?? undefined}

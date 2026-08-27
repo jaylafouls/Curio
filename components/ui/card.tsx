@@ -43,6 +43,12 @@ export interface CollectionCardProps {
   variant?: CollectionCardVariant
   /** Short teaser line, shown under the title in the `overlay` variant only. */
   description?: string
+  /**
+   * Smaller title/description type scale for tight layouts (e.g. a 5-across
+   * strip) without shrinking the badge or owner row, which already read fine
+   * at any card size. `overlay` variant only.
+   */
+  compact?: boolean
   className?: string
 }
 
@@ -112,16 +118,22 @@ export function CollectionCard({
   linksCount,
   variant = 'below',
   description,
+  compact = false,
   className,
 }: CollectionCardProps) {
   const cardBase =
-    'group flex w-full flex-col overflow-hidden rounded-lg border border-border transition-shadow duration-base hover:shadow-md dark:hover:shadow-glow-violet'
+    'group flex w-full flex-col overflow-hidden rounded-lg transition-shadow duration-base hover:shadow-md dark:hover:shadow-glow-violet'
 
   if (variant === 'overlay') {
     return (
       <article
         className={cn(
           cardBase,
+          // No border here: this variant is a full-bleed photo, and a
+          // border-box border rendered outside the clipped image showed as a
+          // stray light line across the top edge (Jay, 2026-08-27) — visible
+          // at rest, hidden once the hover zoom grew past it. The `below`
+          // variant below keeps its border; that one sits on a plain panel.
           'relative aspect-[4/5] bg-violet-soft/20',
           className,
         )}
@@ -150,9 +162,21 @@ export function CollectionCard({
         </div>
         {/* Text block anchored to the bottom, always light on the scrim. */}
         <div className="relative mt-auto flex flex-col gap-sm p-md text-archive">
-          <h3 className="font-serif text-h3 leading-tight">{title}</h3>
+          <h3
+            className={cn(
+              'font-serif leading-tight',
+              compact ? 'text-[17px]' : 'text-h3',
+            )}
+          >
+            {title}
+          </h3>
           {description ? (
-            <p className="font-sans text-body-small text-archive/80">
+            <p
+              className={cn(
+                'font-sans text-archive/80',
+                compact ? 'text-meta' : 'text-body-small',
+              )}
+            >
               {description}
             </p>
           ) : null}
@@ -174,7 +198,9 @@ export function CollectionCard({
   }
 
   return (
-    <article className={cn(cardBase, 'bg-foreground/[0.03]', className)}>
+    <article
+      className={cn(cardBase, 'border border-border bg-foreground/[0.03]', className)}
+    >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-violet-soft/20">
         {cover ? (
           <Image
