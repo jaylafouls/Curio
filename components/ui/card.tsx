@@ -255,6 +255,11 @@ export interface CuratorCardProps {
   avatar?: string
   /** Optional action slot, e.g. a <Button size="small">Follow</Button>. */
   action?: ReactNode
+  /**
+   * Smaller avatar/type scale for tight layouts (e.g. sitting size-for-size
+   * next to CollectionCard's `compact` in a 5-across landing strip).
+   */
+  compact?: boolean
   className?: string
 }
 
@@ -266,25 +271,44 @@ export function CuratorCard({
   followers,
   avatar,
   action,
+  compact = false,
   className,
 }: CuratorCardProps) {
   return (
     <article
       className={cn(
-        'flex w-full flex-col items-center gap-md rounded-lg border border-border bg-foreground/[0.03] p-lg text-center transition-shadow duration-base hover:shadow-md dark:hover:shadow-glow-violet',
+        'flex w-full flex-col items-center rounded-lg border border-border bg-foreground/[0.03] text-center transition-shadow duration-base hover:shadow-md dark:hover:shadow-glow-violet',
+        compact ? 'gap-xs p-sm' : 'gap-md p-lg',
         className,
       )}
     >
-      <Avatar src={avatar} name={name} size="lg" orbital />
+      <Avatar src={avatar} name={name} size={compact ? 'md' : 'lg'} orbital />
       <div className="flex flex-col items-center gap-xs">
-        <h3 className="font-serif text-h3 leading-tight text-foreground">
+        <h3
+          className={cn(
+            'font-serif leading-tight text-foreground',
+            compact ? 'text-[15px]' : 'text-h3',
+          )}
+        >
           {name}
         </h3>
         <Badge topic={topic}>{role}</Badge>
       </div>
-      <p className="font-sans text-body-small text-foreground/70">{bio}</p>
-      <div className="flex items-center gap-xs font-sans text-meta text-foreground/60">
-        <Users className="size-3.5" strokeWidth={2} aria-hidden />
+      <p
+        className={cn(
+          'font-sans text-foreground/70',
+          compact ? 'line-clamp-2 text-meta' : 'text-body-small',
+        )}
+      >
+        {bio}
+      </p>
+      <div
+        className={cn(
+          'flex items-center gap-xs font-sans text-foreground/60',
+          compact ? 'text-[10px]' : 'text-meta',
+        )}
+      >
+        <Users className={compact ? 'size-3' : 'size-3.5'} strokeWidth={2} aria-hidden />
         {FOLLOWER_FORMAT.format(followers)} followers
       </div>
       {action ? <div className="pt-xs">{action}</div> : null}

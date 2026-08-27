@@ -296,7 +296,11 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               around you," reproduced cleanly and predictably at any
               viewport, not chased pixel-for-pixel. */}
           <div
-            className="pointer-events-none absolute left-[53%] top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
+            // Shifted left from 53% (2026-08-27, Jay) so the ring reads as
+            // truly centred in the hero's top band rather than skewed toward
+            // the photo; the photo's left edge below moves in by the same
+            // amount to reclaim that space instead of leaving a gap.
+            className="pointer-events-none absolute left-[47%] top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
             style={{ width: ORBIT_BOX, height: ORBIT_BOX }}
           >
             {/* "You" centre node */}
@@ -353,16 +357,15 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
         {/* Right: hero photo — a sibling of the 1280-capped block above, not
             a child of it, so it can bleed to the TRUE viewport edge on wide
             screens instead of stopping at a gutter once the viewport exceeds
-            1280px. Left edge = min(70.31%, 50%+260px): below 1280px viewport
-            that's a plain 70.31% (== the reference's 900/1280 bbox, no
-            centering offset yet); above 1280px the 1280-block is centered, so
-            "50% of viewport + 260px" is the fixed distance from that block's
-            center to its own x=900 mark — using whichever is smaller keeps
-            the photo's left edge locked to the content block while its right
-            edge always reaches true right:0 (full bleed, no white band). */}
+            1280px. Left edge = min(64%, 50%+184px): both numbers pulled in
+            from the previous 70.31%/260px (2026-08-27, Jay) by the same
+            amount the orbit shifted left, so the photo claims that reclaimed
+            width instead of leaving a gap — shows more of the photo, less
+            aggressively cropped, while still locked to the content block
+            below 1280px and full-bleed to the true right edge above it. */}
         <div
           className="absolute inset-y-0 right-0 hidden overflow-hidden lg:block"
-          style={{ left: 'min(70.31%, calc(50% + 260px))' }}
+          style={{ left: 'min(64%, calc(50% + 184px))' }}
         >
           <Image
             src="/landing/hero-photo.jpg"
@@ -491,7 +494,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               duplicating it under Landing). */}
           {featuredCurators.length > 0 ? (
             <div className="relative flex-1">
-              <div className="grid grid-cols-1 gap-sm sm:grid-cols-3">
+              <div className="grid grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-5">
                 {featuredCurators.map((curator) => (
                   <Link
                     key={curator.id}
@@ -499,6 +502,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
                     className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
                   >
                     <CuratorCard
+                      compact
                       name={curator.displayName}
                       // Curators carry no primary Topic yet — neutral brand
                       // tint for the role badge, same as /curators (P2-3).
