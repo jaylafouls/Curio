@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import { buildMetadata } from '@/lib/seo/metadata'
 import { checkInvitationToken } from '@/lib/auth/invitation'
-import { AccentText, ButtonLink } from '@/components/ui'
+import { AccentText, ButtonLink, CollectionCard } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicConnectedShell } from '@/components/app/public-connected-shell'
@@ -405,54 +405,36 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             </Link>
           </div>
 
-          {/* Right: real public collections (empty today → empty state) */}
+          {/* Right: real public collections (empty today → empty state).
+              Same CollectionCard (variant="overlay") as Home's "Picked for
+              you" — badge, title, description, owner avatar + name, save
+              count — so a collection reads identically everywhere instead of
+              the landing having its own stripped-down look (2026-08-27). */}
           {collections.length > 0 ? (
             <div className="relative flex-1">
-              <div className="grid grid-cols-2 gap-[12px] sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-3">
                 {collections.map((col) => (
                   <Link
                     key={col.id}
                     href={`/collections/${col.slug}`}
-                    className="group relative h-[180px] overflow-hidden rounded-[10px] shadow-md"
+                    className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
                   >
-                    {col.cover ? (
-                      <Image
-                        src={col.cover}
-                        alt={col.title}
-                        fill
-                        className="object-cover transition-transform duration-base group-hover:scale-[1.03]"
-                        style={
-                          // tokyo.jpg has a "FEATURED" pill baked into its
-                          // top-left corner (from the reference extraction);
-                          // center-cropping this card's aspect clips it, so
-                          // anchor left/top here instead of cropping evenly.
-                          col.cover.includes('tokyo.jpg')
-                            ? { objectPosition: 'left top' }
-                            : undefined
-                        }
-                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 170px"
-                      />
-                    ) : (
-                      <div className="h-full bg-muted" />
-                    )}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-sm pb-sm pt-lg">
-                      <span className="font-serif text-[14px] leading-tight text-white">
-                        {col.title}
-                      </span>
-                    </div>
+                    <CollectionCard
+                      variant="overlay"
+                      title={col.title}
+                      topic={col.topic}
+                      cover={col.cover ?? undefined}
+                      mosaic={col.mosaic}
+                      description={col.description ?? undefined}
+                      owner={{
+                        name: col.owner.name,
+                        avatar: col.owner.avatar ?? undefined,
+                      }}
+                      linksCount={col.linksCount}
+                    />
                   </Link>
                 ))}
               </div>
-              {/* Carousel affordance from the reference — decorative for now
-                  (only 5 demo collections exist, nothing to page through
-                  yet); wire up real paging once the collection count grows
-                  past one row. */}
-              <span
-                aria-hidden
-                className="absolute right-0 top-1/2 hidden size-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full bg-white text-foreground shadow-md lg:flex"
-              >
-                <ArrowRight className="size-4" />
-              </span>
             </div>
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center gap-xs py-lg text-center">
