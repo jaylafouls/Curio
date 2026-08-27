@@ -11,14 +11,13 @@ import { BrandLockup } from './brand-lockup'
 /**
  * PublicHeader — the non-authenticated horizontal header:
  *
- *   [C · curio]   Explore · Founding Curators · Editorial · About   [Log in] [Sign up →]
+ *   [C · curio]   Explore · Curators · About   [Log in] [Sign up →]
  *
- * Four nav links per the 01-curio-reference-4x.png pixel-perfect reference
- * (2026-08-23 landing rebuild). "Editorial" was previously delinked because
- * no content had been written (Decisions Log §11.5) — the route has always
- * stayed live, and the new reference restores its nav position, so it's
- * relinked here. Flag to Jay: if there's still no Editorial content, this
- * exposes an empty page again — worth a quick check before shipping.
+ * "Editorial" is intentionally NOT in this nav (Decisions Log §11.5, reaffirmed
+ * 2026-08-27) — no content has been written for it yet, and Jay confirmed we
+ * keep it out rather than expose an empty page. The route itself still exists,
+ * just unlinked. "Curators" label (not "Founding Curators") per 2026-08-27 —
+ * supersedes the scoped label from Decisions Log §19.1.
  * No "Home" link — the landing IS the home, reached via the brand lockup.
  * The centre nav collapses into a slide-down menu below the `md` breakpoint.
  */
@@ -26,7 +25,6 @@ import { BrandLockup } from './brand-lockup'
 const NAV = [
   { href: '/explore', key: 'explore' },
   { href: '/curators', key: 'curators' },
-  { href: '/editorial', key: 'editorial' },
   { href: '/about', key: 'about' },
 ] as const
 

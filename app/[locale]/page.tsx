@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import { buildMetadata } from '@/lib/seo/metadata'
 import { checkInvitationToken } from '@/lib/auth/invitation'
-import { AccentText, ButtonLink, CollectionCard } from '@/components/ui'
+import { AccentText, ButtonLink, CollectionCard, CuratorCard } from '@/components/ui'
 import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicConnectedShell } from '@/components/app/public-connected-shell'
@@ -91,6 +91,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
   setRequestLocale(locale)
   const { token } = await searchParams
   const t = await getTranslations('Landing')
+  const tCurators = await getTranslations('Curators')
 
   const tokenState = await checkInvitationToken(token)
   const signupHref =
@@ -98,6 +99,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
 
   const collections = await getPublicCollections(5)
   const socialProofCurators = await getPublicCurators(4)
+  const featuredCurators = await getPublicCurators(3)
   const allTopics = await getPublicTopics(locale)
 
   // Join the fixed 6-node ring layout to real topic rows (label/icon come
@@ -297,12 +299,6 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             className="pointer-events-none absolute left-[53%] top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
             style={{ width: ORBIT_BOX, height: ORBIT_BOX }}
           >
-            {/* Single orbit ring, sized to the same radius the nodes sit on. */}
-            <span
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border/50"
-              style={{ width: ORBIT_RADIUS * 2, height: ORBIT_RADIUS * 2 }}
-            />
-
             {/* "You" centre node */}
             <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
               <span
@@ -326,7 +322,14 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             {orbitTopics.map((topic) => (
               <div
                 key={topic.id}
-                className="absolute left-1/2 top-1/2 flex flex-col items-center gap-xs"
+                // Sized to exactly the 60px icon circle (not icon+label) so
+                // the -50%/-50% centering transform lands the CIRCLE's centre
+                // at radius ORBIT_RADIUS from "You" — previously this div also
+                // stretched to fit the label underneath, which shifted its
+                // self-centering downward and threw the icon off the ring
+                // (Jay, 2026-08-27). The label is now a sibling, absolutely
+                // positioned below, so it can't affect the centering math.
+                className="absolute left-1/2 top-1/2 size-[60px]"
                 style={{ transform: `translate(calc(-50% + ${topic.x}px), calc(-50% + ${topic.y}px))` }}
               >
                 <div
@@ -338,7 +341,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
                     className={`size-6 ${ORBIT_ICON_COLOR[topic.id as keyof typeof ORBIT_ICON_COLOR]}`}
                   />
                 </div>
-                <span className="whitespace-nowrap font-sans text-[11px] font-medium text-foreground/80">
+                <span className="absolute left-1/2 top-full mt-xs -translate-x-1/2 whitespace-nowrap font-sans text-[11px] font-medium text-foreground/80">
                   {topic.label}
                 </span>
               </div>
@@ -436,6 +439,16 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
                   </Link>
                 ))}
               </div>
+              {/* Real link to /explore (was a decorative-only affordance
+                  before 2026-08-27 — Jay asked for it to actually go
+                  somewhere, same spot). */}
+              <Link
+                href="/explore"
+                aria-label={t('universesCta')}
+                className="absolute right-0 top-1/2 hidden size-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full bg-white text-foreground shadow-md transition-transform hover:scale-105 lg:flex"
+              >
+                <ArrowRight className="size-4" />
+              </Link>
             </div>
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center gap-xs py-lg text-center">
@@ -444,6 +457,75 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               </span>
               <p className="font-sans text-[13px] text-foreground/60">
                 {t('universesEmptyTitle')}
+              </p>
+            </div>
+          )}
+        </div>
+        </div>
+      </section>
+
+      {/* ── Curators showcase ──────────────────────────────────────── */}
+      <section className="bg-[#FAF9F5]">
+        <div className="mx-auto w-full max-w-[1280px]">
+        <div className="flex w-full flex-col gap-md px-lg py-md sm:flex-row sm:items-start sm:gap-lg">
+          {/* Left: text — same shape as the Collections column above. */}
+          <div className="flex w-full shrink-0 flex-col gap-xs sm:w-[220px] sm:pt-sm">
+            <h2 className="font-serif text-[28px] leading-[1.15] text-foreground">
+              {t('curatorsBefore')}
+              <em className="italic text-violet">{t('curatorsAccent')}</em>
+            </h2>
+            <p className="font-sans text-[11px] leading-relaxed text-[#666]">
+              {t('curatorsSubtitle')}
+            </p>
+            <Link
+              href="/curators"
+              className="mt-xs inline-flex items-center gap-xs font-sans text-[11px] font-medium text-violet transition-colors hover:opacity-80"
+            >
+              {t('curatorsCta')}
+              <ArrowRight className="size-3" aria-hidden />
+            </Link>
+          </div>
+
+          {/* Right: real Founding Curators (empty today → same empty-state
+              shape as Curators page, reusing its copy rather than
+              duplicating it under Landing). */}
+          {featuredCurators.length > 0 ? (
+            <div className="relative flex-1">
+              <div className="grid grid-cols-1 gap-sm sm:grid-cols-3">
+                {featuredCurators.map((curator) => (
+                  <Link
+                    key={curator.id}
+                    href={`/profile/${curator.username}`}
+                    className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
+                  >
+                    <CuratorCard
+                      name={curator.displayName}
+                      // Curators carry no primary Topic yet — neutral brand
+                      // tint for the role badge, same as /curators (P2-3).
+                      topic="ideas"
+                      role={tCurators('role')}
+                      bio={curator.bio ?? ''}
+                      followers={curator.followersCount}
+                      avatar={curator.avatarUrl ?? undefined}
+                    />
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/curators"
+                aria-label={t('curatorsCta')}
+                className="absolute right-0 top-1/2 hidden size-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full bg-white text-foreground shadow-md transition-transform hover:scale-105 lg:flex"
+              >
+                <ArrowRight className="size-4" />
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center gap-xs py-lg text-center">
+              <span className="font-sans text-[10px] font-medium uppercase tracking-wide text-violet/60">
+                {tCurators('emptyTag')}
+              </span>
+              <p className="font-sans text-[13px] text-foreground/60">
+                {tCurators('emptyTitle')}
               </p>
             </div>
           )}
