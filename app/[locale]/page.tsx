@@ -9,7 +9,12 @@ import { Link } from '@/lib/i18n/navigation'
 import type { Locale } from '@/lib/i18n/routing'
 import { PublicConnectedShell } from '@/components/app/public-connected-shell'
 import { PublicShell } from '@/components/public/public-shell'
-import { getPublicCollections, getPublicCurators } from '@/lib/public/data'
+import {
+  getPublicCollections,
+  getPublicCurators,
+  getPublicTopics,
+} from '@/lib/public/data'
+import { TopicIcon } from '@/components/brand/topic-icon'
 
 type PageProps = {
   params: Promise<{ locale: Locale }>
@@ -41,26 +46,45 @@ const FEATURES = [
 // Hero orbit — simplified, viewport-proof geometry (see comment at the call
 // site). Fixed pixel radius, 6 topics evenly spaced at 60° starting from the
 // top, computed once with plain trig instead of reference-measured percentages.
+//
+// 2026-08-26: topic photos replaced with the same icon system already used on
+// My Space and Explore (Badge + TopicIcon, lib/public/data getPublicTopics) —
+// real Topic rows (id/label/icon), not decorative stock photos, so the same
+// visual language reads consistently across the whole product. Angles/order
+// unchanged from the previous photo version; these 6 ids are a fixed pick of
+// the 10 real Core Topics (the other 4 — Beauty, Wellness, Design,
+// Photography — just don't fit a 6-node ring).
 const ORBIT_RADIUS = 112
 const ORBIT_BOX = ORBIT_RADIUS * 2 + 140 // room for the 60px node + its two-line label
 
-const ORBIT_TOPIC_DEFS = [
-  { src: '/landing/travel.jpg', label: 'Travel', count: 128, angle: 0 },
-  { src: '/landing/books.jpg', label: 'Books', count: 86, angle: 60 },
-  { src: '/landing/ideas.jpg', label: 'Ideas', count: 64, angle: 120 },
-  { src: '/landing/food.jpg', label: 'Food', count: 93, angle: 180 },
-  { src: '/landing/culture.jpg', label: 'Culture', count: 72, angle: 240 },
-  { src: '/landing/style.jpg', label: 'Style', count: 110, angle: 300 },
+const ORBIT_TOPIC_ANGLES = [
+  { id: 'travel', angle: 0 },
+  { id: 'books', angle: 60 },
+  { id: 'ideas', angle: 120 },
+  { id: 'food', angle: 180 },
+  { id: 'culture', angle: 240 },
+  { id: 'style', angle: 300 },
 ] as const
 
-const ORBIT_TOPICS = ORBIT_TOPIC_DEFS.map((topic) => {
-  const radians = (topic.angle * Math.PI) / 180
-  return {
-    ...topic,
-    x: Math.round(ORBIT_RADIUS * Math.sin(radians)),
-    y: Math.round(-ORBIT_RADIUS * Math.cos(radians)),
-  }
-})
+// Same literal bg-badge-*/text-badge-* pairs as components/ui/badge.tsx,
+// kept local (compact circular icon chip, not a pill — different enough
+// markup that reusing <Badge> directly doesn't fit) rather than reached into.
+const ORBIT_TINT: Record<(typeof ORBIT_TOPIC_ANGLES)[number]['id'], string> = {
+  travel: 'bg-badge-travel/15',
+  books: 'bg-badge-books/15',
+  ideas: 'bg-badge-ideas/15',
+  food: 'bg-badge-food/15',
+  culture: 'bg-badge-culture/15',
+  style: 'bg-badge-style/15',
+}
+const ORBIT_ICON_COLOR: Record<(typeof ORBIT_TOPIC_ANGLES)[number]['id'], string> = {
+  travel: 'text-badge-travel',
+  books: 'text-badge-books',
+  ideas: 'text-badge-ideas',
+  food: 'text-badge-food',
+  culture: 'text-badge-culture',
+  style: 'text-badge-style',
+}
 
 export default async function LandingPage({ params, searchParams }: PageProps) {
   const { locale } = await params
@@ -74,6 +98,24 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
 
   const collections = await getPublicCollections(5)
   const socialProofCurators = await getPublicCurators(4)
+  const allTopics = await getPublicTopics(locale)
+
+  // Join the fixed 6-node ring layout to real topic rows (label/icon come
+  // from the DB, never hardcoded copy) — a topic missing from the result
+  // (shouldn't happen, the 10 Core Topics are seeded) is simply skipped
+  // rather than crashing the hero on a data hiccup.
+  const orbitTopics = ORBIT_TOPIC_ANGLES.flatMap(({ id, angle }) => {
+    const topic = allTopics.find((t) => t.id === id)
+    if (!topic) return []
+    const radians = (angle * Math.PI) / 180
+    return [
+      {
+        ...topic,
+        x: Math.round(ORBIT_RADIUS * Math.sin(radians)),
+        y: Math.round(-ORBIT_RADIUS * Math.cos(radians)),
+      },
+    ]
+  })
 
   const content = (
     <>
@@ -275,28 +317,29 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
             </div>
 
             {/* Topic nodes — evenly spaced at 60° around ORBIT_RADIUS, offset
-                computed once in ORBIT_TOPICS below (plain sin/cos, no
-                percentage math). */}
-            {ORBIT_TOPICS.map((topic) => (
+                computed in orbitTopics above (plain sin/cos, no percentage
+                math). Icon + tint come from the real Topic row (same
+                TopicIcon/badge-* system as My Space and Explore), not a
+                stock photo — no collection count shown here: every Core
+                Topic reads 0 public collections today, and this ring is a
+                concept illustration, not a live stat widget. */}
+            {orbitTopics.map((topic) => (
               <div
-                key={topic.label}
-                className="absolute left-1/2 top-1/2 flex flex-col items-center gap-[2px]"
+                key={topic.id}
+                className="absolute left-1/2 top-1/2 flex flex-col items-center gap-xs"
                 style={{ transform: `translate(calc(-50% + ${topic.x}px), calc(-50% + ${topic.y}px))` }}
               >
-                <div className="relative size-[60px] overflow-hidden rounded-full border border-border/60" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
-                  <Image
-                    src={topic.src}
-                    alt={topic.label}
-                    fill
-                    className="object-cover object-center"
-                    sizes="60px"
+                <div
+                  className={`flex size-[60px] items-center justify-center rounded-full border border-border/60 ${ORBIT_TINT[topic.id as keyof typeof ORBIT_TINT]}`}
+                  style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+                >
+                  <TopicIcon
+                    name={topic.icon}
+                    className={`size-6 ${ORBIT_ICON_COLOR[topic.id as keyof typeof ORBIT_ICON_COLOR]}`}
                   />
                 </div>
                 <span className="whitespace-nowrap font-sans text-[11px] font-medium text-foreground/80">
                   {topic.label}
-                </span>
-                <span className="whitespace-nowrap font-sans text-[9px] text-foreground/45">
-                  {topic.count} collections
                 </span>
               </div>
             ))}
