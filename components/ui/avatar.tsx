@@ -28,7 +28,12 @@ const sizeClasses: Record<AvatarSize, string> = {
 }
 
 // Orbit ring sits slightly outside the avatar; dot positions are the four
-// cardinal points of the rotating ring.
+// cardinal points of the rotating ring. Each dot is anchored to an edge of
+// the same inset-0 box the ring border sits on, then translated -50% on
+// BOTH axes so its own centre lands exactly on the ring line — anchoring
+// with only the cross-axis translate (previous version) left the dot's
+// body pulled inward by half its own size, floating between the ring and
+// the avatar instead of sitting on the ring (Jay, 2026-08-27).
 const orbitPad: Record<AvatarSize, string> = {
   sm: 'p-1',
   md: 'p-1.5',
@@ -36,10 +41,10 @@ const orbitPad: Record<AvatarSize, string> = {
 }
 
 const DOTS = [
-  { pos: 'left-1/2 top-0 -translate-x-1/2', color: 'bg-violet' },
-  { pos: 'right-0 top-1/2 -translate-y-1/2', color: 'bg-badge-travel' },
-  { pos: 'bottom-0 left-1/2 -translate-x-1/2', color: 'bg-badge-food' },
-  { pos: 'left-0 top-1/2 -translate-y-1/2', color: 'bg-violet-soft' },
+  { pos: 'left-1/2 top-0 -translate-x-1/2 -translate-y-1/2', color: 'bg-violet' },
+  { pos: 'right-0 top-1/2 translate-x-1/2 -translate-y-1/2', color: 'bg-badge-travel' },
+  { pos: 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2', color: 'bg-badge-food' },
+  { pos: 'left-0 top-1/2 -translate-x-1/2 -translate-y-1/2', color: 'bg-violet-soft' },
 ]
 
 function initials(name: string): string {
