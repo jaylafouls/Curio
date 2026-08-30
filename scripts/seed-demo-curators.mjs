@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Curio demo-curator seed — creates 3 clearly-labelled fictional Founding
- * Curators (Travel / Style / Design) with Projects, public Collections and
- * categorised Links, so the live site can be exercised in real conditions
- * beyond the owner's own test account.
+ * Curio demo-curator seed — creates 5 clearly-labelled fictional Founding
+ * Curators (Travel / Style / Design / Books / Food) with Projects, public
+ * Collections and categorised Links, so the live site can be exercised in
+ * real conditions beyond the owner's own test account.
  *
  * ⚠️  These accounts are injected into the SAME Supabase project that serves the
  * real "prod" (no separate staging). They are intentionally easy to spot and
@@ -36,12 +36,21 @@
  *   link_subcategories : Travel carries 6 (Hébergement/Restaurant/Lieu à voir/
  *                  Activité/Transport/Autre); resolved by label at runtime.
  *
- * Covers: next/image only allows the Supabase Storage host (next.config.ts
- * remotePatterns). A remote Unsplash URL would NOT render. So a "with cover"
- * collection uploads a small generated SVG→PNG-less placeholder into the
- * 'collection-covers' bucket under <owner_id>/… (the real owner-prefixed path,
- * public-readable, purged with the account). "Without cover" collections leave
- * cover_image_url NULL to exercise the Topic colour+icon fallback card.
+ * ── COVERS & AVATARS (2026-08-30 rewrite) ────────────────────────────────────
+ * Every collection and every curator now points at a static file under
+ * public/collections/ and public/curators/ — locally-generated illustrated
+ * art (Python/PIL, on-brand Topic colours + a simple abstract motif matching
+ * each collection's actual title/theme), not the designer-mockup photos the
+ * landing page borrowed earlier (tokyo.jpg, food-card.jpg, etc. — wrong theme
+ * per collection) nor any Storage upload. next/image already serves local
+ * public/ assets, so cover_image_url / avatar_url are just set to '/collections/
+ * <slug>.jpg' / '/curators/<slug>.jpg' directly — no bucket, no upload, no
+ * network. This supersedes and makes scripts/assign-landing-covers.mjs
+ * redundant (removed — it was patching in the mismatched mockup photos this
+ * rewrite replaces). Every collection now carries a themed cover (the old
+ * "withCover: false → Topic-colour fallback card" tier is no longer exercised
+ * by this seed, but the CoverArt fallback itself is untouched for real users
+ * with no cover).
  *
  * ── IDEMPOTENT ──────────────────────────────────────────────────────────────
  * Re-running never duplicates: accounts are looked up by email, links upserted
@@ -57,8 +66,6 @@ import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { deflateSync } from 'node:zlib'
-import { crc32 } from 'node:zlib'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -100,8 +107,8 @@ const admin = createClient(url, serviceKey, {
 
 // ── demo dataset ─────────────────────────────────────────────────────────────
 // One entry per curator. topic_id must be one of the seeded core topics (0003).
-// Each collection: withCover (upload) or not (Topic fallback). Links carry a
-// subcategoryLabel only for Travel (the others resolve topic alone).
+// Each collection carries a static `cover` path (public/collections/*.jpg).
+// Links carry a subcategoryLabel only for Travel (the others resolve topic alone).
 const CURATORS = [
   {
     spec: 'travel',
@@ -111,6 +118,7 @@ const CURATORS = [
     location: 'Lisbonne, PT',
     bio: `Curatrice voyage — hôtels de charme, tables locales et lieux à voir. ${DEMO_MARKER}`,
     topic: 'travel',
+    avatar: '/curators/camille-voyage.jpg',
     projects: [
       { name: 'Escapades européennes', description: 'Repérages ville par ville.', color: '#D9C6A6' },
       { name: 'Carnet Portugal', description: 'Le meilleur de Lisbonne à Porto.', color: '#C98A4B' },
@@ -120,7 +128,7 @@ const CURATORS = [
         name: 'Lisbonne essentielle',
         description: 'Dormir, manger et flâner à Lisbonne.',
         project: 'Carnet Portugal',
-        withCover: true,
+        cover: '/collections/lisbonne-essentielle.jpg',
         links: [
           { title: 'Memmo Alfama Hotel', url: 'https://www.memmohotels.com/alfama', description: 'Boutique-hôtel avec terrasse sur les toits de l’Alfama.', sub: 'Hébergement' },
           { title: 'Time Out Market Lisboa', url: 'https://www.timeoutmarket.com/lisboa/', description: 'Halle gastronomique du Cais do Sodré.', sub: 'Restaurant' },
@@ -132,7 +140,7 @@ const CURATORS = [
         name: 'Porto en un week-end',
         description: 'Deux jours entre le Douro et les azulejos.',
         project: 'Carnet Portugal',
-        withCover: false,
+        cover: '/collections/porto-en-un-week-end.jpg',
         links: [
           { title: 'The Yeatman', url: 'https://www.the-yeatman-hotel.com/', description: 'Hôtel avec vue sur le Douro et cave à porto.', sub: 'Hébergement' },
           { title: 'Cantinho do Avillez Porto', url: 'https://www.cantinhodoavillez.pt/porto', description: 'La table signature de José Avillez.', sub: 'Restaurant' },
@@ -144,7 +152,7 @@ const CURATORS = [
         name: 'Refuges au bord de l’eau',
         description: 'Adresses les pieds dans l’eau, partout en Europe.',
         project: 'Escapades européennes',
-        withCover: false,
+        cover: '/collections/refuges-au-bord-de-leau.jpg',
         links: [
           { title: 'Il Pellicano (Toscane)', url: 'https://www.hotelilpellicano.com/', description: 'Institution balnéaire de l’Argentario.', sub: 'Hébergement' },
           { title: 'Les Roches Rouges (Var)', url: 'https://www.hotellesrochesrouges.com/', description: 'Hôtel design face à la Méditerranée.', sub: 'Hébergement' },
@@ -161,6 +169,7 @@ const CURATORS = [
     location: 'Paris, FR',
     bio: `Curatrice mode — pièces intemporelles, maisons et silhouettes. ${DEMO_MARKER}`,
     topic: 'style',
+    avatar: '/curators/ines-mode.jpg',
     projects: [
       { name: 'Garde-robe capsule', description: 'Bâtir un vestiaire qui dure.', color: '#4A4550' },
     ],
@@ -169,7 +178,7 @@ const CURATORS = [
         name: 'Le vestiaire essentiel',
         description: 'Les pièces qui ne se démodent pas.',
         project: 'Garde-robe capsule',
-        withCover: true,
+        cover: '/collections/le-vestiaire-essentiel.jpg',
         links: [
           { title: 'Le trench Burberry', url: 'https://www.burberry.com/the-trench-coat/', description: 'La gabardine qui a fait la maison.' },
           { title: 'La marinière Saint James', url: 'https://www.saint-james.com/marinieres', description: 'Le tricot rayé breton, un classique.' },
@@ -180,7 +189,7 @@ const CURATORS = [
         name: 'Maisons à suivre',
         description: 'Marques et créateurs qui comptent.',
         project: 'Garde-robe capsule',
-        withCover: false,
+        cover: '/collections/maisons-a-suivre.jpg',
         links: [
           { title: 'Lemaire', url: 'https://www.lemaire.fr/', description: 'Le vestiaire tout en fluidité de Christophe Lemaire.' },
           { title: 'The Row', url: 'https://www.therow.com/', description: 'Le minimalisme luxe des sœurs Olsen.' },
@@ -198,6 +207,7 @@ const CURATORS = [
     location: 'Copenhague, DK',
     bio: `Curateur design — objets, intérieurs et sources d’inspiration. ${DEMO_MARKER}`,
     topic: 'design',
+    avatar: '/curators/theo-design.jpg',
     projects: [
       { name: 'Objets du quotidien', description: 'Le beau qui sert tous les jours.', color: '#6A7B7A' },
       { name: 'Intérieurs de référence', description: 'Des pièces qui donnent le ton.', color: '#93AFA8' },
@@ -207,7 +217,7 @@ const CURATORS = [
         name: 'Icônes du mobilier',
         description: 'Les assises qui ont marqué le XXe siècle.',
         project: 'Intérieurs de référence',
-        withCover: true,
+        cover: '/collections/icones-du-mobilier.jpg',
         links: [
           { title: 'Egg Chair — Arne Jacobsen', url: 'https://www.fritzhansen.com/egg-chair', description: 'Le fauteuil-cocon de 1958, édité par Fritz Hansen.' },
           { title: 'Wishbone Chair — Wegner', url: 'https://www.carlhansen.com/wishbone-chair', description: 'La CH24, tressée main depuis 1950.' },
@@ -218,7 +228,7 @@ const CURATORS = [
         name: 'Objets bien dessinés',
         description: 'Petits objets, grande attention.',
         project: 'Objets du quotidien',
-        withCover: false,
+        cover: '/collections/objets-bien-dessines.jpg',
         links: [
           { title: 'Bouilloire 9093 — Michael Graves', url: 'https://www.alessi.com/9093', description: 'La bouilloire à l’oiseau siffleur, Alessi.' },
           { title: 'Lampe AJ — Arne Jacobsen', url: 'https://www.louispoulsen.com/aj-lamp', description: 'La lampe de table de 1960, Louis Poulsen.' },
@@ -229,10 +239,84 @@ const CURATORS = [
         name: 'Sources d’inspiration',
         description: 'Où je regarde pour rester curieux.',
         project: 'Objets du quotidien',
-        withCover: false,
+        cover: '/collections/sources-dinspiration.jpg',
         links: [
           { title: 'Dezeen', url: 'https://www.dezeen.com/', description: 'L’actualité mondiale de l’architecture et du design.' },
           { title: 'Sight Unseen', url: 'https://www.sightunseen.com/', description: 'Le design émergent, côté indépendant.' },
+        ],
+      },
+    ],
+  },
+  {
+    spec: 'books',
+    email: 'demo-books@curio.test',
+    username: 'curio_demo_books',
+    displayName: 'Adèle Norn',
+    location: 'Bruxelles, BE',
+    bio: `Curatrice littérature — romans qui marquent, essais qui éclairent et librairies qui comptent. ${DEMO_MARKER}`,
+    topic: 'books',
+    avatar: '/curators/adele-norn.jpg',
+    projects: [
+      { name: 'Bibliothèque idéale', description: 'Les livres qu’on relit.', color: '#8B6F47' },
+    ],
+    collections: [
+      {
+        name: 'Romans qui restent',
+        description: 'Les histoires qu’on n’oublie pas.',
+        project: 'Bibliothèque idéale',
+        cover: '/collections/romans-qui-restent.jpg',
+        links: [
+          { title: 'L’Étranger — Albert Camus', url: 'https://www.gallimard.fr/Catalogue/GALLIMARD/Folio/Folio/L-Etranger', description: 'Le roman qui a défini l’absurde.' },
+          { title: 'Beloved — Toni Morrison', url: 'https://www.penguinrandomhouse.com/books/175570/beloved-by-toni-morrison/', description: 'Prix Pulitzer, une hantise devenue classique.' },
+          { title: 'Norwegian Wood — Haruki Murakami', url: 'https://www.penguinrandomhouse.com/books/79196/norwegian-wood-by-haruki-murakami/', description: 'Le roman qui a révélé Murakami en Occident.' },
+        ],
+      },
+      {
+        name: 'Librairies du monde',
+        description: 'Les adresses qui donnent envie de lire.',
+        project: 'Bibliothèque idéale',
+        cover: '/collections/librairies-du-monde.jpg',
+        links: [
+          { title: 'Livraria Lello (Porto)', url: 'https://www.livrarialello.pt/', description: 'La librairie la plus photographiée du monde.' },
+          { title: 'Shakespeare and Company (Paris)', url: 'https://shakespeareandcompany.com/', description: 'L’institution littéraire de la rive gauche.' },
+          { title: 'El Ateneo Grand Splendid (Buenos Aires)', url: 'https://www.yenny-elateneo.com/', description: 'Une librairie installée dans un ancien théâtre.' },
+        ],
+      },
+    ],
+  },
+  {
+    spec: 'food',
+    email: 'demo-food@curio.test',
+    username: 'curio_demo_food',
+    displayName: 'Nathan Reyes',
+    location: 'Marseille, FR',
+    bio: `Curateur food — tables qui comptent, produits bien sourcés et adresses de quartier. ${DEMO_MARKER}`,
+    topic: 'food',
+    avatar: '/curators/nathan-reyes.jpg',
+    projects: [
+      { name: 'Bonnes tables', description: 'Les adresses qui valent le détour.', color: '#C1694F' },
+    ],
+    collections: [
+      {
+        name: 'Tables de quartier',
+        description: 'Les bonnes adresses du coin.',
+        project: 'Bonnes tables',
+        cover: '/collections/tables-de-quartier.jpg',
+        links: [
+          { title: 'Chez l’Épicier (Marseille)', url: 'https://www.chez-lepicier.fr/', description: 'Bistrot de quartier, produits du marché.' },
+          { title: 'La Cantinetta (Marseille)', url: 'https://www.lacantinetta.fr/', description: 'Cuisine italienne simple et généreuse.' },
+          { title: 'Le Bistrot des Voisins', url: 'https://www.lebistrotdesvoisins.fr/', description: 'La table de quartier qui ne désemplit pas.' },
+        ],
+      },
+      {
+        name: 'Produits bien sourcés',
+        description: 'Ce qu’on met dans l’assiette.',
+        project: 'Bonnes tables',
+        cover: '/collections/produits-bien-sources.jpg',
+        links: [
+          { title: 'Huile d’olive Château d’Estoublon', url: 'https://www.chateaudestoublon.com/', description: 'Huile d’olive AOP des Alpilles.' },
+          { title: 'Fromagerie Quatrehomme', url: 'https://www.cremerie-quatrehomme.fr/', description: 'Une des meilleures fromageries de Paris.' },
+          { title: 'Poissonnerie du Marché des Capucins', url: 'https://www.marchedescapucins.fr/', description: 'Poisson du jour, criée locale.' },
         ],
       },
     ],
@@ -254,69 +338,6 @@ function normalizeUrl(raw) {
   } catch {
     return raw.toLowerCase()
   }
-}
-
-/** A tiny PNG cover for the "with cover" collections. The collection-covers
- * bucket's allowed_mime_types (migration 0010) is jpeg/png/webp/avif — SVG is
- * rejected — so we hand-encode a minimal solid-colour PNG themed to the topic's
- * badge colour. No image dependency: raw PNG chunks + zlib (both Node built-ins).
- * A flat colour is enough to prove the "with cover" card path renders; the point
- * is exercising cover_image_url end to end, not artwork. Includes a soft
- * top→bottom vertical darkening so the card scrim reads naturally. */
-function coverPng(hex, w = 320, h = 240) {
-  const r0 = parseInt(hex.slice(1, 3), 16)
-  const g0 = parseInt(hex.slice(3, 5), 16)
-  const b0 = parseInt(hex.slice(5, 7), 16)
-
-  // Raw image data: each row prefixed with a filter byte (0 = none).
-  const raw = Buffer.alloc((w * 3 + 1) * h)
-  let p = 0
-  for (let y = 0; y < h; y++) {
-    raw[p++] = 0 // filter: none
-    // darken toward the bottom (0 → -35% at the last row) for a subtle gradient
-    const f = 1 - (y / h) * 0.35
-    const r = Math.round(r0 * f)
-    const g = Math.round(g0 * f)
-    const b = Math.round(b0 * f)
-    for (let x = 0; x < w; x++) {
-      raw[p++] = r
-      raw[p++] = g
-      raw[p++] = b
-    }
-  }
-
-  const chunk = (type, data) => {
-    const len = Buffer.alloc(4)
-    len.writeUInt32BE(data.length, 0)
-    const typeBuf = Buffer.from(type, 'ascii')
-    const body = Buffer.concat([typeBuf, data])
-    const crc = Buffer.alloc(4)
-    crc.writeUInt32BE(crc32(body) >>> 0, 0)
-    return Buffer.concat([len, body, crc])
-  }
-
-  const sig = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])
-  const ihdr = Buffer.alloc(13)
-  ihdr.writeUInt32BE(w, 0)
-  ihdr.writeUInt32BE(h, 4)
-  ihdr[8] = 8 // bit depth
-  ihdr[9] = 2 // colour type: truecolour (RGB)
-  ihdr[10] = 0 // compression
-  ihdr[11] = 0 // filter
-  ihdr[12] = 0 // interlace
-  const idat = deflateSync(raw)
-  return Buffer.concat([
-    sig,
-    chunk('IHDR', ihdr),
-    chunk('IDAT', idat),
-    chunk('IEND', Buffer.alloc(0)),
-  ])
-}
-
-const TOPIC_COLOR = {
-  travel: '#D9C6A6',
-  style: '#4A4550',
-  design: '#6A7B7A',
 }
 
 /** Find an existing demo auth user by email (Admin API has no getByEmail; page
@@ -368,6 +389,7 @@ async function seedCurator(c, subcatIdByLabel) {
       display_name: c.displayName,
       bio: c.bio,
       location: c.location,
+      avatar_url: c.avatar ?? null,
       is_founding_curator: true,
       onboarding_completed: true,
     })
@@ -406,24 +428,9 @@ async function seedCurator(c, subcatIdByLabel) {
 
   // 4. collections + links
   for (const col of c.collections) {
-    // cover upload (only for withCover) — under <uid>/… so RLS/purge line up
-    let coverUrl = null
-    if (col.withCover) {
-      const path = `${uid}/${col.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}.png`
-      const png = coverPng(TOPIC_COLOR[c.topic] ?? '#888888')
-      const { error: upErr2 } = await admin.storage
-        .from('collection-covers')
-        .upload(path, png, {
-          contentType: 'image/png',
-          upsert: true,
-        })
-      if (upErr2) {
-        log(`  ! cover upload failed (${col.name}): ${upErr2.message}`)
-      } else {
-        const { data: pub } = admin.storage.from('collection-covers').getPublicUrl(path)
-        coverUrl = pub.publicUrl
-      }
-    }
+    // cover: static illustrated asset under public/collections/ (2026-08-30 —
+    // no Storage upload needed, next/image serves local public/ files directly).
+    const coverUrl = col.cover ?? null
 
     // collection (idempotent on (owner_id, name))
     let collectionId
@@ -508,7 +515,7 @@ async function seedCurator(c, subcatIdByLabel) {
       })
       if (ulErr) throw new Error(`insert user_link(${l.title}) failed: ${ulErr.message}`)
     }
-    log(`    · collection "${col.name}" (${col.links.length} links)${col.withCover ? ' [cover]' : ' [fallback]'}`)
+    log(`    · collection "${col.name}" (${col.links.length} links)${col.cover ? ' [cover]' : ' [fallback]'}`)
   }
 }
 

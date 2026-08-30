@@ -1,13 +1,22 @@
 #!/usr/bin/env node
 /**
- * Assigns the 5 landing page photos as cover_image_url on the 5 demo
- * collections that appear on the landing showcase strip.
+ * ⚠️  DEPRECATED (2026-08-30) — DO NOT RUN.
  *
- * Uses local public/ paths (served by Next.js) — not Supabase Storage.
- * Idempotent: safe to re-run.
+ * This script pointed 5 demo collections at designer-mockup photos
+ * (public/landing/tokyo.jpg, food-card.jpg, etc.) that don't match those
+ * collections' actual titles/themes (e.g. a food photo on "Objets bien
+ * dessinés", a travel photo on "Maisons à suivre"). It has been fully
+ * superseded by scripts/seed-demo-curators.mjs, which now sets a themed,
+ * locally-generated illustrated cover on every demo collection (see that
+ * file's "COVERS & AVATARS" doc comment).
  *
- * Usage:  node scripts/assign-landing-covers.mjs
+ * Kept only because this sandbox's mounted filesystem can rename files but
+ * not delete them (unlink is blocked) — Jay, feel free to `git rm
+ * scripts/assign-landing-covers.mjs` on your machine, it does nothing useful
+ * anymore. The hard exit below prevents it from running by accident.
  */
+process.exit(1)
+// eslint-disable-next-line no-unreachable
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
