@@ -73,16 +73,13 @@ export default async function AboutPage({ params }: PageProps) {
         </p>
       </section>
 
-      {/* Manifesto. Was a single boxed column of left-ragged paragraphs;
-          2026-09-05 (Jay): give it an editorial two-column shape — a fixed
-          title rail + justified body copy, "les deux bords alignés" — and
-          rewrote the three paragraphs around his own framing (keep it all in
-          one place / share discoveries with friends for real inspiration,
-          hotel-tip and style-tip examples / stop being shaped by ads and
-          algorithms, be shaped by people you know again). */}
-      <section className="mx-auto w-full max-w-4xl px-lg pb-2xl">
-        <div className="flex flex-col gap-lg rounded-lg border border-border bg-foreground/[0.02] p-xl sm:p-2xl md:flex-row md:gap-2xl">
-          <h2 className="shrink-0 font-serif text-h2 text-foreground md:w-[30%]">
+      {/* Manifesto. Title sits back above the body copy as a question
+          (2026-09-05, Jay: the side-by-side title read oddly — put it back
+          on top, phrase it as a question, "pour que ce soit joli"). Body
+          stays justified, both edges aligned. */}
+      <section className="mx-auto w-full max-w-3xl px-lg pb-2xl">
+        <div className="flex flex-col gap-lg rounded-lg border border-border bg-foreground/[0.02] p-xl sm:p-2xl">
+          <h2 className="font-serif text-h2 text-foreground">
             {t('manifestoTitle')}
           </h2>
           <div
