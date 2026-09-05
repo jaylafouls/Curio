@@ -143,13 +143,15 @@
     "subtitle": "Parcourez par sujet et découvrez des collections créées par des esprits curieux.",
     "tabAll": "Tout",
     "emptyTag": "Bientôt",
-    "curatorRole": "Curateur",
     "collectionsTitle": "Explorer par collections",
     "collectionsEmptyTitle": "Pas encore de collections publiques",
     "collectionsEmptyBody": "Les collections publiques apparaîtront ici dès que les membres commenceront à partager ce qu'ils gardent.",
     "popularTitle": "Populaire sur Curio",
     "popularEmptyTitle": "La communauté ne fait que commencer",
-    "popularEmptyBody": "Les curateurs et collections populaires émergeront ici dès que Curio accueillera ses premiers membres."
+    "popularEmptyBody": "Les collections populaires émergeront ici dès que les membres commenceront à suivre ce qu'ils préfèrent.",
+    "trendingTitle": "Tendances",
+    "trendingEmptyTitle": "Aucune tendance pour l'instant",
+    "trendingEmptyBody": "Les collections qui montent en ce moment apparaîtront ici dès que l'activité récente démarrera."
   },
   "Consent": {
     "title": "Votre vie privée, votre choix",

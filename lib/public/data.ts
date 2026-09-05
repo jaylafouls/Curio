@@ -191,6 +191,154 @@ export async function getPublicCollections(
   )
 }
 
+/** Shared row shape + mapper for the two ranked queries below — same fields as
+ * getPublicCollections plus created_at (recency tie-break), factored out so
+ * "Popular" and "Trending" don't each re-normalise the owner embed. */
+type RankedRow = {
+  id: string
+  slug: string
+  name: string
+  description: string | null
+  cover_image_url: string | null
+  topic_id: string
+  links_count: number
+  created_at: string
+  owner:
+    | { display_name: string; avatar_url: string | null; username: string }
+    | { display_name: string; avatar_url: string | null; username: string }[]
+    | null
+}
+
+function mapRankedRow(row: RankedRow): PublicCollection {
+  const owner = Array.isArray(row.owner) ? row.owner[0] : row.owner
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.name,
+    topic: row.topic_id as BadgeTopic,
+    cover: row.cover_image_url,
+    description: row.description,
+    linksCount: row.links_count ?? 0,
+    owner: {
+      name: owner?.display_name ?? '',
+      avatar: owner?.avatar_url ?? null,
+      username: owner?.username ?? '',
+    },
+  }
+}
+
+async function attachMosaics(
+  collections: PublicCollection[],
+): Promise<PublicCollection[]> {
+  const coverlessIds = collections.filter((c) => !c.cover).map((c) => c.id)
+  if (coverlessIds.length === 0) return collections
+  const mosaics = await getPublicCollectionMosaics(coverlessIds)
+  return collections.map((c) => (c.cover ? c : { ...c, mosaic: mosaics[c.id] }))
+}
+
+const RANKED_SELECT =
+  'id, slug, name, description, cover_image_url, topic_id, links_count, created_at, ' +
+  'owner:users!collections_owner_id_fkey (display_name, avatar_url, username)'
+
+/**
+ * "Populaire sur Curio" (/explore): public collections ranked by ALL-TIME
+ * follower count (collection_follows — the real "follow this collection"
+ * signal, world-readable under collection_follows_select_public), then
+ * recency. Same mechanism already resolved for Home's Trending tab (spec
+ * §8.2, Decisions Log §15) — reused here through the anon client since
+ * /explore has no session. Reads a recent window then ranks in memory
+ * (honest about the count rather than approximating it — correct while the
+ * corpus is small, per lib/home/data.ts's getTrendingFeed).
+ */
+export async function getPublicPopularCollections(
+  limit = 8,
+  window = 100,
+): Promise<PublicCollection[]> {
+  const supabase = anonClient()
+
+  const { data, error } = await supabase
+    .from('collections')
+    .select(`${RANKED_SELECT}, collection_follows (count)`)
+    .eq('is_public', true)
+    .order('created_at', { ascending: false })
+    .limit(window)
+
+  if (error) {
+    console.error('public: failed to load popular collections', {
+      message: error.message,
+    })
+    return []
+  }
+
+  type Row = RankedRow & { collection_follows: { count: number }[] | null }
+  const ranked = ((data ?? []) as unknown as Row[])
+    .filter((row) => isBadgeTopic(row.topic_id))
+    .map((row) => ({
+      collection: mapRankedRow(row),
+      followers: row.collection_follows?.[0]?.count ?? 0,
+    }))
+    .sort((a, b) => b.followers - a.followers)
+    .slice(0, limit)
+    .map((r) => r.collection)
+
+  return attachMosaics(ranked)
+}
+
+/**
+ * "Tendances" (/explore): public collections ranked by RECENT follower count
+ * — collection_follows created within the last `days` days — then recency.
+ * A genuinely distinct, real signal from "Populaire" (all-time count), not a
+ * relabeled duplicate: collection_follows.created_at already exists, so this
+ * needs no new schema. Per-collection count queries run in parallel over the
+ * anon client (same explicit-count-per-row style as getPublicTopics above) —
+ * simpler and more honest than approximating with a filtered embed.
+ */
+export async function getPublicTrendingCollections(
+  limit = 8,
+  days = 14,
+  window = 100,
+): Promise<PublicCollection[]> {
+  const supabase = anonClient()
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
+
+  const { data, error } = await supabase
+    .from('collections')
+    .select(RANKED_SELECT)
+    .eq('is_public', true)
+    .order('created_at', { ascending: false })
+    .limit(window)
+
+  if (error) {
+    console.error('public: failed to load trending collections', {
+      message: error.message,
+    })
+    return []
+  }
+
+  const rows = ((data ?? []) as unknown as RankedRow[]).filter((row) =>
+    isBadgeTopic(row.topic_id),
+  )
+
+  const recentFollows = await Promise.all(
+    rows.map(async (row) => {
+      const { count } = await supabase
+        .from('collection_follows')
+        .select('id', { count: 'exact', head: true })
+        .eq('collection_id', row.id)
+        .gte('created_at', since)
+      return count ?? 0
+    }),
+  )
+
+  const ranked = rows
+    .map((row, i) => ({ collection: mapRankedRow(row), recent: recentFollows[i] }))
+    .sort((a, b) => b.recent - a.recent)
+    .slice(0, limit)
+    .map((r) => r.collection)
+
+  return attachMosaics(ranked)
+}
+
 // ── Public curators (curators page) ─────────────────────────────────────────
 
 export type PublicCurator = {

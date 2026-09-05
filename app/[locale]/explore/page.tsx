@@ -8,15 +8,21 @@ import { PublicShell } from '@/components/public/public-shell'
 import {
   getPublicTopics,
   getPublicCollections,
-  getPublicCurators,
+  getPublicPopularCollections,
+  getPublicTrendingCollections,
 } from '@/lib/public/data'
 import { ExploreClient } from './explore-client'
 
 /**
- * /[locale]/explore — public discovery feed (spec §8.3). Topic tabs over the
- * three feed sections (New & noteworthy / Explore by collections / Popular on
- * Curio). All data is anon-visible and empty today; the page renders its
- * designed empty states with no fake seeding. generateMetadata per brief rule 1.
+ * /[locale]/explore — public discovery feed (spec §8.3). Three sections, in
+ * order: Populaire (all-time collection_follows) → Tendances (collection_follows
+ * in the last 14 days) → Explorer par collections (the full topic-tab browse).
+ * 2026-09-05: Populaire/Tendances used to show CURATOR cards under a
+ * "Popular on Curio" heading — a leftover from before collection_follows
+ * existed as a signal; both now rank real public COLLECTIONS, matching the
+ * mechanism already resolved for Home's Trending tab (Decisions Log §15).
+ * All data is anon-visible; empty states render with no fake seeding.
+ * generateMetadata per brief rule 1.
  */
 type PageProps = { params: Promise<{ locale: Locale }> }
 
@@ -40,10 +46,11 @@ export default async function ExplorePage({ params }: PageProps) {
   setRequestLocale(locale)
 
   const t = await getTranslations({ locale, namespace: 'Explore' })
-  const [topics, collections, curators] = await Promise.all([
+  const [topics, collections, popular, trending] = await Promise.all([
     getPublicTopics(locale),
     getPublicCollections(24),
-    getPublicCurators(6),
+    getPublicPopularCollections(8),
+    getPublicTrendingCollections(8),
   ])
 
   // The page content, rendered once. It's handed to PublicConnectedShell twice:
@@ -66,7 +73,8 @@ export default async function ExplorePage({ params }: PageProps) {
       <ExploreClient
         topics={topics}
         collections={collections}
-        curators={curators}
+        popular={popular}
+        trending={trending}
       />
     </section>
   )

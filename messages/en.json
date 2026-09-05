@@ -143,13 +143,15 @@
     "subtitle": "Browse by topic and discover collections built by curious minds.",
     "tabAll": "All",
     "emptyTag": "Coming soon",
-    "curatorRole": "Curator",
     "collectionsTitle": "Explore by collections",
     "collectionsEmptyTitle": "No public collections yet",
     "collectionsEmptyBody": "Public collections will appear here as people start sharing what they keep.",
     "popularTitle": "Popular on Curio",
     "popularEmptyTitle": "The community is just getting started",
-    "popularEmptyBody": "Popular curators and collections will rise here once Curio opens to its first members."
+    "popularEmptyBody": "Popular collections will rise here once people start following what they love.",
+    "trendingTitle": "Trending",
+    "trendingEmptyTitle": "Nothing trending yet",
+    "trendingEmptyBody": "Collections on the rise right now will appear here once recent activity picks up."
   },
   "Consent": {
     "title": "Your privacy, your choice",
