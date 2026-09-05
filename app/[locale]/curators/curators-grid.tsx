@@ -42,7 +42,7 @@ export function CuratorsGrid({
         <Tabs items={tabs} value={topic} onValueChange={setTopic} variant="pill" />
       </div>
 
-      <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-lg sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {curators.map((c) => (
           <CuratorCard
             key={c.id}
