@@ -97,9 +97,12 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
   const signupHref =
     tokenState === 'valid' ? `/signup?token=${token}` : '/signup'
 
-  const collections = await getPublicCollections(5)
+  // 4 items + 4 columns on both strips below (was 5): matches /explore's
+  // and /curators' column count exactly, so a vignette here is the same
+  // width as on those pages, not just the same style (2026-09-05, Jay).
+  const collections = await getPublicCollections(4)
   const socialProofCurators = await getPublicCurators(4)
-  const featuredCurators = await getPublicCurators(3)
+  const featuredCurators = await getPublicCurators(4)
   const allTopics = await getPublicTopics(locale)
 
   // Join the fixed 6-node ring layout to real topic rows (label/icon come
@@ -420,7 +423,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               so this now matches it exactly, `compact` sized site-wide. */}
           {collections.length > 0 ? (
             <div className="relative flex-1">
-              <div className="grid grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-4">
                 {collections.map((col) => (
                   <Link
                     key={col.id}
@@ -494,7 +497,7 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
               duplicating it under Landing). */}
           {featuredCurators.length > 0 ? (
             <div className="relative flex-1">
-              <div className="grid grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-4">
                 {featuredCurators.map((curator) => (
                   <Link
                     key={curator.id}
