@@ -46,6 +46,7 @@ export function CuratorsGrid({
         {curators.map((c) => (
           <CuratorCard
             key={c.id}
+            compact
             name={c.displayName}
             // Neutral brand tint for the "Curator" role badge — curators carry
             // no primary Topic yet, so this is a role colour, not a category

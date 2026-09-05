@@ -23,6 +23,14 @@ import { Badge, type BadgeTopic } from './badge'
  *
  * CuratorCard (Curators list, "Curators you follow"): avatar, name, role badge,
  * short bio, and a follower count with a follow action slot.
+ *
+ * 2026-09-05 (Jay): vignette sizes had drifted across pages (landing/explore/
+ * curators/my space each a bit different) — `compact` is now the standard for
+ * both card types on every page. Landing + Explore + Curators additionally
+ * share the exact same `below` (split cover/panel) shape, which Jay prefers
+ * over `overlay`'s text-on-photo look for these browsing surfaces. `overlay`
+ * remains for Home's "Picked for you" feed (its own established pattern, not
+ * revisited here) — same `compact` sizing, different shape.
  */
 
 export type CollectionCardVariant = 'below' | 'overlay'
@@ -44,9 +52,11 @@ export interface CollectionCardProps {
   /** Short teaser line, shown under the title in the `overlay` variant only. */
   description?: string
   /**
-   * Smaller title/description type scale for tight layouts (e.g. a 5-across
-   * strip) without shrinking the badge or owner row, which already read fine
-   * at any card size. `overlay` variant only.
+   * Smaller title/owner/count type scale + tighter panel padding, without
+   * shrinking the badge (or the description in `overlay`), which already read
+   * fine at any card size. This is now the site-wide default size (2026-09-05,
+   * Jay: standardise vignette size/style across every page) — both variants
+   * honor it.
    */
   compact?: boolean
   className?: string
@@ -217,20 +227,35 @@ export function CollectionCard({
           <Badge topic={topic} variant="solid" />
         </div>
       </div>
-      <div className="flex flex-col gap-xs p-sm">
+      <div className={cn('flex flex-col', compact ? 'gap-xs p-xs' : 'gap-xs p-sm')}>
         {/* DM Serif Display, size-only hierarchy (§2.1). Mode-aware text. */}
-        <h3 className="font-serif text-h3 leading-tight text-foreground">
+        <h3
+          className={cn(
+            'font-serif leading-tight text-foreground',
+            compact ? 'text-[17px]' : 'text-h3',
+          )}
+        >
           {title}
         </h3>
         <div className="mt-xs flex items-center justify-between">
           <div className="flex items-center gap-sm">
             <Avatar src={owner.avatar} name={owner.name} size="sm" />
-            <span className="font-sans text-meta text-foreground/70">
+            <span
+              className={cn(
+                'font-sans text-foreground/70',
+                compact ? 'text-[11px]' : 'text-meta',
+              )}
+            >
               {owner.name}
             </span>
           </div>
-          <span className="flex items-center gap-xs font-sans text-meta text-foreground/60">
-            <Bookmark className="size-3.5" strokeWidth={2} aria-hidden />
+          <span
+            className={cn(
+              'flex items-center gap-xs font-sans text-foreground/60',
+              compact ? 'text-[11px]' : 'text-meta',
+            )}
+          >
+            <Bookmark className={compact ? 'size-3' : 'size-3.5'} strokeWidth={2} aria-hidden />
             {linksCount}
           </span>
         </div>

@@ -189,6 +189,7 @@ export function ProjectDetailClient({
                 className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
               >
                 <CollectionCard
+                  compact
                   title={c.title}
                   topic={c.topic}
                   cover={c.cover ?? undefined}

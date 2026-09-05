@@ -412,10 +412,12 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
           </div>
 
           {/* Right: real public collections (empty today → empty state).
-              Same CollectionCard (variant="overlay") as Home's "Picked for
-              you" — badge, title, description, owner avatar + name, save
+              Same CollectionCard (default `below` variant) as /explore —
+              split cover/panel shape, badge, title, owner avatar + name, save
               count — so a collection reads identically everywhere instead of
-              the landing having its own stripped-down look (2026-08-27). */}
+              the landing having its own look. Was `variant="overlay"` (text
+              on photo) until 2026-09-05: Jay prefers Explore's split shape,
+              so this now matches it exactly, `compact` sized site-wide. */}
           {collections.length > 0 ? (
             <div className="relative flex-1">
               <div className="grid grid-cols-2 gap-sm sm:grid-cols-3 lg:grid-cols-5">
@@ -426,13 +428,11 @@ export default async function LandingPage({ params, searchParams }: PageProps) {
                     className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
                   >
                     <CollectionCard
-                      variant="overlay"
                       compact
                       title={col.title}
                       topic={col.topic}
                       cover={col.cover ?? undefined}
                       mosaic={col.mosaic}
-                      description={col.description ?? undefined}
                       owner={{
                         name: col.owner.name,
                         avatar: col.owner.avatar ?? undefined,

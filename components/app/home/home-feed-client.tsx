@@ -140,6 +140,7 @@ export function HomeFeedClient({
                 >
                   <CollectionCard
                     variant="overlay"
+                    compact
                     title={c.title}
                     topic={c.topic}
                     cover={c.cover ?? undefined}

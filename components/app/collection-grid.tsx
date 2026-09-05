@@ -8,7 +8,8 @@ import type { AppCollection } from '@/lib/app/data'
  * (§8.10). Each card links to the public collection page /collections/[slug].
  *
  * linksCount is the real trigger-maintained count (collections.links_count,
- * chantier 10 migration 0010).
+ * chantier 10 migration 0010). `compact` (2026-09-05, Jay) is the site-wide
+ * standard vignette size now — matches Landing/Explore/Curators.
  */
 export function CollectionGrid({
   collections,
@@ -24,6 +25,7 @@ export function CollectionGrid({
             className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet focus-visible:ring-offset-2"
           >
             <CollectionCard
+              compact
               title={c.title}
               topic={c.topic}
               cover={c.cover ?? undefined}
